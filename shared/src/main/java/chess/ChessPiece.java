@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -11,7 +12,13 @@ import java.util.List;
  */
 public class ChessPiece {
 
+    private final ChessGame.TeamColor COLOR;
+    private final PieceType TYPE;
+    private ArrayList<ChessMove> possibleMoves = new ArrayList<ChessMove>();
+
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+        COLOR = pieceColor;
+        TYPE = type;
     }
 
     /**
@@ -30,14 +37,14 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        throw new RuntimeException("Not implemented");
+        return COLOR;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        throw new RuntimeException("Not implemented");
+        return TYPE;
     }
 
     /**
@@ -48,6 +55,26 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return List.of();
+        PieceType piece = board.getPiece(myPosition).getPieceType();
+        possibleMoves = switch (piece) {
+            case KNIGHT -> {
+                ArrayList<ChessMove> knightMoves = new ArrayList<ChessMove>();
+                //directionList = {UP_RIGHT_L, UP_LEFT_L, LEFT_UP_L, LEFT_DOWN_L, DOWN_LEFT_L, DOWN_RIGHT_L, RIGHT_DOWN_L, RIGHT_UP_L};
+                //for (int[] direction : directionList) {
+                    //ChessPosition newPosition = getNewPosition(direction, myPosition);
+                    //if (!isOccupied(newPosition) || isEnemyPiece(newPosition)) {
+                        //ChessMove newMove = ChessMove(myPosition, newPosition, null);
+                        //knightMoves.add(newMove);
+                    //}
+                //}
+                yield knightMoves;
+            }
+            default -> {
+                yield possibleMoves;
+            }
+        };
+        return possibleMoves;
     }
+
+
 }
