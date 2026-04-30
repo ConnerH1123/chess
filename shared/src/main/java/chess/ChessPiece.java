@@ -16,6 +16,16 @@ public class ChessPiece {
     private final PieceType TYPE;
     private ArrayList<ChessMove> possibleMoves = new ArrayList<ChessMove>();
 
+    //Array int pairs that have the horizontal and vertical transformation (i.e. [x,y])
+    private final int[] UP_RIGHT_L = {1,2};
+    private final int[] UP_LEFT_L = {-1,2};
+    private final int[] LEFT_UP_L = {-2,1};
+    private final int[] LEFT_DOWN_L = {-2,-1};
+    private final int[] DOWN_LEFT_L = {-2,-1};
+    private final int[] DOWN_RIGHT_L = {-2,1};
+    private final int[] RIGHT_DOWN_L = {2,-1};
+    private final int[] RIGHT_UP_L = {2,1};
+
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         COLOR = pieceColor;
         TYPE = type;
