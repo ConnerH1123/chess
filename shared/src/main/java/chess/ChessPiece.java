@@ -74,6 +74,12 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         possibleMoves = switch (TYPE) {
+            case QUEEN -> {
+                ArrayList<ChessMove> queenMoves = new ArrayList<>();
+                int[][] directionList = {UP, DOWN, LEFT, RIGHT, UP_LEFT_DIAG, UP_RIGHT_DIAG, DOWN_RIGHT_DIAG, DOWN_LEFT_DIAG};
+                moveUntilStopped(board, myPosition, directionList, queenMoves);
+                yield queenMoves;
+            }
             case ROOK -> {
                 ArrayList<ChessMove> rookMoves = new ArrayList<>();
                 int[][] directionList = {UP, DOWN, LEFT, RIGHT};
