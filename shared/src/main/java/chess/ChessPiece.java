@@ -19,6 +19,8 @@ public class ChessPiece {
     //Array int pairs that have the horizontal and vertical transformation (i.e. [x,y])
     private final int[] UP = {0,1};
     private final int[] DOWN = {0,-1};
+    private final int[] LEFT = {-1,0};
+    private final int[] RIGHT = {1,0};
     private final int[] UP_LEFT_DIAG = {-1,1};
     private final int[] UP_RIGHT_DIAG = {1,1};
     private final int[] DOWN_LEFT_DIAG = {-1,-1};
@@ -72,6 +74,12 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         possibleMoves = switch (TYPE) {
+            case ROOK -> {
+                ArrayList<ChessMove> rookMoves = new ArrayList<>();
+                int[][] directionList = {UP, DOWN, LEFT, RIGHT};
+                moveUntilStopped(board, myPosition, directionList, rookMoves);
+                yield rookMoves;
+            }
             case BISHOP -> {
                 ArrayList<ChessMove> bishopMoves = new ArrayList<>();
                 int[][] directionList = {UP_LEFT_DIAG, UP_RIGHT_DIAG, DOWN_RIGHT_DIAG, DOWN_LEFT_DIAG};
