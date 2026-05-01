@@ -56,13 +56,13 @@ public class ChessBoard {
         ChessPiece.PieceType knight = ChessPiece.PieceType.KNIGHT;
         ChessPiece.PieceType pawn = ChessPiece.PieceType.PAWN;
 
-        ChessPiece[] whitePieces = {new ChessPiece(white,rook), new ChessPiece(white,knight), new ChessPiece(white,bishop), new ChessPiece(white,king), new ChessPiece(white,queen), new ChessPiece(white,bishop), new ChessPiece(white,knight), new ChessPiece(white,rook), new ChessPiece(white,pawn), new ChessPiece(white,pawn), new ChessPiece(white,pawn), new ChessPiece(white,pawn), new ChessPiece(white,pawn), new ChessPiece(white,pawn), new ChessPiece(white,pawn), new ChessPiece(white,pawn)};
+        ChessPiece[] whitePieces = {new ChessPiece(white,rook), new ChessPiece(white,knight), new ChessPiece(white,bishop), new ChessPiece(white,queen), new ChessPiece(white,king), new ChessPiece(white,bishop), new ChessPiece(white,knight), new ChessPiece(white,rook), new ChessPiece(white,pawn), new ChessPiece(white,pawn), new ChessPiece(white,pawn), new ChessPiece(white,pawn), new ChessPiece(white,pawn), new ChessPiece(white,pawn), new ChessPiece(white,pawn), new ChessPiece(white,pawn)};
         for (int i = 0; i < 16; i++) {
             ChessPosition position = new ChessPosition((i/8)+1, (i%8)+1);
             addPiece(position, whitePieces[i]);
         }
 
-        ChessPiece[] blackPieces = {new ChessPiece(black,pawn), new ChessPiece(black,pawn), new ChessPiece(black,pawn), new ChessPiece(black,pawn), new ChessPiece(black,pawn), new ChessPiece(black,pawn), new ChessPiece(black,pawn), new ChessPiece(black,pawn), new ChessPiece(black,rook), new ChessPiece(black,knight), new ChessPiece(black,bishop), new ChessPiece(black,king), new ChessPiece(black,queen), new ChessPiece(black,bishop), new ChessPiece(black,knight), new ChessPiece(black,rook)};
+        ChessPiece[] blackPieces = {new ChessPiece(black,pawn), new ChessPiece(black,pawn), new ChessPiece(black,pawn), new ChessPiece(black,pawn), new ChessPiece(black,pawn), new ChessPiece(black,pawn), new ChessPiece(black,pawn), new ChessPiece(black,pawn), new ChessPiece(black,rook), new ChessPiece(black,knight), new ChessPiece(black,bishop), new ChessPiece(black,queen), new ChessPiece(black,king), new ChessPiece(black,bishop), new ChessPiece(black,knight), new ChessPiece(black,rook)};
         for (int i = 0; i < 16; i++) {
             ChessPosition position = new ChessPosition((i/8)+7, (i%8)+1);
             addPiece(position, blackPieces[i]);
