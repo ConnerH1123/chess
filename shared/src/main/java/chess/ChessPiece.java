@@ -145,7 +145,7 @@ public class ChessPiece {
     }
 
     private void pawnPromotionMovement(ChessPosition currentPosition, ChessPosition newPosition, ArrayList<ChessMove> moves) {
-        if (isPromotionRank(currentPosition)) {
+        if (isPromotionRank(newPosition)) {
             PieceType[] possiblePieces = {PieceType.QUEEN, PieceType.ROOK, PieceType.BISHOP, PieceType.KNIGHT};
             for (PieceType piece : possiblePieces) {
                 ChessMove newMove = new ChessMove(currentPosition, newPosition, piece);
@@ -191,7 +191,7 @@ public class ChessPiece {
         for (int[] direction : directionList) {
             ChessPosition newPosition = getNewPosition(direction, currentPosition);
             if (isEnemyPiece(board, newPosition)) {
-                pawnPromotionMovement(currentPosition, newPosition,moves);
+                pawnPromotionMovement(currentPosition, newPosition, moves);
             }
         }
     }
