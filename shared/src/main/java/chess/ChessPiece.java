@@ -112,7 +112,6 @@ public class ChessPiece {
                 pawnCaptureMovement(board, myPosition, pawnMoves);
                 yield pawnMoves;
             }
-            default -> possibleMoves;
         };
         return possibleMoves;
     }
