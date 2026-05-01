@@ -124,12 +124,18 @@ public class ChessPiece {
         return new ChessPosition(newRow, newCol);
     }
 
+    /**
+     * Returns true if position is within the board limits
+     */
     private boolean isInBounds(ChessPosition position) {
         int row = position.getRow();
         int col = position.getColumn();
         return (row <= 8 && row >= 1 && col <= 8 && col >= 1);
     }
 
+    /**
+     * Returns true if given square is empty
+     */
     private boolean isEmpty(ChessBoard board, ChessPosition position) {
         if (isInBounds(position)) {
             return board.getPiece(position) == null;
@@ -137,6 +143,9 @@ public class ChessPiece {
         return false;
     }
 
+    /**
+     * Returns true if given square contains enemy piece
+     */
     private boolean isEnemyPiece(ChessBoard board, ChessPosition position) {
         if (isInBounds(position)) {
             ChessPiece piece = board.getPiece(position);
@@ -145,6 +154,9 @@ public class ChessPiece {
         return false;
     }
 
+    /**
+     * Given an array of directions, updates possible moves to include one step per direction (if possible)
+     */
     private void moveOnePerDirection(ChessBoard board, ChessPosition currentPosition, int[][] directionList, ArrayList<ChessMove> moves) {
         for (int[] direction : directionList) {
             ChessPosition newPosition = getNewPosition(direction, currentPosition);
@@ -155,6 +167,9 @@ public class ChessPiece {
         }
     }
 
+    /**
+     * Helper rec for moveUntilStopped
+     */
     private void moveUntilStoppedRec(ChessBoard board, ChessPosition OGposition, ChessPosition currentPosition, int[] direction, ArrayList<ChessMove> moves) {
         ChessPosition newPosition = getNewPosition(direction, currentPosition);
         if (isEnemyPiece(board, newPosition)) {
@@ -168,12 +183,18 @@ public class ChessPiece {
         }
     }
 
+    /**
+     * Given an array of directions, updates moves to include all possible movements per direction
+     */
     private void moveUntilStopped(ChessBoard board, ChessPosition position, int[][] directionList, ArrayList<ChessMove> moves) {
         for (int[] direction : directionList) {
             moveUntilStoppedRec(board, position, position, direction, moves);
         }
     }
 
+    /**
+     * e.g. if PAWN is BLACK direction is DOWN
+     */
     private int[] getPawnDirection() {
         return switch (COLOR) {
             case WHITE -> UP;
@@ -181,6 +202,9 @@ public class ChessPiece {
         };
     }
 
+    /**
+     * e.g. returns true if PAWN is BLACK and on the 1st rank
+     */
     private boolean isPromotionRank(ChessPosition position) {
         return switch (COLOR) {
             case WHITE -> position.getRow() == 8;
@@ -188,6 +212,9 @@ public class ChessPiece {
         };
     }
 
+    /**
+     * Given a valid pawn movement, will promote pawn if applicable
+     */
     private void pawnPromotionMovement(ChessPosition currentPosition, ChessPosition newPosition, ArrayList<ChessMove> moves) {
         if (isPromotionRank(newPosition)) {
             PieceType[] possiblePieces = {PieceType.QUEEN, PieceType.ROOK, PieceType.BISHOP, PieceType.KNIGHT};
@@ -202,6 +229,9 @@ public class ChessPiece {
         }
     }
 
+    /**
+     * Adds forward pawn movement to movement list
+     */
     private void normalPawnMovement(ChessBoard board, ChessPosition currentPosition, int[] direction, ArrayList<ChessMove> moves) {
         ChessPosition newPosition = getNewPosition(direction, currentPosition);
         if (isEmpty(board, newPosition)) {
@@ -209,6 +239,9 @@ public class ChessPiece {
         }
     }
 
+    /**
+     * Returns true if PAWN is BLACK and on the 7th rank
+     */
     private boolean isInitialPawnSquare(ChessPosition position) {
         return switch (COLOR) {
             case WHITE -> position.getRow() == 2;
@@ -216,6 +249,9 @@ public class ChessPiece {
         };
     }
 
+    /**
+     * Adds a double forward pawn movement if applicable
+     */
     private void initialPawnMovement(ChessBoard board, ChessPosition currentPosition, int[] direction, ArrayList<ChessMove> moves) {
         if (isInitialPawnSquare(currentPosition)) {
             ChessPosition tempPosition = getNewPosition(direction, currentPosition);
@@ -227,6 +263,9 @@ public class ChessPiece {
         }
     }
 
+    /**
+     * Adds a diagonal pawn movement if applicable
+     */
     private void pawnCaptureMovement(ChessBoard board, ChessPosition currentPosition, ArrayList<ChessMove> moves) {
         int[][] directionList = switch (COLOR) {
             case WHITE -> new int[][]{UP_LEFT_DIAG, UP_RIGHT_DIAG};
