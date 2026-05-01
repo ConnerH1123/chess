@@ -14,10 +14,12 @@ public class ChessPiece {
 
     private final ChessGame.TeamColor COLOR;
     private final PieceType TYPE;
-    private ArrayList<ChessMove> possibleMoves = new ArrayList<ChessMove>();
+    private ArrayList<ChessMove> possibleMoves = new ArrayList<>();
 
     //Array int pairs that have the horizontal and vertical transformation (i.e. [x,y])
     private final int[] UP = {0,1};
+    private final int[] UP_LEFT_DIAG = {-1,1};
+    private final int[] UP_RIGHT_DIAG = {1,1};
     private final int[] UP_RIGHT_L = {1,2};
     private final int[] UP_LEFT_L = {-1,2};
     private final int[] LEFT_UP_L = {-2,1};
@@ -67,21 +69,21 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        PieceType piece = board.getPiece(myPosition).getPieceType();
-        possibleMoves = switch (piece) {
+//        PieceType piece = board.getPiece(myPosition).getPieceType();
+        possibleMoves = switch (TYPE) {
             case KNIGHT -> {
                 ArrayList<ChessMove> knightMoves = new ArrayList<>();
                 int[][] directionList = {UP_RIGHT_L, UP_LEFT_L, LEFT_UP_L, LEFT_DOWN_L, DOWN_LEFT_L, DOWN_RIGHT_L, RIGHT_DOWN_L, RIGHT_UP_L};
                 moveOnePerDirection(board, myPosition, directionList, knightMoves);
                 yield knightMoves;
             }
-//            case PAWN -> {
-//                ArrayList<ChessMove> pawnMoves = new ArrayList<>();
-//                normalPawnMovement(board, position, pawnMoves);
-//                pawnCaptureMovement(board, position, COLOR, pawnMoves);
-//                initialPawnMovement(board, position, COLOR, pawnMoves));
-//                yield pawnMoves;
-//            }
+            case PAWN -> {
+                ArrayList<ChessMove> pawnMoves = new ArrayList<>();
+                normalPawnMovement(board, myPosition, pawnMoves);
+                initialPawnMovement(board, myPosition, pawnMoves);
+                pawnCaptureMovement(board, myPosition, pawnMoves);
+                yield pawnMoves;
+            }
             default -> possibleMoves;
         };
         return possibleMoves;
@@ -111,12 +113,12 @@ public class ChessPiece {
     private boolean isEnemyPiece(ChessBoard board, ChessPosition position) {
         if (isInBounds(position)) {
             ChessPiece piece = board.getPiece(position);
-            return piece.getTeamColor() != COLOR;
+            return (piece != null && piece.getTeamColor() != COLOR);
         }
         return false;
     }
 
-    public void moveOnePerDirection(ChessBoard board, ChessPosition currentPosition, int[][] directionList, ArrayList<ChessMove> moves) {
+    private void moveOnePerDirection(ChessBoard board, ChessPosition currentPosition, int[][] directionList, ArrayList<ChessMove> moves) {
         for (int[] direction : directionList) {
             ChessPosition newPosition = getNewPosition(direction, currentPosition);
             if (isEmpty(board, newPosition) || isEnemyPiece(board, newPosition)) {
@@ -126,17 +128,39 @@ public class ChessPiece {
         }
     }
 
-    public void normalPawnMovement(ChessBoard board, ChessPosition position, ArrayList<ChessMove> moves) {
+    private void normalPawnMovement(ChessBoard board, ChessPosition position, ArrayList<ChessMove> moves) {
         int[][] directionList = {UP};
         moveOnePerDirection(board, position, directionList, moves);
     }
 
-//    public void initialPawnMovement(ChessBoard board, ChessPosition position, ArrayList<ChessMove> moves) {
-//        if (isInitalPawnSquare()) {
-//            int[][] directionList = {DOUBLE_UP};
-//            moveOnePerDirection(board, position, directionList, moves);
-//        }
-//    }
+    private boolean isInitialPawnSquare(ChessPosition position) {
+        return switch (COLOR) {
+            case WHITE -> {
+                yield position.getRow() == 2;
+            }
+            case BLACK -> {
+                yield position.getRow() == 7;
+            }
+        };
+    }
+
+    private void initialPawnMovement(ChessBoard board, ChessPosition position, ArrayList<ChessMove> moves) {
+        if (isInitialPawnSquare(position)) {
+            int[][] directionList = {DOUBLE_UP};
+            moveOnePerDirection(board, position, directionList, moves);
+        }
+    }
+
+    private void pawnCaptureMovement(ChessBoard board, ChessPosition currentPosition, ArrayList<ChessMove> moves) {
+        int[][] directionList = {UP_LEFT_DIAG, UP_RIGHT_DIAG};
+        for (int[] direction : directionList) {
+            ChessPosition newPosition = getNewPosition(direction, currentPosition);
+            if (isEnemyPiece(board, newPosition)) {
+                ChessMove newMove = new ChessMove(currentPosition, newPosition, null);
+                moves.add(newMove);
+            }
+        }
+    }
 
 
     @Override
