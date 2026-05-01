@@ -72,12 +72,12 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         possibleMoves = switch (TYPE) {
-//            case BISHOP {
-//                ArrayList<ChessMove> bishopMoves = new ArrayList<>();
-//                int[][] directionList = {UP_LEFT_DIAG, UP_RIGHT_DIAG, DOWN_RIGHT_DIAG, DOWN_LEFT_DIAG};
-//                moveUntilStopped(board, myPosition, directionList, knightMoves)
-//                yield bishopMoves;
-//            }
+            case BISHOP -> {
+                ArrayList<ChessMove> bishopMoves = new ArrayList<>();
+                int[][] directionList = {UP_LEFT_DIAG, UP_RIGHT_DIAG, DOWN_RIGHT_DIAG, DOWN_LEFT_DIAG};
+                moveUntilStopped(board, myPosition, directionList, bishopMoves);
+                yield bishopMoves;
+            }
             case KNIGHT -> {
                 ArrayList<ChessMove> knightMoves = new ArrayList<>();
                 int[][] directionList = {UP_RIGHT_L, UP_LEFT_L, LEFT_UP_L, LEFT_DOWN_L, DOWN_LEFT_L, DOWN_RIGHT_L, RIGHT_DOWN_L, RIGHT_UP_L};
@@ -133,6 +133,25 @@ public class ChessPiece {
                 ChessMove newMove = new ChessMove(currentPosition, newPosition, null);
                 moves.add(newMove);
             }
+        }
+    }
+
+    private void moveUntilStoppedRec(ChessBoard board, ChessPosition position, int[] direction, ArrayList<ChessMove> moves) {
+        ChessPosition newPosition = getNewPosition(direction, position);
+        if (isEnemyPiece(board, newPosition)) {
+            ChessMove newMove = new ChessMove(position, newPosition, null);
+            moves.add(newMove);
+        }
+        else if (isEmpty(board, newPosition)) {
+            ChessMove newMove = new ChessMove(position, newPosition, null);
+            moves.add(newMove);
+            moveUntilStoppedRec(board, newPosition, direction, moves);
+        }
+    }
+
+    private void moveUntilStopped(ChessBoard board, ChessPosition position, int[][] directionList, ArrayList<ChessMove> moves) {
+        for (int[] direction : directionList) {
+            moveUntilStoppedRec(board, position, direction, moves);
         }
     }
 
@@ -201,7 +220,6 @@ public class ChessPiece {
             }
         }
     }
-
 
     @Override
     public boolean equals(Object o) {
