@@ -18,8 +18,11 @@ public class ChessPiece {
 
     //Array int pairs that have the horizontal and vertical transformation (i.e. [x,y])
     private final int[] UP = {0,1};
+    private final int[] DOWN = {0,-1};
     private final int[] UP_LEFT_DIAG = {-1,1};
     private final int[] UP_RIGHT_DIAG = {1,1};
+    private final int[] DOWN_LEFT_DIAG = {-1,-1};
+    private final int[] DOWN_RIGHT_DIAG = {1,-1};
     private final int[] UP_RIGHT_L = {1,2};
     private final int[] UP_LEFT_L = {-1,2};
     private final int[] LEFT_UP_L = {-2,1};
@@ -28,7 +31,6 @@ public class ChessPiece {
     private final int[] DOWN_RIGHT_L = {1,-2};
     private final int[] RIGHT_DOWN_L = {2,-1};
     private final int[] RIGHT_UP_L = {2,1};
-    private final int[] DOUBLE_UP = {0,2};
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         COLOR = pieceColor;
@@ -78,10 +80,10 @@ public class ChessPiece {
             }
             case PAWN -> {
                 ArrayList<ChessMove> pawnMoves = new ArrayList<>();
-                // Gotta keep track of moving black versus white
-                normalPawnMovement(board, myPosition, pawnMoves);
-                initialPawnMovement(board, myPosition, pawnMoves);
-                pawnCaptureMovement(board, myPosition, pawnMoves);
+                int[] direction = getPawnDirection();
+                normalPawnMovement(board, myPosition, direction, pawnMoves);
+                initialPawnMovement(board, myPosition, direction, pawnMoves);
+                pawnCaptureMovement(board, myPosition, direction, pawnMoves);
                 yield pawnMoves;
             }
             default -> possibleMoves;
@@ -128,6 +130,13 @@ public class ChessPiece {
         }
     }
 
+    private int[] getPawnDirection() {
+        return switch (COLOR) {
+            case WHITE -> UP;
+            case BLACK -> DOWN;
+        };
+    }
+
     private boolean isPromotionRank(ChessPosition position) {
         return switch (COLOR) {
             case WHITE -> position.getRow() == 8;
@@ -149,8 +158,8 @@ public class ChessPiece {
         }
     }
 
-    private void normalPawnMovement(ChessBoard board, ChessPosition currentPosition, ArrayList<ChessMove> moves) {
-        ChessPosition newPosition = getNewPosition(UP, currentPosition);
+    private void normalPawnMovement(ChessBoard board, ChessPosition currentPosition, int[] direction, ArrayList<ChessMove> moves) {
+        ChessPosition newPosition = getNewPosition(direction, currentPosition);
         if (isEmpty(board, newPosition)) {
             pawnPromotionMovement(currentPosition, newPosition, moves);
         }
@@ -163,10 +172,10 @@ public class ChessPiece {
         };
     }
 
-    private void initialPawnMovement(ChessBoard board, ChessPosition currentPosition, ArrayList<ChessMove> moves) {
+    private void initialPawnMovement(ChessBoard board, ChessPosition currentPosition, int[] direction, ArrayList<ChessMove> moves) {
         if (isInitialPawnSquare(currentPosition)) {
-            ChessPosition tempPosition = getNewPosition(UP, currentPosition);
-            ChessPosition newPosition = getNewPosition(DOUBLE_UP, currentPosition);
+            ChessPosition tempPosition = getNewPosition(direction, currentPosition);
+            ChessPosition newPosition = getNewPosition(direction, tempPosition);
             if (isEmpty(board, tempPosition) && isEmpty(board, newPosition)) {
                 ChessMove newMove = new ChessMove(currentPosition, newPosition, null);
                 moves.add(newMove);
@@ -174,8 +183,11 @@ public class ChessPiece {
         }
     }
 
-    private void pawnCaptureMovement(ChessBoard board, ChessPosition currentPosition, ArrayList<ChessMove> moves) {
-        int[][] directionList = {UP_LEFT_DIAG, UP_RIGHT_DIAG};
+    private void pawnCaptureMovement(ChessBoard board, ChessPosition currentPosition, int[] pawnDirection, ArrayList<ChessMove> moves) {
+        int[][] directionList = switch (pawnDirection) {
+            case UP -> new int[][]{UP_LEFT_DIAG, UP_RIGHT_DIAG};
+            case DOWN -> new int[][]{DOWN_LEFT_DIAG, DOWN_RIGHT_DIAG};
+        };
         for (int[] direction : directionList) {
             ChessPosition newPosition = getNewPosition(direction, currentPosition);
             if (isEnemyPiece(board, newPosition)) {
