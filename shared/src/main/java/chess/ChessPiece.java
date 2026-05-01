@@ -71,6 +71,7 @@ public class ChessPiece {
                 ArrayList<ChessMove> knightMoves = new ArrayList<ChessMove>();
                 int[][] directionList = {UP_RIGHT_L, UP_LEFT_L, LEFT_UP_L, LEFT_DOWN_L, DOWN_LEFT_L, DOWN_RIGHT_L, RIGHT_DOWN_L, RIGHT_UP_L};
                 for (int[] direction : directionList) {
+//                    System.out.println(board);
                     ChessPosition newPosition = getNewPosition(direction, myPosition);
                     if (isUnoccupied(board, newPosition)) { //|| isEnemyPiece(newPosition)) {
                         ChessMove newMove = new ChessMove(myPosition, newPosition, null);
@@ -94,18 +95,19 @@ public class ChessPiece {
         return new ChessPosition(newRow, newCol);
     }
 
-    private boolean isOutOfBounds(ChessPosition position) {
+    private boolean isInBounds(ChessPosition position) {
         int row = position.getRow();
         int col = position.getColumn();
         return (row <= 8 && row >= 1 && col <= 8 && col >= 1);
     }
 
     private boolean isUnoccupied(ChessBoard board, ChessPosition position) {
-        if (isOutOfBounds(position)) {
-            return false;
-        }
-        System.out.println(board.getPiece(position));
-        return (board.getPiece(position) == null);
+        boolean noPiece = board.getPiece(position) == null;
+        return (isInBounds(position) && noPiece);
     }
 
+    @Override
+    public String toString() {
+        return COLOR + " " + TYPE;
+    }
 }
