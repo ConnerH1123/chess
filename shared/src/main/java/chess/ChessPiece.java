@@ -69,7 +69,6 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-//        PieceType piece = board.getPiece(myPosition).getPieceType();
         possibleMoves = switch (TYPE) {
             case KNIGHT -> {
                 ArrayList<ChessMove> knightMoves = new ArrayList<>();
@@ -128,26 +127,48 @@ public class ChessPiece {
         }
     }
 
-    private void normalPawnMovement(ChessBoard board, ChessPosition position, ArrayList<ChessMove> moves) {
-        int[][] directionList = {UP};
-        moveOnePerDirection(board, position, directionList, moves);
+    private boolean isPromotionRank(ChessPosition position) {
+        return switch (COLOR) {
+            case WHITE -> position.getRow() == 8;
+            case BLACK -> position.getRow() == 1;
+        };
+    }
+
+    private void pawnPromotionMovement(ChessPosition currentPosition, ChessPosition newPosition, ArrayList<ChessMove> moves) {
+        if (isPromotionRank(currentPosition)) {
+            PieceType[] possiblePieces = {PieceType.QUEEN, PieceType.ROOK, PieceType.BISHOP, PieceType.KNIGHT};
+            for (PieceType piece : possiblePieces) {
+                ChessMove newMove = new ChessMove(currentPosition, newPosition, piece);
+                moves.add(newMove);
+            }
+        }
+        else {
+            ChessMove newMove = new ChessMove(currentPosition, newPosition, null);
+            moves.add(newMove);
+        }
+    }
+
+    private void normalPawnMovement(ChessBoard board, ChessPosition currentPosition, ArrayList<ChessMove> moves) {
+        ChessPosition newPosition = getNewPosition(UP, currentPosition);
+        if (isEmpty(board, newPosition)) {
+            pawnPromotionMovement(currentPosition, newPosition, moves);
+        }
     }
 
     private boolean isInitialPawnSquare(ChessPosition position) {
         return switch (COLOR) {
-            case WHITE -> {
-                yield position.getRow() == 2;
-            }
-            case BLACK -> {
-                yield position.getRow() == 7;
-            }
+            case WHITE -> position.getRow() == 2;
+            case BLACK -> position.getRow() == 7;
         };
     }
 
-    private void initialPawnMovement(ChessBoard board, ChessPosition position, ArrayList<ChessMove> moves) {
-        if (isInitialPawnSquare(position)) {
-            int[][] directionList = {DOUBLE_UP};
-            moveOnePerDirection(board, position, directionList, moves);
+    private void initialPawnMovement(ChessBoard board, ChessPosition currentPosition, ArrayList<ChessMove> moves) {
+        if (isInitialPawnSquare(currentPosition)) {
+            ChessPosition newPosition = getNewPosition(DOUBLE_UP, currentPosition);
+            if (isEmpty(board, newPosition)) {
+                ChessMove newMove = new ChessMove(currentPosition, newPosition, null);
+                moves.add(newMove);
+            }
         }
     }
 
@@ -156,8 +177,7 @@ public class ChessPiece {
         for (int[] direction : directionList) {
             ChessPosition newPosition = getNewPosition(direction, currentPosition);
             if (isEnemyPiece(board, newPosition)) {
-                ChessMove newMove = new ChessMove(currentPosition, newPosition, null);
-                moves.add(newMove);
+                pawnPromotionMovement(currentPosition, newPosition,moves);
             }
         }
     }
