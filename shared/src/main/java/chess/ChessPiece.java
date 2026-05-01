@@ -21,8 +21,8 @@ public class ChessPiece {
     private final int[] UP_LEFT_L = {-1,2};
     private final int[] LEFT_UP_L = {-2,1};
     private final int[] LEFT_DOWN_L = {-2,-1};
-    private final int[] DOWN_LEFT_L = {-2,-1};
-    private final int[] DOWN_RIGHT_L = {-2,1};
+    private final int[] DOWN_LEFT_L = {-1,-2};
+    private final int[] DOWN_RIGHT_L = {1,-2};
     private final int[] RIGHT_DOWN_L = {2,-1};
     private final int[] RIGHT_UP_L = {2,1};
 
@@ -69,14 +69,14 @@ public class ChessPiece {
         possibleMoves = switch (piece) {
             case KNIGHT -> {
                 ArrayList<ChessMove> knightMoves = new ArrayList<ChessMove>();
-                //directionList = {UP_RIGHT_L, UP_LEFT_L, LEFT_UP_L, LEFT_DOWN_L, DOWN_LEFT_L, DOWN_RIGHT_L, RIGHT_DOWN_L, RIGHT_UP_L};
-                //for (int[] direction : directionList) {
-                    //ChessPosition newPosition = getNewPosition(direction, myPosition);
-                    //if (!isOccupied(newPosition) || isEnemyPiece(newPosition)) {
-                        //ChessMove newMove = ChessMove(myPosition, newPosition, null);
-                        //knightMoves.add(newMove);
-                    //}
-                //}
+                int[][] directionList = {UP_RIGHT_L, UP_LEFT_L, LEFT_UP_L, LEFT_DOWN_L, DOWN_LEFT_L, DOWN_RIGHT_L, RIGHT_DOWN_L, RIGHT_UP_L};
+                for (int[] direction : directionList) {
+                    ChessPosition newPosition = getNewPosition(direction, myPosition);
+                    if (isUnoccupied(board, newPosition)) { //|| isEnemyPiece(newPosition)) {
+                        ChessMove newMove = new ChessMove(myPosition, newPosition, null);
+                        knightMoves.add(newMove);
+                    }
+                }
                 yield knightMoves;
             }
             default -> {
@@ -86,5 +86,26 @@ public class ChessPiece {
         return possibleMoves;
     }
 
+    private ChessPosition getNewPosition(int[] direction, ChessPosition currentPosition) {
+        int xChange = direction[0];
+        int yChange = direction[1];
+        int newRow = currentPosition.getRow() + yChange;
+        int newCol = currentPosition.getColumn() + xChange;
+        return new ChessPosition(newRow, newCol);
+    }
+
+    private boolean isOutOfBounds(ChessPosition position) {
+        int row = position.getRow();
+        int col = position.getColumn();
+        return (row <= 8 && row >= 1 && col <= 8 && col >= 1);
+    }
+
+    private boolean isUnoccupied(ChessBoard board, ChessPosition position) {
+        if (isOutOfBounds(position)) {
+            return false;
+        }
+        System.out.println(board.getPiece(position));
+        return (board.getPiece(position) == null);
+    }
 
 }
