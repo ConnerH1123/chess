@@ -136,22 +136,22 @@ public class ChessPiece {
         }
     }
 
-    private void moveUntilStoppedRec(ChessBoard board, ChessPosition position, int[] direction, ArrayList<ChessMove> moves) {
-        ChessPosition newPosition = getNewPosition(direction, position);
+    private void moveUntilStoppedRec(ChessBoard board, ChessPosition OGposition, ChessPosition currentPosition, int[] direction, ArrayList<ChessMove> moves) {
+        ChessPosition newPosition = getNewPosition(direction, currentPosition);
         if (isEnemyPiece(board, newPosition)) {
-            ChessMove newMove = new ChessMove(position, newPosition, null);
+            ChessMove newMove = new ChessMove(OGposition, newPosition, null);
             moves.add(newMove);
         }
         else if (isEmpty(board, newPosition)) {
-            ChessMove newMove = new ChessMove(position, newPosition, null);
+            ChessMove newMove = new ChessMove(OGposition, newPosition, null);
             moves.add(newMove);
-            moveUntilStoppedRec(board, newPosition, direction, moves);
+            moveUntilStoppedRec(board, OGposition, newPosition, direction, moves);
         }
     }
 
     private void moveUntilStopped(ChessBoard board, ChessPosition position, int[][] directionList, ArrayList<ChessMove> moves) {
         for (int[] direction : directionList) {
-            moveUntilStoppedRec(board, position, direction, moves);
+            moveUntilStoppedRec(board, position, position, direction, moves);
         }
     }
 
