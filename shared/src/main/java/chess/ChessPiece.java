@@ -78,6 +78,7 @@ public class ChessPiece {
             }
             case PAWN -> {
                 ArrayList<ChessMove> pawnMoves = new ArrayList<>();
+                // Gotta keep track of moving black versus white
                 normalPawnMovement(board, myPosition, pawnMoves);
                 initialPawnMovement(board, myPosition, pawnMoves);
                 pawnCaptureMovement(board, myPosition, pawnMoves);
@@ -164,8 +165,9 @@ public class ChessPiece {
 
     private void initialPawnMovement(ChessBoard board, ChessPosition currentPosition, ArrayList<ChessMove> moves) {
         if (isInitialPawnSquare(currentPosition)) {
+            ChessPosition tempPosition = getNewPosition(UP, currentPosition);
             ChessPosition newPosition = getNewPosition(DOUBLE_UP, currentPosition);
-            if (isEmpty(board, newPosition)) {
+            if (isEmpty(board, tempPosition) && isEmpty(board, newPosition)) {
                 ChessMove newMove = new ChessMove(currentPosition, newPosition, null);
                 moves.add(newMove);
             }
