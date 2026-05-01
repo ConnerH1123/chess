@@ -2,7 +2,6 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Represents a single chess piece
@@ -71,9 +70,8 @@ public class ChessPiece {
                 ArrayList<ChessMove> knightMoves = new ArrayList<ChessMove>();
                 int[][] directionList = {UP_RIGHT_L, UP_LEFT_L, LEFT_UP_L, LEFT_DOWN_L, DOWN_LEFT_L, DOWN_RIGHT_L, RIGHT_DOWN_L, RIGHT_UP_L};
                 for (int[] direction : directionList) {
-//                    System.out.println(board);
                     ChessPosition newPosition = getNewPosition(direction, myPosition);
-                    if (isUnoccupied(board, newPosition)) { //|| isEnemyPiece(newPosition)) {
+                    if (isEmpty(board, newPosition) || isEnemyPiece(board, newPosition)) {
                         ChessMove newMove = new ChessMove(myPosition, newPosition, null);
                         knightMoves.add(newMove);
                     }
@@ -101,10 +99,21 @@ public class ChessPiece {
         return (row <= 8 && row >= 1 && col <= 8 && col >= 1);
     }
 
-    private boolean isUnoccupied(ChessBoard board, ChessPosition position) {
-        boolean noPiece = board.getPiece(position) == null;
-        return (isInBounds(position) && noPiece);
+    private boolean isEmpty(ChessBoard board, ChessPosition position) {
+        if (isInBounds(position)) {
+            return board.getPiece(position) == null;
+        }
+        return false;
     }
+
+    private boolean isEnemyPiece(ChessBoard board, ChessPosition position) {
+        if (isInBounds(position)) {
+            ChessPiece piece = board.getPiece(position);
+            return piece.getTeamColor() != COLOR;
+        }
+        return false;
+    }
+
 
     @Override
     public String toString() {
