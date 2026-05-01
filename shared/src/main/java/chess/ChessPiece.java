@@ -70,18 +70,10 @@ public class ChessPiece {
             case KNIGHT -> {
                 ArrayList<ChessMove> knightMoves = new ArrayList<ChessMove>();
                 int[][] directionList = {UP_RIGHT_L, UP_LEFT_L, LEFT_UP_L, LEFT_DOWN_L, DOWN_LEFT_L, DOWN_RIGHT_L, RIGHT_DOWN_L, RIGHT_UP_L};
-                for (int[] direction : directionList) {
-                    ChessPosition newPosition = getNewPosition(direction, myPosition);
-                    if (isEmpty(board, newPosition) || isEnemyPiece(board, newPosition)) {
-                        ChessMove newMove = new ChessMove(myPosition, newPosition, null);
-                        knightMoves.add(newMove);
-                    }
-                }
+                moveOnePerDirection(board,myPosition, directionList, knightMoves);
                 yield knightMoves;
             }
-            default -> {
-                yield possibleMoves;
-            }
+            default -> possibleMoves;
         };
         return possibleMoves;
     }
@@ -114,6 +106,18 @@ public class ChessPiece {
         }
         return false;
     }
+
+    public void moveOnePerDirection(ChessBoard board, ChessPosition currentPosition, int[][] directionList, ArrayList<ChessMove> moves) {
+        for (int[] direction : directionList) {
+            ChessPosition newPosition = getNewPosition(direction, currentPosition);
+            if (isEmpty(board, newPosition) || isEnemyPiece(board, newPosition)) {
+                ChessMove newMove = new ChessMove(currentPosition, newPosition, null);
+                moves.add(newMove);
+            }
+        }
+
+    }
+
 
     @Override
     public boolean equals(Object o) {
