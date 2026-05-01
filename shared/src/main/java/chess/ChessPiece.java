@@ -83,7 +83,7 @@ public class ChessPiece {
                 int[] direction = getPawnDirection();
                 normalPawnMovement(board, myPosition, direction, pawnMoves);
                 initialPawnMovement(board, myPosition, direction, pawnMoves);
-                pawnCaptureMovement(board, myPosition, direction, pawnMoves);
+                pawnCaptureMovement(board, myPosition, pawnMoves);
                 yield pawnMoves;
             }
             default -> possibleMoves;
@@ -183,10 +183,10 @@ public class ChessPiece {
         }
     }
 
-    private void pawnCaptureMovement(ChessBoard board, ChessPosition currentPosition, int[] pawnDirection, ArrayList<ChessMove> moves) {
-        int[][] directionList = switch (pawnDirection) {
-            case UP -> new int[][]{UP_LEFT_DIAG, UP_RIGHT_DIAG};
-            case DOWN -> new int[][]{DOWN_LEFT_DIAG, DOWN_RIGHT_DIAG};
+    private void pawnCaptureMovement(ChessBoard board, ChessPosition currentPosition, ArrayList<ChessMove> moves) {
+        int[][] directionList = switch (COLOR) {
+            case WHITE -> new int[][]{UP_LEFT_DIAG, UP_RIGHT_DIAG};
+            case BLACK -> new int[][]{DOWN_LEFT_DIAG, DOWN_RIGHT_DIAG};
         };
         for (int[] direction : directionList) {
             ChessPosition newPosition = getNewPosition(direction, currentPosition);
