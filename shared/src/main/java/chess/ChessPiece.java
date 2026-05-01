@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -114,6 +115,19 @@ public class ChessPiece {
         return false;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPiece that = (ChessPiece) o;
+        return COLOR == that.COLOR && TYPE == that.TYPE && Objects.equals(possibleMoves, that.possibleMoves);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(COLOR, TYPE, possibleMoves);
+    }
 
     @Override
     public String toString() {

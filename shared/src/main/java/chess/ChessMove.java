@@ -1,6 +1,7 @@
 package chess;
 
 import java.io.PipedOutputStream;
+import java.util.Objects;
 
 /**
  * Represents moving a chess piece on a chessboard
@@ -44,6 +45,20 @@ public class ChessMove {
      */
     public ChessPiece.PieceType getPromotionPiece() {
         return PROMO_PIECE;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessMove chessMove = (ChessMove) o;
+        return Objects.equals(START_POS, chessMove.START_POS) && Objects.equals(END_POS, chessMove.END_POS) && PROMO_PIECE == chessMove.PROMO_PIECE;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(START_POS, END_POS, PROMO_PIECE);
     }
 
     @Override
