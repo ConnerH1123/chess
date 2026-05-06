@@ -17,22 +17,24 @@ public class ChessPiece {
     private ArrayList<ChessMove> possibleMoves = new ArrayList<>();
 
     //Array int pairs that have the horizontal and vertical transformation (i.e. [x,y])
-    private final int[] UP = {0,1};
-    private final int[] DOWN = {0,-1};
-    private final int[] LEFT = {-1,0};
-    private final int[] RIGHT = {1,0};
-    private final int[] UP_LEFT_DIAG = {-1,1};
-    private final int[] UP_RIGHT_DIAG = {1,1};
-    private final int[] DOWN_LEFT_DIAG = {-1,-1};
-    private final int[] DOWN_RIGHT_DIAG = {1,-1};
-    private final int[] UP_RIGHT_L = {1,2};
-    private final int[] UP_LEFT_L = {-1,2};
-    private final int[] LEFT_UP_L = {-2,1};
-    private final int[] LEFT_DOWN_L = {-2,-1};
-    private final int[] DOWN_LEFT_L = {-1,-2};
-    private final int[] DOWN_RIGHT_L = {1,-2};
-    private final int[] RIGHT_DOWN_L = {2,-1};
-    private final int[] RIGHT_UP_L = {2,1};
+    private final Direction UP = new Direction(0,1);
+    private final Direction DOWN = new Direction(0,-1);
+    private final Direction LEFT = new Direction(-1,0);
+    private final Direction RIGHT = new Direction(1,0);
+    private final Direction UP_LEFT_DIAG = new Direction(-1,1);
+    private final Direction UP_RIGHT_DIAG = new Direction(1,1);
+    private final Direction DOWN_LEFT_DIAG = new Direction(-1,-1);
+    private final Direction DOWN_RIGHT_DIAG = new Direction(1,-1);
+    private final Direction UP_RIGHT_L = new Direction(1,2);
+    private final Direction UP_LEFT_L = new Direction(-1,2);
+    private final Direction LEFT_UP_L = new Direction(-2,1);
+    private final Direction LEFT_DOWN_L = new Direction(-2,-1);
+    private final Direction DOWN_LEFT_L = new Direction(-1,-2);
+    private final Direction DOWN_RIGHT_L = new Direction(1,-2);
+    private final Direction RIGHT_DOWN_L = new Direction(2,-1);
+    private final Direction RIGHT_UP_L = new Direction(2,1);
+
+    private record Direction(int x, int y) {}
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         COLOR = pieceColor;
@@ -76,37 +78,37 @@ public class ChessPiece {
         possibleMoves = switch (TYPE) {
             case KING -> {
                 ArrayList<ChessMove> kingMoves = new ArrayList<>();
-                int[][] directionList = {UP, DOWN, LEFT, RIGHT, UP_LEFT_DIAG, UP_RIGHT_DIAG, DOWN_RIGHT_DIAG, DOWN_LEFT_DIAG};
+                Direction[] directionList = {UP, DOWN, LEFT, RIGHT, UP_LEFT_DIAG, UP_RIGHT_DIAG, DOWN_RIGHT_DIAG, DOWN_LEFT_DIAG};
                 moveOnePerDirection(board, myPosition, directionList, kingMoves);
                 yield kingMoves;
             }
             case QUEEN -> {
                 ArrayList<ChessMove> queenMoves = new ArrayList<>();
-                int[][] directionList = {UP, DOWN, LEFT, RIGHT, UP_LEFT_DIAG, UP_RIGHT_DIAG, DOWN_RIGHT_DIAG, DOWN_LEFT_DIAG};
+                Direction[] directionList = {UP, DOWN, LEFT, RIGHT, UP_LEFT_DIAG, UP_RIGHT_DIAG, DOWN_RIGHT_DIAG, DOWN_LEFT_DIAG};
                 moveUntilStopped(board, myPosition, directionList, queenMoves);
                 yield queenMoves;
             }
             case ROOK -> {
                 ArrayList<ChessMove> rookMoves = new ArrayList<>();
-                int[][] directionList = {UP, DOWN, LEFT, RIGHT};
+                Direction[] directionList = {UP, DOWN, LEFT, RIGHT};
                 moveUntilStopped(board, myPosition, directionList, rookMoves);
                 yield rookMoves;
             }
             case BISHOP -> {
                 ArrayList<ChessMove> bishopMoves = new ArrayList<>();
-                int[][] directionList = {UP_LEFT_DIAG, UP_RIGHT_DIAG, DOWN_RIGHT_DIAG, DOWN_LEFT_DIAG};
+                Direction[] directionList = {UP_LEFT_DIAG, UP_RIGHT_DIAG, DOWN_RIGHT_DIAG, DOWN_LEFT_DIAG};
                 moveUntilStopped(board, myPosition, directionList, bishopMoves);
                 yield bishopMoves;
             }
             case KNIGHT -> {
                 ArrayList<ChessMove> knightMoves = new ArrayList<>();
-                int[][] directionList = {UP_RIGHT_L, UP_LEFT_L, LEFT_UP_L, LEFT_DOWN_L, DOWN_LEFT_L, DOWN_RIGHT_L, RIGHT_DOWN_L, RIGHT_UP_L};
+                Direction[] directionList = {UP_RIGHT_L, UP_LEFT_L, LEFT_UP_L, LEFT_DOWN_L, DOWN_LEFT_L, DOWN_RIGHT_L, RIGHT_DOWN_L, RIGHT_UP_L};
                 moveOnePerDirection(board, myPosition, directionList, knightMoves);
                 yield knightMoves;
             }
             case PAWN -> {
                 ArrayList<ChessMove> pawnMoves = new ArrayList<>();
-                int[] direction = getPawnDirection();
+                Direction direction = getPawnDirection();
                 normalPawnMovement(board, myPosition, direction, pawnMoves);
                 initialPawnMovement(board, myPosition, direction, pawnMoves);
                 pawnCaptureMovement(board, myPosition, pawnMoves);
@@ -116,9 +118,9 @@ public class ChessPiece {
         return possibleMoves;
     }
 
-    private ChessPosition getNewPosition(int[] direction, ChessPosition currentPosition) {
-        int xChange = direction[0];
-        int yChange = direction[1];
+    private ChessPosition getNewPosition(Direction direction, ChessPosition currentPosition) {
+        int xChange = direction.x();
+        int yChange = direction.y();
         int newRow = currentPosition.getRow() + yChange;
         int newCol = currentPosition.getColumn() + xChange;
         return new ChessPosition(newRow, newCol);
@@ -157,8 +159,8 @@ public class ChessPiece {
     /**
      * Given an array of directions, updates possible moves to include one step per direction (if possible)
      */
-    private void moveOnePerDirection(ChessBoard board, ChessPosition currentPosition, int[][] directionList, ArrayList<ChessMove> moves) {
-        for (int[] direction : directionList) {
+    private void moveOnePerDirection(ChessBoard board, ChessPosition currentPosition, Direction[] directionList, ArrayList<ChessMove> moves) {
+        for (Direction direction : directionList) {
             ChessPosition newPosition = getNewPosition(direction, currentPosition);
             if (isEmpty(board, newPosition) || isEnemyPiece(board, newPosition)) {
                 ChessMove newMove = new ChessMove(currentPosition, newPosition, null);
@@ -170,7 +172,7 @@ public class ChessPiece {
     /**
      * Helper rec for moveUntilStopped
      */
-    private void moveUntilStoppedRec(ChessBoard board, ChessPosition OGposition, ChessPosition currentPosition, int[] direction, ArrayList<ChessMove> moves) {
+    private void moveUntilStoppedRec(ChessBoard board, ChessPosition OGposition, ChessPosition currentPosition, Direction direction, ArrayList<ChessMove> moves) {
         ChessPosition newPosition = getNewPosition(direction, currentPosition);
         if (isEnemyPiece(board, newPosition)) {
             ChessMove newMove = new ChessMove(OGposition, newPosition, null);
@@ -186,8 +188,8 @@ public class ChessPiece {
     /**
      * Given an array of directions, updates moves to include all possible movements per direction
      */
-    private void moveUntilStopped(ChessBoard board, ChessPosition position, int[][] directionList, ArrayList<ChessMove> moves) {
-        for (int[] direction : directionList) {
+    private void moveUntilStopped(ChessBoard board, ChessPosition position, Direction[] directionList, ArrayList<ChessMove> moves) {
+        for (Direction direction : directionList) {
             moveUntilStoppedRec(board, position, position, direction, moves);
         }
     }
@@ -195,7 +197,7 @@ public class ChessPiece {
     /**
      * e.g. if PAWN is BLACK direction is DOWN
      */
-    private int[] getPawnDirection() {
+    private Direction getPawnDirection() {
         return switch (COLOR) {
             case WHITE -> UP;
             case BLACK -> DOWN;
@@ -232,7 +234,7 @@ public class ChessPiece {
     /**
      * Adds forward pawn movement to movement list
      */
-    private void normalPawnMovement(ChessBoard board, ChessPosition currentPosition, int[] direction, ArrayList<ChessMove> moves) {
+    private void normalPawnMovement(ChessBoard board, ChessPosition currentPosition, Direction direction, ArrayList<ChessMove> moves) {
         ChessPosition newPosition = getNewPosition(direction, currentPosition);
         if (isEmpty(board, newPosition)) {
             pawnPromotionMovement(currentPosition, newPosition, moves);
@@ -252,7 +254,7 @@ public class ChessPiece {
     /**
      * Adds a double forward pawn movement if applicable
      */
-    private void initialPawnMovement(ChessBoard board, ChessPosition currentPosition, int[] direction, ArrayList<ChessMove> moves) {
+    private void initialPawnMovement(ChessBoard board, ChessPosition currentPosition, Direction direction, ArrayList<ChessMove> moves) {
         if (isInitialPawnSquare(currentPosition)) {
             ChessPosition tempPosition = getNewPosition(direction, currentPosition);
             ChessPosition newPosition = getNewPosition(direction, tempPosition);
@@ -267,11 +269,11 @@ public class ChessPiece {
      * Adds a diagonal pawn movement if applicable
      */
     private void pawnCaptureMovement(ChessBoard board, ChessPosition currentPosition, ArrayList<ChessMove> moves) {
-        int[][] directionList = switch (COLOR) {
-            case WHITE -> new int[][]{UP_LEFT_DIAG, UP_RIGHT_DIAG};
-            case BLACK -> new int[][]{DOWN_LEFT_DIAG, DOWN_RIGHT_DIAG};
+        Direction[] directionList = switch (COLOR) {
+            case WHITE -> new Direction[]{UP_LEFT_DIAG, UP_RIGHT_DIAG};
+            case BLACK -> new Direction[]{DOWN_LEFT_DIAG, DOWN_RIGHT_DIAG};
         };
-        for (int[] direction : directionList) {
+        for (Direction direction : directionList) {
             ChessPosition newPosition = getNewPosition(direction, currentPosition);
             if (isEnemyPiece(board, newPosition)) {
                 pawnPromotionMovement(currentPosition, newPosition, moves);
