@@ -62,6 +62,13 @@ public class ChessBoard {
             addPiece(position, whitePieces[i]);
         }
 
+        for (int i = 3; i < 7; i++) {
+            for (int j = 1; j < 9; j++) {
+                ChessPosition position = new ChessPosition(i, j);
+                addPiece(position, null);
+            }
+        }
+
         ChessPiece[] blackPieces = {new ChessPiece(black,pawn), new ChessPiece(black,pawn), new ChessPiece(black,pawn), new ChessPiece(black,pawn), new ChessPiece(black,pawn), new ChessPiece(black,pawn), new ChessPiece(black,pawn), new ChessPiece(black,pawn), new ChessPiece(black,rook), new ChessPiece(black,knight), new ChessPiece(black,bishop), new ChessPiece(black,queen), new ChessPiece(black,king), new ChessPiece(black,bishop), new ChessPiece(black,knight), new ChessPiece(black,rook)};
         for (int i = 0; i < 16; i++) {
             ChessPosition position = new ChessPosition((i/8)+7, (i%8)+1);
