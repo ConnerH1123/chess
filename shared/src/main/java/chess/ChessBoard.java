@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Objects;
 
 /**
@@ -11,10 +12,16 @@ import java.util.Objects;
  */
 public class ChessBoard {
 
-    ChessPiece[][] theBoard = new ChessPiece[8][8];
+    private ChessPiece[][] theBoard = new ChessPiece[8][8];
+    private HashMap<ChessPiece.PieceType,Integer> whitePiecesMap = new HashMap<>();
+    private HashMap<ChessPiece.PieceType,Integer> blackPiecesMap = new HashMap<>();
+
 
     public ChessBoard() {
-
+        for (ChessPiece.PieceType type : ChessPiece.PieceType.values()) {
+            whitePiecesMap.put(type, 0);
+            blackPiecesMap.put(type, 0);
+        }
     }
 
     /**
@@ -27,6 +34,16 @@ public class ChessBoard {
         int row = position.getRow();
         int column = position.getColumn();
         theBoard[row-1][column-1] = piece;
+        updatePieceMap(piece);
+    }
+
+    private void updatePieceMap(ChessPiece piece) {
+        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+            whitePiecesMap.merge(piece.getPieceType(), 1, Integer::sum);
+        }
+        else {
+            blackPiecesMap.merge(piece.getPieceType(), 1, Integer::sum);
+        }
     }
 
     /**
@@ -75,17 +92,18 @@ public class ChessBoard {
 
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
+                ChessPosition newPosition = new ChessPosition(i+1,j+1);
                 if (i == 0) {
-                    theBoard[i][j] = rank1[j];
+                    addPiece(newPosition, rank1[j]);
                 }
                 else if (i == 1) {
-                    theBoard[i][j] = wPawn;
+                    addPiece(newPosition, wPawn);
                 }
                 else if (i == 6) {
-                    theBoard[i][j] = bPawn;
+                    addPiece(newPosition, bPawn);
                 }
                 else if (i == 7) {
-                    theBoard[i][j] = rank8[j];
+                    addPiece(newPosition, rank8[j]);
                 }
                 else {
                     theBoard[i][j] = null;
@@ -120,6 +138,4 @@ public class ChessBoard {
         }
         return sb.toString();
     }
-
-
 }
