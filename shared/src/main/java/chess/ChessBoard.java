@@ -59,6 +59,14 @@ public class ChessBoard {
         return theBoard[row-1][column-1];
     }
 
+    public HashMap<ChessPiece.PieceType, Integer> getWhitePieces() {
+        return whitePiecesMap;
+    }
+
+    public HashMap<ChessPiece.PieceType, Integer> getBlackPieces() {
+        return blackPiecesMap;
+    }
+
     /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
