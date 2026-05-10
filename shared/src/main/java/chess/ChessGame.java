@@ -80,6 +80,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
+        //return (isInCheck(teamColor) && !hasLegalMoves(teamColor));
         throw new RuntimeException("Not implemented");
     }
 
@@ -100,6 +101,15 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
+        //chessboard.clearBoard();
+        //for (ChessPosition occupiedSquare : HashSet<ChessPosition> whiteOccupiedSquares) {
+            //ChessPiece newPiece = board.getPiece();
+            //chessboard.addPiece(occupiedSquare, newPiece);
+        //}
+        //for (ChessPosition occupiedSquare : HashSet<ChessPosition> blackOccupiedSquares) {
+            //ChessPiece newPiece = board.getPiece();
+            //chessboard.addPiece(occupiedSquare, newPiece);
+        //}
         throw new RuntimeException("Not implemented");
     }
 
