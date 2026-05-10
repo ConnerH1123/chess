@@ -14,7 +14,6 @@ public class ChessPiece {
 
     private final ChessGame.TeamColor COLOR;
     private final PieceType TYPE;
-    private ArrayList<ChessMove> possibleMoves = new ArrayList<>();
 
     //Array int pairs that have the horizontal and vertical transformation (i.e. [x,y])
     private final Direction UP = new Direction(0,1);
@@ -75,7 +74,7 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        possibleMoves = switch (TYPE) {
+        ArrayList<ChessMove> possibleMoves = switch (TYPE) {
             case KING -> {
                 ArrayList<ChessMove> kingMoves = new ArrayList<>();
                 Direction[] directionList = {UP, DOWN, LEFT, RIGHT, UP_LEFT_DIAG, UP_RIGHT_DIAG, DOWN_RIGHT_DIAG, DOWN_LEFT_DIAG};
@@ -287,12 +286,12 @@ public class ChessPiece {
             return false;
         }
         ChessPiece that = (ChessPiece) o;
-        return COLOR == that.COLOR && TYPE == that.TYPE && Objects.equals(possibleMoves, that.possibleMoves);
+        return COLOR == that.COLOR && TYPE == that.TYPE;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(COLOR, TYPE, possibleMoves);
+        return Objects.hash(COLOR, TYPE);
     }
 
     @Override
