@@ -2,6 +2,7 @@ package chess;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Objects;
 
 /**
@@ -13,6 +14,7 @@ import java.util.Objects;
 public class ChessBoard {
 
     private ChessPiece[][] theBoard = new ChessPiece[8][8];
+
     private HashMap<ChessPiece.PieceType,Integer> whitePiecesMap = new HashMap<>();
     private HashMap<ChessPiece.PieceType,Integer> blackPiecesMap = new HashMap<>();
 
