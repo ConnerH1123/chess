@@ -157,7 +157,7 @@ public class ChessBoard {
     }
 
     public boolean isInCheck(ChessGame.TeamColor team) {
-        //HashSet<ChessPosition> enemyPieceLocations;
+        //HashSet<ChessPosition> enemyPieceLocations = getEnemyLocations(team);
         //ChessPosition kingPosition = getKingPosition(team);
         //for (ChessPosition enemySquare : enemyPieceLocations) {
             //ChessPiece enemyPiece = getPiece(enemySquare);
@@ -171,16 +171,19 @@ public class ChessBoard {
         return false;
     }
 
+    //private ChessPosition getEnemyLocations(ChessGame.TeamColor team) {
+        //HashSet<ChessPosition> enemyPieceLocations = switch (team) {
+            //case WHITE -> blackPieceLocations;
+            //case BLACK -> whitePieceLocations;
+        //};
+        //return enemyPieceLocations;
+    //}
+
+
     //private ChessPosition getKingPosition(ChessGame.TeamColor team) {
         //ChessPosition kingPosition = switch (team) {
-            //case WHITE -> {
-                //enemyPieceLocations = blackPieceLocations;
-                //yield whiteKingPosition;
-            //}
-            //case BLACK -> {
-                //enemyPieceLocations = whitePieceLocations;
-                //yield blackKingPosition;
-            //}
+            //case WHITE -> whiteKingPosition;
+            //case BLACK -> blackKingPosition;
         //};
         //return kingPosition;
     //}
