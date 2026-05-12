@@ -12,7 +12,7 @@ import java.util.HashSet;
  */
 public class ChessGame {
 
-    private ChessBoard chessboard = new ChessBoard();
+    private final ChessBoard chessboard = new ChessBoard();
     private TeamColor teamTurn;
 
     public ChessGame() {
@@ -82,6 +82,8 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        //if not move in allLegalMoves throw InvalidMoveException;
+        //else chessboard.makeMove(move);
         throw new RuntimeException("Not implemented");
     }
 
@@ -92,6 +94,7 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
+        //return chessboard.isInCheck(teamColor);
         throw new RuntimeException("Not implemented");
     }
 
