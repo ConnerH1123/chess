@@ -13,16 +13,16 @@ import java.util.Objects;
  */
 public class ChessBoard {
 
-    private ChessPiece[][] theBoard = new ChessPiece[8][8];
+    private final ChessPiece[][] theBoard = new ChessPiece[8][8];
 
-    private HashMap<ChessPiece.PieceType,Integer> whitePiecesMap = new HashMap<>();
-    private HashMap<ChessPiece.PieceType,Integer> blackPiecesMap = new HashMap<>();
+    private final HashMap<ChessPiece.PieceType,Integer> whitePieces = new HashMap<>();
+    private final HashMap<ChessPiece.PieceType,Integer> blackPieces = new HashMap<>();
 
 
     public ChessBoard() {
         for (ChessPiece.PieceType type : ChessPiece.PieceType.values()) {
-            whitePiecesMap.put(type, 0);
-            blackPiecesMap.put(type, 0);
+            whitePieces.put(type, 0);
+            blackPieces.put(type, 0);
         }
     }
 
@@ -36,15 +36,22 @@ public class ChessBoard {
         int row = position.getRow();
         int column = position.getColumn();
         theBoard[row-1][column-1] = piece;
-        updatePieceMap(piece);
+        updatePieceMap(piece, true);
     }
 
-    private void updatePieceMap(ChessPiece piece) {
-        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-            whitePiecesMap.merge(piece.getPieceType(), 1, Integer::sum);
+    private void updatePieceMap(ChessPiece piece, boolean isAdded) {
+        int increment;
+        if (isAdded) {
+            increment = 1;
         }
         else {
-            blackPiecesMap.merge(piece.getPieceType(), 1, Integer::sum);
+            increment = -1;
+        }
+        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+            whitePieces.merge(piece.getPieceType(), increment, Integer::sum);
+        }
+        else {
+            blackPieces.merge(piece.getPieceType(), increment, Integer::sum);
         }
     }
 
@@ -62,11 +69,11 @@ public class ChessBoard {
     }
 
     public HashMap<ChessPiece.PieceType, Integer> getWhitePieces() {
-        return whitePiecesMap;
+        return whitePieces;
     }
 
     public HashMap<ChessPiece.PieceType, Integer> getBlackPieces() {
-        return blackPiecesMap;
+        return blackPieces;
     }
 
     /**
@@ -121,6 +128,62 @@ public class ChessBoard {
             }
         }
     }
+
+    public ChessBoard copyBoard() {
+        ChessBoard copy = new ChessBoard();
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                ChessPosition position = new ChessPosition(i+1,j+1);
+                copy.addPiece(position, theBoard[i][j]);
+            }
+        }
+        return copy;
+    }
+
+    public void makeMove(ChessMove move) {
+        ChessPosition startPosition = move.getStartPosition();
+        ChessPosition endPosition = move.getEndPosition();
+        ChessPiece movingPiece = getPiece(startPosition);
+        ChessPiece capturedPiece = getPiece(endPosition);
+        if (move.getPromotionPiece() != null) {
+            movingPiece = new ChessPiece(movingPiece.getTeamColor(), move.getPromotionPiece());
+        }
+        if (capturedPiece != null) {
+            updatePieceMap(capturedPiece, false);
+        }
+
+        theBoard[startPosition.getRow()-1][startPosition.getColumn()-1] = null;
+        theBoard[endPosition.getRow()-1][endPosition.getColumn()-1] = movingPiece;
+    }
+
+    public boolean isInCheck(ChessGame.TeamColor team) {
+        //HashSet<ChessPosition> enemyPieceLocations;
+        //ChessPosition kingPosition = getKingPosition(team);
+        //for (ChessPosition enemySquare : enemyPieceLocations) {
+            //ChessPiece enemyPiece = getPiece(enemySquare);
+            //ArrayList<ChessMove> pieceMoves = (ArrayList<ChessMove>) enemyPiece.pieceMoves(chessboard, position);
+            //for (ChessMove move = pieceMoves) {
+                //if (move.getEndPosition() == kingPosition) {
+                    //return true;
+                //}
+            //}
+        //}
+        return false;
+    }
+
+    //private ChessPosition getKingPosition(ChessGame.TeamColor team) {
+        //ChessPosition kingPosition = switch (team) {
+            //case WHITE -> {
+                //enemyPieceLocations = blackPieceLocations;
+                //yield whiteKingPosition;
+            //}
+            //case BLACK -> {
+                //enemyPieceLocations = whitePieceLocations;
+                //yield blackKingPosition;
+            //}
+        //};
+        //return kingPosition;
+    //}
 
     @Override
     public boolean equals(Object o) {

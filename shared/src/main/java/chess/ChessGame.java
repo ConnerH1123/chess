@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -56,23 +57,23 @@ public class ChessGame {
         if (piece == null) {
             return legalMoves;
         }
-        //removeIllegalMoves(piece, legalMoves);
+        //removeIllegalMoves(startPosition, piece, legalMoves);
         //includeCastling(piece, legalMoves);
         //includeEnPassant(piece, legalMoves);
         //return legalMoves;
         throw new RuntimeException("Not implemented");
     }
 
-    // private void removeIllegalMoves(ChessPiece piece, HashSet<ChessMove> legalMoves) {
-        //ArrayList<ChessMove> pieceMoves = piece.pieceMoves(chessboard, startPosition);
-        //for (ChessMove move : ArrayList<ChessMove> pieceMoves) {
-            //ChessBoard boardCopy = chessboard.copyBoard();
-            //boardCopy.makeMove(move);
+    private void removeIllegalMoves(ChessPosition position, ChessPiece piece, HashSet<ChessMove> legalMoves) {
+        ArrayList<ChessMove> pieceMoves = (ArrayList<ChessMove>) piece.pieceMoves(chessboard, position);
+        for (ChessMove move : pieceMoves) {
+            ChessBoard boardCopy = chessboard.copyBoard();
+            boardCopy.makeMove(move);
             //if (!boardCopy.isInCheck(piece.getTeamColor())) {
                 //legalMoves.add(move);
             //}
-        //}
-    //}
+        }
+    }
 
     /**
      * Makes a move in the chess game
