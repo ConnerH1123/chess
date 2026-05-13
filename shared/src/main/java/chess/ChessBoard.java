@@ -189,7 +189,7 @@ public class ChessBoard {
         };
     }
 
-    public boolean whiteQueenSideCastle() {
+    public boolean whiteKingSideCastle() {
         if (isInCheck(ChessGame.TeamColor.WHITE) || !isEmptyPosition(1,6) || !isEmptyPosition(1,7)) {
             return false;
         }
@@ -207,7 +207,26 @@ public class ChessBoard {
         return true;
     }
 
-    public boolean blackQueenSideCastle() {
+    public boolean whiteQueenSideCastle() {
+        if (isInCheck(ChessGame.TeamColor.WHITE) || !isEmptyPosition(1,4) || !isEmptyPosition(1,3)) {
+            return false;
+        }
+        ChessBoard copy = copyBoard();
+        ChessMove partialCastle = new ChessMove(new ChessPosition(1,5),new ChessPosition(1,4),null);
+        copy.makeMove(partialCastle);
+        if (isInCheck(ChessGame.TeamColor.WHITE)) {
+            return false;
+        }
+        ChessMove completeCastle = new ChessMove(new ChessPosition(1,4),new ChessPosition(1,3),null);
+        copy.makeMove(completeCastle);
+        if (isInCheck(ChessGame.TeamColor.WHITE)) {
+            return false;
+        }
+        return true;
+    }
+
+
+    public boolean blackKingSideCastle() {
         if (isInCheck(ChessGame.TeamColor.BLACK) || !isEmptyPosition(8,6) || !isEmptyPosition(8,7)) {
             return false;
         }
@@ -224,6 +243,25 @@ public class ChessBoard {
         }
         return true;
     }
+
+    public boolean blackQueenSideCastle() {
+        if (isInCheck(ChessGame.TeamColor.BLACK) || !isEmptyPosition(8,4) || !isEmptyPosition(8,3)) {
+            return false;
+        }
+        ChessBoard copy = copyBoard();
+        ChessMove partialCastle = new ChessMove(new ChessPosition(8,5),new ChessPosition(8,4),null);
+        copy.makeMove(partialCastle);
+        if (isInCheck(ChessGame.TeamColor.BLACK)) {
+            return false;
+        }
+        ChessMove completeCastle = new ChessMove(new ChessPosition(8,4),new ChessPosition(8,3),null);
+        copy.makeMove(completeCastle);
+        if (isInCheck(ChessGame.TeamColor.BLACK)) {
+            return false;
+        }
+        return true;
+    }
+
 
     private boolean isEmptyPosition(int row, int col) {
         return getPiece(new ChessPosition(row,col)) == null;
@@ -284,8 +322,39 @@ public class ChessBoard {
     private void updateCastleStatus(ChessPiece piece, ChessPosition position) {
         CastlingRights castlingRights = getCastlingRights(piece.getTeamColor());
         if (piece.getPieceType() == ChessPiece.PieceType.KING) {
-            castlingRights = new CastlingRights(false, false);
+            castlingRights.setQueenSide(false);
+            castlingRights.setKingSide(false);
         }
+        else if (piece.getPieceType() == ChessPiece.PieceType.ROOK && isStartingSquare(piece, position) && position.getColumn() == 1) {
+            castlingRights.setQueenSide(false);
+        }
+        else if (piece.getPieceType() == ChessPiece.PieceType.ROOK && isStartingSquare(piece, position) && position.getColumn() == 8) {
+            castlingRights.setKingSide(false);
+        }
+    }
+
+    private boolean isStartingSquare(ChessPiece piece, ChessPosition position) {
+        int row = switch (piece.getTeamColor()) {
+            case WHITE -> 1;
+            case BLACK -> 8;
+        };
+        int col1 = switch (piece.getPieceType()) {
+            case KING -> 5;
+            case QUEEN -> 4;
+            case BISHOP -> 3;
+            case KNIGHT -> 2;
+            case ROOK -> 1;
+            case PAWN -> 0;
+        };
+        int col2 = switch (piece.getPieceType()) {
+            case KING -> 5;
+            case QUEEN -> 4;
+            case BISHOP -> 6;
+            case KNIGHT -> 7;
+            case ROOK -> 8;
+            case PAWN -> 0;
+        };
+        return (position.equals(new ChessPosition(row,col1)) || position.equals(new ChessPosition(row,col2)));
     }
 
     public boolean isInCheck(ChessGame.TeamColor team) {
