@@ -3,6 +3,7 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 
 /**
  * A class that can manage a chess game, making moves on a board
@@ -17,7 +18,7 @@ public class ChessGame {
 
     public ChessGame() {
         chessboard.resetBoard();
-        setTeamTurn(TeamColor.WHITE);
+        teamTurn = TeamColor.WHITE;
     }
 
     /**
@@ -60,7 +61,6 @@ public class ChessGame {
         removeIllegalMoves(startPosition, piece, legalMoves);
         //includeCastling(piece, legalMoves);
         //includeEnPassant(piece, legalMoves);
-        //return legalMoves;
         return legalMoves;
     }
 
@@ -82,9 +82,8 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        //if not move in allLegalMoves throw InvalidMoveException;
-        //else chessboard.makeMove(move);
-        throw new RuntimeException("Not implemented");
+        //Needs to throw exception
+        chessboard.makeMove(move);
     }
 
     /**
@@ -94,8 +93,7 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        //return chessboard.isInCheck(teamColor);
-        throw new RuntimeException("Not implemented");
+        return chessboard.isInCheck(teamColor);
     }
 
     /**
@@ -106,7 +104,7 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         //return (isInCheck(teamColor) && !hasLegalMoves(teamColor));
-        throw new RuntimeException("Not implemented");
+        return false;
     }
 
     /**
@@ -117,7 +115,8 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        //NEED TO IMPLEMENT
+        return false;
     }
 
     /**
@@ -126,16 +125,17 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        //chessboard.clearBoard();
-        //for (ChessPosition occupiedSquare : HashSet<ChessPosition> whiteOccupiedSquares) {
-            //ChessPiece newPiece = board.getPiece();
-            //chessboard.addPiece(occupiedSquare, newPiece);
-        //}
-        //for (ChessPosition occupiedSquare : HashSet<ChessPosition> blackOccupiedSquares) {
-            //ChessPiece newPiece = board.getPiece();
-            //chessboard.addPiece(occupiedSquare, newPiece);
-        //}
-        throw new RuntimeException("Not implemented");
+        chessboard.clearBoard();
+        HashSet<ChessPosition> whiteOccupiedSquares = chessboard.getWhitePieceLocations();
+        for (ChessPosition occupiedSquare : whiteOccupiedSquares) {
+            ChessPiece newPiece = chessboard.getPiece(occupiedSquare);
+            chessboard.addPiece(occupiedSquare, newPiece);
+        }
+        HashSet<ChessPosition> blackOccupiedSquares = chessboard.getBlackPieceLocations();
+        for (ChessPosition occupiedSquare : blackOccupiedSquares) {
+            ChessPiece newPiece = board.getPiece(occupiedSquare);
+            chessboard.addPiece(occupiedSquare, newPiece);
+        }
     }
 
     /**
@@ -145,5 +145,26 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return chessboard;
+    }
+
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessGame chessGame = (ChessGame) o;
+        return Objects.equals(chessboard, chessGame.getBoard()) && teamTurn == chessGame.getTeamTurn();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(chessboard, teamTurn);
+    }
+
+    @Override
+    public String toString() {
+        return "Turn: " + teamTurn + ". Chessboard: " + chessboard;
     }
 }

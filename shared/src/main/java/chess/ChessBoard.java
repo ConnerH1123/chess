@@ -15,8 +15,8 @@ public class ChessBoard {
     private final HashMap<ChessPiece.PieceType,Integer> whitePieces = new HashMap<>();
     private final HashMap<ChessPiece.PieceType,Integer> blackPieces = new HashMap<>();
 
-    private HashSet<ChessPosition> whitePieceLocations = new HashSet<>();
-    private HashSet<ChessPosition> blackPieceLocations = new HashSet<>();
+    private final HashSet<ChessPosition> whitePieceLocations = new HashSet<>();
+    private final HashSet<ChessPosition> blackPieceLocations = new HashSet<>();
 
     private ChessPosition whiteKingLocation;
     private ChessPosition blackKingLocation;
@@ -130,6 +130,7 @@ public class ChessBoard {
         ChessPiece[] rank1 = {wRook, wKnight, wBishop, wQueen, wKing, wBishop, wKnight, wRook};
         ChessPiece[] rank8 = {bRook, bKnight, bBishop, bQueen, bKing, bBishop, bKnight, bRook};
 
+        clearBoard();
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 ChessPosition newPosition = new ChessPosition(i+1,j+1);
@@ -167,6 +168,9 @@ public class ChessBoard {
         ChessPosition startPosition = move.getStartPosition();
         ChessPosition endPosition = move.getEndPosition();
         ChessPiece movingPiece = getPiece(startPosition);
+        if (movingPiece == null) {
+            return;
+        }
         ChessPiece capturedPiece = getPiece(endPosition);
         if (move.getPromotionPiece() != null) {
             updatePieceCount(movingPiece, false);
@@ -225,6 +229,46 @@ public class ChessBoard {
             case WHITE -> whiteKingLocation;
             case BLACK -> blackKingLocation;
         };
+    }
+
+    public void clearBoard() {
+        clearPieces();
+        clearLocations();
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                theBoard[i][j] = null;
+            }
+        }
+    }
+
+    private void clearPieces() {
+        for (ChessPiece.PieceType type : ChessPiece.PieceType.values()) {
+            whitePieces.put(type, 0);
+            blackPieces.put(type, 0);
+        }
+    }
+
+    private void clearLocations() {
+        whitePieceLocations.clear();
+        blackPieceLocations.clear();
+        whiteKingLocation = null;
+        blackKingLocation = null;
+    }
+
+    public HashSet<ChessPosition> getWhitePieceLocations() {
+        return whitePieceLocations;
+    }
+
+    public HashSet<ChessPosition> getBlackPieceLocations() {
+        return blackPieceLocations;
+    }
+
+    public ChessPosition getWhiteKingLocation() {
+        return whiteKingLocation;
+    }
+
+    public ChessPosition getBlackKingLocation() {
+        return blackKingLocation;
     }
 
     @Override
