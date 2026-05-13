@@ -57,11 +57,11 @@ public class ChessGame {
         if (piece == null) {
             return legalMoves;
         }
-        //removeIllegalMoves(startPosition, piece, legalMoves);
+        removeIllegalMoves(startPosition, piece, legalMoves);
         //includeCastling(piece, legalMoves);
         //includeEnPassant(piece, legalMoves);
         //return legalMoves;
-        throw new RuntimeException("Not implemented");
+        return legalMoves;
     }
 
     private void removeIllegalMoves(ChessPosition position, ChessPiece piece, HashSet<ChessMove> legalMoves) {
