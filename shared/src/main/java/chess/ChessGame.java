@@ -119,10 +119,10 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        return (isInCheck(teamColor) && !hasLegalMoves(teamColor));
+        return (isInCheck(teamColor) && hasNoLegalMoves(teamColor));
     }
 
-    private boolean hasLegalMoves(TeamColor teamColor) {
+    private boolean hasNoLegalMoves(TeamColor teamColor) {
         HashSet<ChessMove> allLegalMoves = generateLegalMoves(teamColor);
         return (allLegalMoves.isEmpty());
     }
@@ -144,7 +144,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        return (!isInCheck(teamColor) && !hasLegalMoves(teamColor));
+        return (!isInCheck(teamColor) && hasNoLegalMoves(teamColor));
     }
 
     /**
