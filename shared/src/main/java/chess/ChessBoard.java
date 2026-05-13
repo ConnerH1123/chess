@@ -234,6 +234,14 @@ public class ChessBoard {
         };
     }
 
+    public HashSet<ChessPosition> getFriendlyLocations(ChessGame.TeamColor team) {
+        return switch (team) {
+            case WHITE -> whitePieceLocations;
+            case BLACK -> blackPieceLocations;
+        };
+    }
+
+
     private ChessPosition getKingPosition(ChessGame.TeamColor team) {
         return switch (team) {
             case WHITE -> whiteKingLocation;
