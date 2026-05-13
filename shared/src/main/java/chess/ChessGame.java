@@ -165,6 +165,6 @@ public class ChessGame {
 
     @Override
     public String toString() {
-        return "Turn: " + teamTurn + ". Chessboard: " + chessboard;
+        return chessboard + "\nTurn: " + teamTurn;
     }
 }

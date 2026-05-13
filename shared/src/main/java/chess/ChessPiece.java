@@ -296,6 +296,18 @@ public class ChessPiece {
 
     @Override
     public String toString() {
-        return COLOR + " " + TYPE;
+        String team = switch (COLOR) {
+            case WHITE -> "w";
+            case BLACK -> "b";
+        };
+        String piece = switch (TYPE) {
+            case KING -> "K";
+            case QUEEN -> "Q";
+            case ROOK -> "R";
+            case BISHOP -> "B";
+            case KNIGHT -> "N";
+            case PAWN -> "P";
+        };
+        return " " + team + piece + " ";
     }
 }
