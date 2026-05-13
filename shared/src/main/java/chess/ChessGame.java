@@ -126,12 +126,12 @@ public class ChessGame {
      */
     public void setBoard(ChessBoard board) {
         chessboard.clearBoard();
-        HashSet<ChessPosition> whiteOccupiedSquares = chessboard.getWhitePieceLocations();
+        HashSet<ChessPosition> whiteOccupiedSquares = board.getWhitePieceLocations();
         for (ChessPosition occupiedSquare : whiteOccupiedSquares) {
-            ChessPiece newPiece = chessboard.getPiece(occupiedSquare);
+            ChessPiece newPiece = board.getPiece(occupiedSquare);
             chessboard.addPiece(occupiedSquare, newPiece);
         }
-        HashSet<ChessPosition> blackOccupiedSquares = chessboard.getBlackPieceLocations();
+        HashSet<ChessPosition> blackOccupiedSquares = board.getBlackPieceLocations();
         for (ChessPosition occupiedSquare : blackOccupiedSquares) {
             ChessPiece newPiece = board.getPiece(occupiedSquare);
             chessboard.addPiece(occupiedSquare, newPiece);

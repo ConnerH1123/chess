@@ -39,11 +39,14 @@ public class ChessBoard {
         int column = position.getColumn();
         theBoard[row-1][column-1] = piece;
         updatePieceCount(piece, true);
-        updatePieceLocation(piece.getTeamColor(),position,true);
+        updatePieceLocation(piece,position,true);
         updateKingPosition(piece, position);
     }
 
     private void updatePieceCount(ChessPiece piece, boolean isAdded) {
+        if (piece == null) {
+            return;
+        }
         int increment;
         if (isAdded) {
             increment = 1;
@@ -59,7 +62,11 @@ public class ChessBoard {
         }
     }
 
-    private void updatePieceLocation(ChessGame.TeamColor color, ChessPosition position, boolean isAdded) {
+    private void updatePieceLocation(ChessPiece piece, ChessPosition position, boolean isAdded) {
+        if (piece == null) {
+            return;
+        }
+        ChessGame.TeamColor color = piece.getTeamColor();
         if (isAdded) {
             if (color == ChessGame.TeamColor.WHITE) {
                 whitePieceLocations.add(position);
@@ -179,10 +186,10 @@ public class ChessBoard {
         }
         if (capturedPiece != null) {
             updatePieceCount(capturedPiece, false);
-            updatePieceLocation(capturedPiece.getTeamColor(),endPosition,false);
+            updatePieceLocation(capturedPiece,endPosition,false);
         }
-        updatePieceLocation(movingPiece.getTeamColor(),startPosition, false);
-        updatePieceLocation(movingPiece.getTeamColor(), endPosition, true);
+        updatePieceLocation(movingPiece,startPosition, false);
+        updatePieceLocation(movingPiece, endPosition, true);
         updateKingPosition(movingPiece, endPosition);
         //updateCastleStatus(movingPiece, startPosition);
         //updateEnPassantStatus(movingPiece, move);
@@ -192,6 +199,9 @@ public class ChessBoard {
     }
 
     private void updateKingPosition(ChessPiece piece, ChessPosition position) {
+        if (piece == null) {
+            return;
+        }
         if (piece.getPieceType() == ChessPiece.PieceType.KING) {
             if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
                 whiteKingLocation = position;
