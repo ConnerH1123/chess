@@ -69,9 +69,9 @@ public class ChessGame {
         for (ChessMove move : pieceMoves) {
             ChessBoard boardCopy = chessboard.copyBoard();
             boardCopy.makeMove(move);
-            //if (!boardCopy.isInCheck(piece.getTeamColor())) {
-                //legalMoves.add(move);
-            //}
+            if (!boardCopy.isInCheck(piece.getTeamColor())) {
+                legalMoves.add(move);
+            }
         }
     }
 

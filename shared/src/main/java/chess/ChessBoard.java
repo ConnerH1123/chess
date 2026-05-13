@@ -1,9 +1,6 @@
 package chess;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * A chessboard that can hold and rearrange chess pieces.
@@ -20,6 +17,9 @@ public class ChessBoard {
 
     private HashSet<ChessPosition> whitePieceLocations = new HashSet<>();
     private HashSet<ChessPosition> blackPieceLocations = new HashSet<>();
+
+    private ChessPosition whiteKingLocation;
+    private ChessPosition blackKingLocation;
 
     public ChessBoard() {
         for (ChessPiece.PieceType type : ChessPiece.PieceType.values()) {
@@ -40,6 +40,7 @@ public class ChessBoard {
         theBoard[row-1][column-1] = piece;
         updatePieceCount(piece, true);
         updatePieceLocation(piece.getTeamColor(),position,true);
+        updateKingPosition(piece, position);
     }
 
     private void updatePieceCount(ChessPiece piece, boolean isAdded) {
@@ -178,7 +179,7 @@ public class ChessBoard {
         }
         updatePieceLocation(movingPiece.getTeamColor(),startPosition, false);
         updatePieceLocation(movingPiece.getTeamColor(), endPosition, true);
-        //updateKingPosition(movingPiece, endPosition);
+        updateKingPosition(movingPiece, endPosition);
         //updateCastleStatus(movingPiece, startPosition);
         //updateEnPassantStatus(movingPiece, move);
 
@@ -186,18 +187,29 @@ public class ChessBoard {
         theBoard[endPosition.getRow()-1][endPosition.getColumn()-1] = movingPiece;
     }
 
+    private void updateKingPosition(ChessPiece piece, ChessPosition position) {
+        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+            if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                whiteKingLocation = position;
+            }
+            else {
+                blackKingLocation = position;
+            }
+        }
+    }
+
     public boolean isInCheck(ChessGame.TeamColor team) {
         HashSet<ChessPosition> enemyPieceLocations = getEnemyLocations(team);
-        //ChessPosition kingPosition = getKingPosition(team);
-        //for (ChessPosition enemySquare : enemyPieceLocations) {
-            //ChessPiece enemyPiece = getPiece(enemySquare);
-            //ArrayList<ChessMove> pieceMoves = (ArrayList<ChessMove>) enemyPiece.pieceMoves(chessboard, position);
-            //for (ChessMove move = pieceMoves) {
-                //if (move.getEndPosition() == kingPosition) {
-                    //return true;
-                //}
-            //}
-        //}
+        ChessPosition kingPosition = getKingPosition(team);
+        for (ChessPosition enemySquare : enemyPieceLocations) {
+            ChessPiece enemyPiece = getPiece(enemySquare);
+            ArrayList<ChessMove> pieceMoves = (ArrayList<ChessMove>) enemyPiece.pieceMoves(this, enemySquare);
+            for (ChessMove move : pieceMoves) {
+                if (move.getEndPosition() == kingPosition) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -208,14 +220,12 @@ public class ChessBoard {
         };
     }
 
-
-    //private ChessPosition getKingPosition(ChessGame.TeamColor team) {
-        //ChessPosition kingPosition = switch (team) {
-            //case WHITE -> whiteKingPosition;
-            //case BLACK -> blackKingPosition;
-        //};
-        //return kingPosition;
-    //}
+    private ChessPosition getKingPosition(ChessGame.TeamColor team) {
+        return switch (team) {
+            case WHITE -> whiteKingLocation;
+            case BLACK -> blackKingLocation;
+        };
+    }
 
     @Override
     public boolean equals(Object o) {
