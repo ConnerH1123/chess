@@ -18,6 +18,8 @@ public class ChessBoard {
     private final HashMap<ChessPiece.PieceType,Integer> whitePieces = new HashMap<>();
     private final HashMap<ChessPiece.PieceType,Integer> blackPieces = new HashMap<>();
 
+    private HashSet<ChessPosition> whitePieceLocations = new HashSet<>();
+    private HashSet<ChessPosition> blackPieceLocations = new HashSet<>();
 
     public ChessBoard() {
         for (ChessPiece.PieceType type : ChessPiece.PieceType.values()) {
@@ -36,10 +38,11 @@ public class ChessBoard {
         int row = position.getRow();
         int column = position.getColumn();
         theBoard[row-1][column-1] = piece;
-        updatePieceMap(piece, true);
+        updatePieceCount(piece, true);
+        updatePieceLocation(piece.getTeamColor(),position,true);
     }
 
-    private void updatePieceMap(ChessPiece piece, boolean isAdded) {
+    private void updatePieceCount(ChessPiece piece, boolean isAdded) {
         int increment;
         if (isAdded) {
             increment = 1;
@@ -52,6 +55,25 @@ public class ChessBoard {
         }
         else {
             blackPieces.merge(piece.getPieceType(), increment, Integer::sum);
+        }
+    }
+
+    private void updatePieceLocation(ChessGame.TeamColor color, ChessPosition position, boolean isAdded) {
+        if (isAdded) {
+            if (color == ChessGame.TeamColor.WHITE) {
+                whitePieceLocations.add(position);
+            }
+            else {
+                blackPieceLocations.add(position);
+            }
+        }
+        else {
+            if (color == ChessGame.TeamColor.WHITE) {
+                whitePieceLocations.remove(position);
+            }
+            else {
+                blackPieceLocations.remove(position);
+            }
         }
     }
 
@@ -146,18 +168,26 @@ public class ChessBoard {
         ChessPiece movingPiece = getPiece(startPosition);
         ChessPiece capturedPiece = getPiece(endPosition);
         if (move.getPromotionPiece() != null) {
+            updatePieceCount(movingPiece, false);
             movingPiece = new ChessPiece(movingPiece.getTeamColor(), move.getPromotionPiece());
+            updatePieceCount(movingPiece, true);
         }
         if (capturedPiece != null) {
-            updatePieceMap(capturedPiece, false);
+            updatePieceCount(capturedPiece, false);
+            updatePieceLocation(capturedPiece.getTeamColor(),endPosition,false);
         }
+        updatePieceLocation(movingPiece.getTeamColor(),startPosition, false);
+        updatePieceLocation(movingPiece.getTeamColor(), endPosition, true);
+        //updateKingPosition(movingPiece, endPosition);
+        //updateCastleStatus(movingPiece, startPosition);
+        //updateEnPassantStatus(movingPiece, move);
 
         theBoard[startPosition.getRow()-1][startPosition.getColumn()-1] = null;
         theBoard[endPosition.getRow()-1][endPosition.getColumn()-1] = movingPiece;
     }
 
     public boolean isInCheck(ChessGame.TeamColor team) {
-        //HashSet<ChessPosition> enemyPieceLocations = getEnemyLocations(team);
+        HashSet<ChessPosition> enemyPieceLocations = getEnemyLocations(team);
         //ChessPosition kingPosition = getKingPosition(team);
         //for (ChessPosition enemySquare : enemyPieceLocations) {
             //ChessPiece enemyPiece = getPiece(enemySquare);
@@ -171,13 +201,12 @@ public class ChessBoard {
         return false;
     }
 
-    //private ChessPosition getEnemyLocations(ChessGame.TeamColor team) {
-        //HashSet<ChessPosition> enemyPieceLocations = switch (team) {
-            //case WHITE -> blackPieceLocations;
-            //case BLACK -> whitePieceLocations;
-        //};
-        //return enemyPieceLocations;
-    //}
+    private HashSet<ChessPosition> getEnemyLocations(ChessGame.TeamColor team) {
+        return switch (team) {
+            case WHITE -> blackPieceLocations;
+            case BLACK -> whitePieceLocations;
+        };
+    }
 
 
     //private ChessPosition getKingPosition(ChessGame.TeamColor team) {
