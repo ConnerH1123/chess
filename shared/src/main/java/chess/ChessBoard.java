@@ -207,12 +207,12 @@ public class ChessBoard {
         ChessBoard copy = copyBoard();
         ChessMove partialCastle = new ChessMove(new ChessPosition(1,5),new ChessPosition(1,6),null);
         copy.makeMove(partialCastle);
-        if (isInCheck(ChessGame.TeamColor.WHITE)) {
+        if (copy.isInCheck(ChessGame.TeamColor.WHITE)) {
             return false;
         }
         ChessMove completeCastle = new ChessMove(new ChessPosition(1,6),new ChessPosition(1,7),null);
         copy.makeMove(completeCastle);
-        if (isInCheck(ChessGame.TeamColor.WHITE)) {
+        if (copy.isInCheck(ChessGame.TeamColor.WHITE)) {
             return false;
         }
         return true;
@@ -225,12 +225,12 @@ public class ChessBoard {
         ChessBoard copy = copyBoard();
         ChessMove partialCastle = new ChessMove(new ChessPosition(1,5),new ChessPosition(1,4),null);
         copy.makeMove(partialCastle);
-        if (isInCheck(ChessGame.TeamColor.WHITE)) {
+        if (copy.isInCheck(ChessGame.TeamColor.WHITE)) {
             return false;
         }
         ChessMove completeCastle = new ChessMove(new ChessPosition(1,4),new ChessPosition(1,3),null);
         copy.makeMove(completeCastle);
-        if (isInCheck(ChessGame.TeamColor.WHITE)) {
+        if (copy.isInCheck(ChessGame.TeamColor.WHITE)) {
             return false;
         }
         return true;
@@ -244,12 +244,12 @@ public class ChessBoard {
         ChessBoard copy = copyBoard();
         ChessMove partialCastle = new ChessMove(new ChessPosition(8,5),new ChessPosition(8,6),null);
         copy.makeMove(partialCastle);
-        if (isInCheck(ChessGame.TeamColor.BLACK)) {
+        if (copy.isInCheck(ChessGame.TeamColor.BLACK)) {
             return false;
         }
         ChessMove completeCastle = new ChessMove(new ChessPosition(8,6),new ChessPosition(8,7),null);
         copy.makeMove(completeCastle);
-        if (isInCheck(ChessGame.TeamColor.BLACK)) {
+        if (copy.isInCheck(ChessGame.TeamColor.BLACK)) {
             return false;
         }
         return true;
@@ -262,12 +262,12 @@ public class ChessBoard {
         ChessBoard copy = copyBoard();
         ChessMove partialCastle = new ChessMove(new ChessPosition(8,5),new ChessPosition(8,4),null);
         copy.makeMove(partialCastle);
-        if (isInCheck(ChessGame.TeamColor.BLACK)) {
+        if (copy.isInCheck(ChessGame.TeamColor.BLACK)) {
             return false;
         }
         ChessMove completeCastle = new ChessMove(new ChessPosition(8,4),new ChessPosition(8,3),null);
         copy.makeMove(completeCastle);
-        if (isInCheck(ChessGame.TeamColor.BLACK)) {
+        if (copy.isInCheck(ChessGame.TeamColor.BLACK)) {
             return false;
         }
         return true;
@@ -366,16 +366,29 @@ public class ChessBoard {
     }
 
     private void updateCastleStatus(ChessPiece piece, ChessPosition position) {
-        CastlingRights castlingRights = getCastlingRights(piece.getTeamColor());
-        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
-            castlingRights = castlingRights.setQueenSide(false);
-            castlingRights = castlingRights.setKingSide(false);
+        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+            if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+                whiteCastlingRights = whiteCastlingRights.setQueenSide(false);
+                whiteCastlingRights = whiteCastlingRights.setKingSide(false);
+            }
+            else if (piece.getPieceType() == ChessPiece.PieceType.ROOK && isStartingSquare(piece, position) && position.getColumn() == 1) {
+                whiteCastlingRights = whiteCastlingRights.setQueenSide(false);
+            }
+            else if (piece.getPieceType() == ChessPiece.PieceType.ROOK && isStartingSquare(piece, position) && position.getColumn() == 8) {
+                whiteCastlingRights = whiteCastlingRights.setKingSide(false);
+            }
         }
-        else if (piece.getPieceType() == ChessPiece.PieceType.ROOK && isStartingSquare(piece, position) && position.getColumn() == 1) {
-            castlingRights = castlingRights.setQueenSide(false);
-        }
-        else if (piece.getPieceType() == ChessPiece.PieceType.ROOK && isStartingSquare(piece, position) && position.getColumn() == 8) {
-            castlingRights = castlingRights.setKingSide(false);
+        else {
+            if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+                blackCastlingRights = blackCastlingRights.setQueenSide(false);
+                blackCastlingRights = blackCastlingRights.setKingSide(false);
+            }
+            else if (piece.getPieceType() == ChessPiece.PieceType.ROOK && isStartingSquare(piece, position) && position.getColumn() == 1) {
+                blackCastlingRights = blackCastlingRights.setQueenSide(false);
+            }
+            else if (piece.getPieceType() == ChessPiece.PieceType.ROOK && isStartingSquare(piece, position) && position.getColumn() == 8) {
+                blackCastlingRights = blackCastlingRights.setKingSide(false);
+            }
         }
     }
 
