@@ -219,7 +219,7 @@ public class ChessBoard {
             ChessPiece enemyPiece = getPiece(enemySquare);
             ArrayList<ChessMove> pieceMoves = (ArrayList<ChessMove>) enemyPiece.pieceMoves(this, enemySquare);
             for (ChessMove move : pieceMoves) {
-                if (move.getEndPosition() == kingPosition) {
+                if (move.getEndPosition().equals(kingPosition)) {
                     return true;
                 }
             }
