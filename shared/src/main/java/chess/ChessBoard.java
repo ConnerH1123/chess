@@ -182,6 +182,17 @@ public class ChessBoard {
         return whiteCastlingRights;
     }
 
+    public void setBlackCastlingRights(boolean queenSide, boolean kingSide) {
+        blackCastlingRights = blackCastlingRights.setQueenSide(queenSide);
+        blackCastlingRights = blackCastlingRights.setKingSide(kingSide);
+    }
+
+    public void setWhiteCastlingRights(boolean queenSide, boolean kingSide) {
+        whiteCastlingRights = whiteCastlingRights.setQueenSide(queenSide);
+        whiteCastlingRights = whiteCastlingRights.setKingSide(kingSide);
+    }
+
+
     private CastlingRights getCastlingRights(ChessGame.TeamColor teamColor) {
         return switch (teamColor) {
             case WHITE -> whiteCastlingRights;
@@ -322,18 +333,21 @@ public class ChessBoard {
     private void updateCastleStatus(ChessPiece piece, ChessPosition position) {
         CastlingRights castlingRights = getCastlingRights(piece.getTeamColor());
         if (piece.getPieceType() == ChessPiece.PieceType.KING) {
-            castlingRights.setQueenSide(false);
-            castlingRights.setKingSide(false);
+            castlingRights = castlingRights.setQueenSide(false);
+            castlingRights = castlingRights.setKingSide(false);
         }
         else if (piece.getPieceType() == ChessPiece.PieceType.ROOK && isStartingSquare(piece, position) && position.getColumn() == 1) {
-            castlingRights.setQueenSide(false);
+            castlingRights = castlingRights.setQueenSide(false);
         }
         else if (piece.getPieceType() == ChessPiece.PieceType.ROOK && isStartingSquare(piece, position) && position.getColumn() == 8) {
-            castlingRights.setKingSide(false);
+            castlingRights = castlingRights.setKingSide(false);
         }
     }
 
-    private boolean isStartingSquare(ChessPiece piece, ChessPosition position) {
+    public boolean isStartingSquare(ChessPiece piece, ChessPosition position) {
+        if (piece == null) {
+            return false;
+        }
         int row = switch (piece.getTeamColor()) {
             case WHITE -> 1;
             case BLACK -> 8;

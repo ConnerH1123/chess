@@ -83,9 +83,9 @@ public class ChessGame {
         if (castlingRights.queenSide()) {
             addQueenSideCastling(piece, moves);
         }
-        //if (castlingRights.getKingSide()) {
-            //addKingSideCastling(piece, moves);
-        //}
+        if (castlingRights.kingSide()) {
+            addKingSideCastling(piece, moves);
+        }
     }
 
     ChessBoard.CastlingRights getCastlingRights(TeamColor teamColor) {
@@ -107,7 +107,10 @@ public class ChessGame {
         else if (piece.getTeamColor() == TeamColor.BLACK && chessboard.blackQueenSideCastle()) {
             moves.add(BLACK_QUEEN_SIDE_CASTLE);
         }
-        else if (piece.getTeamColor() == TeamColor.WHITE && chessboard.whiteKingSideCastle()) {
+    }
+
+    private void addKingSideCastling(ChessPiece piece, HashSet<ChessMove> moves) {
+        if (piece.getTeamColor() == TeamColor.WHITE && chessboard.whiteKingSideCastle()) {
             moves.add(WHITE_KING_SIDE_CASTLE);
         }
         else if (piece.getTeamColor() == TeamColor.BLACK && chessboard.blackKingSideCastle()) {
@@ -204,6 +207,43 @@ public class ChessGame {
             ChessPiece newPiece = board.getPiece(occupiedSquare);
             chessboard.addPiece(occupiedSquare, newPiece);
         }
+        updateCastleStatus();
+    }
+
+    private void updateCastleStatus() {
+        ChessPosition a1 = new ChessPosition(1,1);
+        ChessPosition e1 = new ChessPosition(1,5);
+        ChessPosition h1 = new ChessPosition(1,8);
+        ChessPosition a8 = new ChessPosition(8,1);
+        ChessPosition e8 = new ChessPosition(8,5);
+        ChessPosition h8 = new ChessPosition(8,8);
+
+
+        ChessPiece wRook1 = chessboard.getPiece(a1);
+        ChessPiece wKing = chessboard.getPiece(e1);
+        ChessPiece wRook2 = chessboard.getPiece(h1);
+        ChessPiece bRook1 = chessboard.getPiece(a8);
+        ChessPiece bKing = chessboard.getPiece(e8);
+        ChessPiece bRook2 = chessboard.getPiece(h8);
+
+        boolean wQueenside = false;
+        boolean wKingside = false;
+        boolean bQueenside = false;
+        boolean bKingside = false;
+        if (chessboard.isStartingSquare(wRook1, a1) && chessboard.isStartingSquare(wKing, e1)) {
+            wQueenside = true;
+        }
+        if (chessboard.isStartingSquare(wRook2, h1) && chessboard.isStartingSquare(wKing, e1)) {
+            wKingside = true;
+        }
+        if (chessboard.isStartingSquare(bRook1, a8) && chessboard.isStartingSquare(bKing, e8)) {
+            bQueenside = true;
+        }
+        if (chessboard.isStartingSquare(bRook2, h8) && chessboard.isStartingSquare(bKing, e8)) {
+            bKingside = true;
+        }
+        chessboard.setWhiteCastlingRights(wQueenside,wKingside);
+        chessboard.setBlackCastlingRights(bQueenside,bKingside);
     }
 
     /**
