@@ -171,8 +171,8 @@ public class ChessBoard {
         }
     }
 
-    private CastlingRights whiteCastlingRights;
-    private CastlingRights blackCastlingRights;
+    private CastlingRights whiteCastlingRights = new CastlingRights(false,false);
+    private CastlingRights blackCastlingRights = new CastlingRights(false,false);
 
     public CastlingRights getBlackCastlingRights() {
         return blackCastlingRights;
@@ -309,11 +309,46 @@ public class ChessBoard {
         updatePieceLocation(movingPiece,startPosition, false);
         updatePieceLocation(movingPiece, endPosition, true);
         updateKingPosition(movingPiece, endPosition);
-        //updateCastleStatus(movingPiece, startPosition);
+        updateCastleStatus(movingPiece, startPosition);
         //updateEnPassantStatus(movingPiece, move);
+
+        if (movingPiece.getPieceType() == ChessPiece.PieceType.KING) {
+            ArrayList<ChessMove> normalKingMoves = (ArrayList<ChessMove>) movingPiece.pieceMoves(this, startPosition);
+            if (!normalKingMoves.contains(move)) {
+                castle(movingPiece, move);
+            }
+        }
 
         theBoard[startPosition.getRow()-1][startPosition.getColumn()-1] = null;
         theBoard[endPosition.getRow()-1][endPosition.getColumn()-1] = movingPiece;
+    }
+
+    private void castle(ChessPiece piece, ChessMove move) {
+        ChessPosition startPosition = move.getStartPosition();
+        ChessPosition endPosition = move.getEndPosition();
+
+        theBoard[startPosition.getRow()-1][startPosition.getColumn()-1] = null;
+        theBoard[endPosition.getRow()-1][endPosition.getColumn()-1] = piece;
+
+        int rRow = switch (piece.getTeamColor()) {
+            case WHITE -> 1;
+            case BLACK -> 8;
+        };
+        int rStartingCol = switch (endPosition.getColumn()) {
+            case 3 -> 1;
+            case 7 -> 8;
+            default -> 0;
+        };
+        int rEndingCol = switch (endPosition.getColumn()) {
+            case 3 -> 4;
+            case 7 -> 6;
+            default -> 0;
+        };
+        ChessPosition rStartingPosition = new ChessPosition(rRow, rStartingCol);
+        ChessPosition rEndingPosition = new ChessPosition(rRow, rEndingCol);
+        ChessMove rookMove = new ChessMove(rStartingPosition, rEndingPosition, null);
+
+        makeMove(rookMove);
     }
 
     private void updateKingPosition(ChessPiece piece, ChessPosition position) {
