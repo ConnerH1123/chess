@@ -158,6 +158,75 @@ public class ChessBoard {
                 }
             }
         }
+        blackCastlingRights = new CastlingRights(true,true);
+        whiteCastlingRights = new CastlingRights(true,true);
+    }
+
+    public record CastlingRights(boolean queenSide, boolean kingSide) {
+        public CastlingRights setQueenSide(boolean b) {
+            return new CastlingRights(b,this.kingSide);
+        }
+        public CastlingRights setKingSide(boolean b) {
+            return new CastlingRights(this.queenSide,b);
+        }
+    }
+
+    private CastlingRights whiteCastlingRights;
+    private CastlingRights blackCastlingRights;
+
+    public CastlingRights getBlackCastlingRights() {
+        return blackCastlingRights;
+    }
+
+    public CastlingRights getWhiteCastlingRights() {
+        return whiteCastlingRights;
+    }
+
+    private CastlingRights getCastlingRights(ChessGame.TeamColor teamColor) {
+        return switch (teamColor) {
+            case WHITE -> whiteCastlingRights;
+            case BLACK -> blackCastlingRights;
+        };
+    }
+
+    public boolean whiteQueenSideCastle() {
+        if (isInCheck(ChessGame.TeamColor.WHITE) || !isEmptyPosition(1,6) || !isEmptyPosition(1,7)) {
+            return false;
+        }
+        ChessBoard copy = copyBoard();
+        ChessMove partialCastle = new ChessMove(new ChessPosition(1,5),new ChessPosition(1,6),null);
+        copy.makeMove(partialCastle);
+        if (isInCheck(ChessGame.TeamColor.WHITE)) {
+            return false;
+        }
+        ChessMove completeCastle = new ChessMove(new ChessPosition(1,6),new ChessPosition(1,7),null);
+        copy.makeMove(completeCastle);
+        if (isInCheck(ChessGame.TeamColor.WHITE)) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean blackQueenSideCastle() {
+        if (isInCheck(ChessGame.TeamColor.BLACK) || !isEmptyPosition(8,6) || !isEmptyPosition(8,7)) {
+            return false;
+        }
+        ChessBoard copy = copyBoard();
+        ChessMove partialCastle = new ChessMove(new ChessPosition(8,5),new ChessPosition(8,6),null);
+        copy.makeMove(partialCastle);
+        if (isInCheck(ChessGame.TeamColor.BLACK)) {
+            return false;
+        }
+        ChessMove completeCastle = new ChessMove(new ChessPosition(8,6),new ChessPosition(8,7),null);
+        copy.makeMove(completeCastle);
+        if (isInCheck(ChessGame.TeamColor.BLACK)) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isEmptyPosition(int row, int col) {
+        return getPiece(new ChessPosition(row,col)) == null;
     }
 
     public ChessBoard copyBoard() {
@@ -209,6 +278,13 @@ public class ChessBoard {
             else {
                 blackKingLocation = position;
             }
+        }
+    }
+
+    private void updateCastleStatus(ChessPiece piece, ChessPosition position) {
+        CastlingRights castlingRights = getCastlingRights(piece.getTeamColor());
+        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+            castlingRights = new CastlingRights(false, false);
         }
     }
 

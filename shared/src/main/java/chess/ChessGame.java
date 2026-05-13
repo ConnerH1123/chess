@@ -59,7 +59,7 @@ public class ChessGame {
             return legalMoves;
         }
         removeIllegalMoves(startPosition, piece, legalMoves);
-        //includeCastling(piece, legalMoves);
+        includeCastling(piece, legalMoves);
         //includeEnPassant(piece, legalMoves);
         return legalMoves;
     }
@@ -72,6 +72,38 @@ public class ChessGame {
             if (!boardCopy.isInCheck(piece.getTeamColor())) {
                 legalMoves.add(move);
             }
+        }
+    }
+
+    private void includeCastling(ChessPiece piece, HashSet<ChessMove> moves) {
+        if (piece.getPieceType() != ChessPiece.PieceType.KING) {
+            return;
+        }
+        ChessBoard.CastlingRights castlingRights = getCastlingRights(piece.getTeamColor());
+        if (castlingRights.queenSide()) {
+            addQueenSideCastling(piece, moves);
+        }
+        //if (castlingRights.getKingSide()) {
+            //addKingSideCastling(piece, moves);
+        //}
+    }
+
+    ChessBoard.CastlingRights getCastlingRights(TeamColor teamColor) {
+        return switch (teamColor) {
+            case WHITE -> chessboard.getWhiteCastlingRights();
+            case BLACK -> chessboard.getBlackCastlingRights();
+        };
+    }
+
+    private final ChessMove WHITE_QUEEN_SIDE_CASTLE = new ChessMove(new ChessPosition(1,4),new ChessPosition(1,6), null);
+    private final ChessMove BLACK_QUEEN_SIDE_CASTLE = new ChessMove(new ChessPosition(8,4),new ChessPosition(8,6), null);
+
+    private void addQueenSideCastling(ChessPiece piece, HashSet<ChessMove> moves) {
+        if (piece.getTeamColor() == TeamColor.WHITE && chessboard.whiteQueenSideCastle()) {
+            moves.add(WHITE_QUEEN_SIDE_CASTLE);
+        }
+        else if (piece.getTeamColor() == TeamColor.BLACK && chessboard.blackQueenSideCastle()) {
+            moves.add(BLACK_QUEEN_SIDE_CASTLE);
         }
     }
 
