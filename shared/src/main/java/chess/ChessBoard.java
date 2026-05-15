@@ -316,8 +316,16 @@ public class ChessBoard {
             ArrayList<ChessMove> normalKingMoves = (ArrayList<ChessMove>) movingPiece.pieceMoves(this, startPosition);
             if (!normalKingMoves.contains(move)) {
                 castle(movingPiece, move);
+                return;
             }
         }
+
+        //Should put this in validMoves
+        //if (!enPassantMoves.isEmpty()) {
+            //move = enPassantMoves.pop();
+            //enPassantMove(move);
+            //return;
+        //}
 
         theBoard[startPosition.getRow()-1][startPosition.getColumn()-1] = null;
         theBoard[endPosition.getRow()-1][endPosition.getColumn()-1] = movingPiece;
@@ -349,6 +357,16 @@ public class ChessBoard {
         ChessMove rookMove = new ChessMove(rStartingPosition, rEndingPosition, null);
 
         makeMove(rookMove);
+    }
+
+    private void enPassantMove(ChessMove move) {
+        //int row = move.getStartPosition().getRow();
+        //int col = move.getEndPosition().getCol();
+        //ChessPosition partialEndPosition = new ChessPosition(row, col)
+        //ChessMove partialMove = new ChessMove(move.getStartPosition(), partialEndPosition, null);
+        //makeMove(partialMove);
+        //ChessMove completedMove = new ChessMove(partialEndPosition, move.getEndPosition(), null);
+        //makeMove(partialEndPosition, move.getEndPosition);
     }
 
     private void updateKingPosition(ChessPiece piece, ChessPosition position) {
