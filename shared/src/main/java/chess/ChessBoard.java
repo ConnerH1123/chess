@@ -330,7 +330,7 @@ public class ChessBoard {
 
         if (movingPiece.getPieceType() == ChessPiece.PieceType.PAWN) {
             ArrayList<ChessMove> normalPawnMoves = (ArrayList<ChessMove>) movingPiece.pieceMoves(this, startPosition);
-            if (!normalPawnMoves.contains(move)) {
+            if (!normalPawnMoves.contains(move) && capturedPiece == null) {
                 enPassantMove(move);
                 return;
             }

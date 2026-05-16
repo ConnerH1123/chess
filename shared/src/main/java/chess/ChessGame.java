@@ -60,7 +60,7 @@ public class ChessGame {
         }
         removeIllegalMoves(startPosition, piece, legalMoves);
         includeCastling(piece, legalMoves);
-        //includeEnPassant(legalMoves);
+        includeEnPassant(legalMoves);
         return legalMoves;
     }
 
