@@ -289,7 +289,14 @@ public class ChessBoard {
         return copy;
     }
 
+    private final ArrayList<ChessMove> enPassantMoveList = new ArrayList<>();
+
+    public ArrayList<ChessMove> getEnPassantMoves() {
+        return enPassantMoveList;
+    }
+
     public void makeMove(ChessMove move) {
+        enPassantMoveList.clear();
         ChessPosition startPosition = move.getStartPosition();
         ChessPosition endPosition = move.getEndPosition();
         ChessPiece movingPiece = getPiece(startPosition);
@@ -306,11 +313,12 @@ public class ChessBoard {
             updatePieceCount(capturedPiece, false);
             updatePieceLocation(capturedPiece,endPosition,false);
         }
+
         updatePieceLocation(movingPiece,startPosition, false);
         updatePieceLocation(movingPiece, endPosition, true);
         updateKingPosition(movingPiece, endPosition);
         updateCastleStatus(movingPiece, startPosition);
-        //updateEnPassantStatus(movingPiece, move);
+        updateEnPassantStatus(movingPiece, move);
 
         if (movingPiece.getPieceType() == ChessPiece.PieceType.KING) {
             ArrayList<ChessMove> normalKingMoves = (ArrayList<ChessMove>) movingPiece.pieceMoves(this, startPosition);
@@ -320,12 +328,13 @@ public class ChessBoard {
             }
         }
 
-        //Should put this in validMoves
-        //if (!enPassantMoves.isEmpty()) {
-            //move = enPassantMoves.pop();
-            //enPassantMove(move);
-            //return;
-        //}
+        if (movingPiece.getPieceType() == ChessPiece.PieceType.PAWN) {
+            ArrayList<ChessMove> normalPawnMoves = (ArrayList<ChessMove>) movingPiece.pieceMoves(this, startPosition);
+            if (!normalPawnMoves.contains(move)) {
+                enPassantMove(move);
+                return;
+            }
+        }
 
         theBoard[startPosition.getRow()-1][startPosition.getColumn()-1] = null;
         theBoard[endPosition.getRow()-1][endPosition.getColumn()-1] = movingPiece;
@@ -359,14 +368,43 @@ public class ChessBoard {
         makeMove(rookMove);
     }
 
+    private void updateEnPassantStatus(ChessPiece piece, ChessMove move) {
+        if (piece.getPieceType() != ChessPiece.PieceType.PAWN) {
+            return;
+        }
+        int startRow = move.getStartPosition().getRow();
+        int endRow = move.getEndPosition().getRow();
+
+        if (Math.abs(startRow-endRow) != 2) {
+            return;
+        }
+
+        ChessPosition leftAdjacentPosition = new ChessPosition(endRow, move.getEndPosition().getColumn()-1);
+        ChessPosition rightAdjacentPosition = new ChessPosition(endRow, move.getEndPosition().getColumn()+1);
+        ChessPiece leftAdjacentPiece = getPiece(leftAdjacentPosition);
+        ChessPiece rightAdjacentPiece = getPiece(rightAdjacentPosition);
+
+        ChessPosition behindPawn = new ChessPosition((startRow+endRow)/2, move.getEndPosition().getColumn());
+
+        if (leftAdjacentPiece != null && leftAdjacentPiece.getPieceType() == ChessPiece.PieceType.PAWN) {
+            ChessMove enPassant = new ChessMove(leftAdjacentPosition, behindPawn, null);
+            enPassantMoveList.add(enPassant);
+        }
+        if (rightAdjacentPiece != null && rightAdjacentPiece.getPieceType() == ChessPiece.PieceType.PAWN) {
+            ChessMove enPassant = new ChessMove(rightAdjacentPosition, behindPawn, null);
+            enPassantMoveList.add(enPassant);
+        }
+
+    }
+
     private void enPassantMove(ChessMove move) {
-        //int row = move.getStartPosition().getRow();
-        //int col = move.getEndPosition().getCol();
-        //ChessPosition partialEndPosition = new ChessPosition(row, col)
-        //ChessMove partialMove = new ChessMove(move.getStartPosition(), partialEndPosition, null);
-        //makeMove(partialMove);
-        //ChessMove completedMove = new ChessMove(partialEndPosition, move.getEndPosition(), null);
-        //makeMove(partialEndPosition, move.getEndPosition);
+        int row = move.getStartPosition().getRow();
+        int col = move.getEndPosition().getColumn();
+        ChessPosition partialEndPosition = new ChessPosition(row, col);
+        ChessMove partialMove = new ChessMove(move.getStartPosition(), partialEndPosition, null);
+        makeMove(partialMove);
+        ChessMove completedMove = new ChessMove(partialEndPosition, move.getEndPosition(), null);
+        makeMove(completedMove);
     }
 
     private void updateKingPosition(ChessPiece piece, ChessPosition position) {

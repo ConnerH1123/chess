@@ -60,7 +60,7 @@ public class ChessGame {
         }
         removeIllegalMoves(startPosition, piece, legalMoves);
         includeCastling(piece, legalMoves);
-        //includeEnPassant(piece, legalMoves);
+        //includeEnPassant(legalMoves);
         return legalMoves;
     }
 
@@ -117,6 +117,14 @@ public class ChessGame {
             moves.add(BLACK_KING_SIDE_CASTLE);
         }
     }
+
+    private void includeEnPassant(HashSet<ChessMove> moves) {
+        ArrayList<ChessMove> enPassantMoves = chessboard.getEnPassantMoves();
+        if (enPassantMoves != null) {
+            moves.addAll(enPassantMoves);
+        }
+    }
+
 
     /**
      * Makes a move in the chess game
