@@ -93,10 +93,20 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
+        if (!isInBounds(position)) {
+            return null;
+        }
         int row = position.getRow();
         int column = position.getColumn();
         return theBoard[row-1][column-1];
     }
+
+    private boolean isInBounds(ChessPosition position) {
+        int row = position.getRow();
+        int col = position.getColumn();
+        return (row <= 8 && row >= 1 && col <= 8 && col >= 1);
+    }
+
 
     public HashMap<ChessPiece.PieceType, Integer> getWhitePieces() {
         return whitePieces;
@@ -297,28 +307,26 @@ public class ChessBoard {
 
     public void makeMove(ChessMove move) {
         enPassantMoveList.clear();
+
         ChessPosition startPosition = move.getStartPosition();
         ChessPosition endPosition = move.getEndPosition();
+
         ChessPiece movingPiece = getPiece(startPosition);
         if (movingPiece == null) {
             return;
         }
+
         ChessPiece capturedPiece = getPiece(endPosition);
-        if (move.getPromotionPiece() != null) {
-            updatePieceCount(movingPiece, false);
-            movingPiece = new ChessPiece(movingPiece.getTeamColor(), move.getPromotionPiece());
-            updatePieceCount(movingPiece, true);
-        }
         if (capturedPiece != null) {
             updatePieceCount(capturedPiece, false);
             updatePieceLocation(capturedPiece,endPosition,false);
         }
 
-        updatePieceLocation(movingPiece,startPosition, false);
-        updatePieceLocation(movingPiece, endPosition, true);
-        updateKingPosition(movingPiece, endPosition);
-        updateCastleStatus(movingPiece, startPosition);
-        updateEnPassantStatus(movingPiece, move);
+        if (move.getPromotionPiece() != null) {
+            updatePieceCount(movingPiece, false);
+            movingPiece = new ChessPiece(movingPiece.getTeamColor(), move.getPromotionPiece());
+            updatePieceCount(movingPiece, true);
+        }
 
         if (movingPiece.getPieceType() == ChessPiece.PieceType.KING) {
             ArrayList<ChessMove> normalKingMoves = (ArrayList<ChessMove>) movingPiece.pieceMoves(this, startPosition);
@@ -336,16 +344,28 @@ public class ChessBoard {
             }
         }
 
+        movePiece(movingPiece, move);
+    }
+
+    private void movePiece(ChessPiece piece, ChessMove move) {
+        ChessPosition startPosition = move.getStartPosition();
+        ChessPosition endPosition = move.getEndPosition();
+
+        updatePieceLocation(piece,startPosition, false);
+        updatePieceLocation(piece, endPosition, true);
+        updateKingPosition(piece, endPosition);
+        updateCastleStatus(piece, startPosition);
+        updateEnPassantStatus(piece, move);
+
         theBoard[startPosition.getRow()-1][startPosition.getColumn()-1] = null;
-        theBoard[endPosition.getRow()-1][endPosition.getColumn()-1] = movingPiece;
+        theBoard[endPosition.getRow()-1][endPosition.getColumn()-1] = piece;
     }
 
     private void castle(ChessPiece piece, ChessMove move) {
         ChessPosition startPosition = move.getStartPosition();
         ChessPosition endPosition = move.getEndPosition();
 
-        theBoard[startPosition.getRow()-1][startPosition.getColumn()-1] = null;
-        theBoard[endPosition.getRow()-1][endPosition.getColumn()-1] = piece;
+        movePiece(piece, move);
 
         int rRow = switch (piece.getTeamColor()) {
             case WHITE -> 1;
