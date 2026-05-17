@@ -311,22 +311,12 @@ public class ChessBoard {
         ChessPosition startPosition = move.getStartPosition();
         ChessPosition endPosition = move.getEndPosition();
 
-        ChessPiece movingPiece = getPiece(startPosition);
-        if (movingPiece == null) {
+        if (getPiece(startPosition) == null) {
             return;
         }
 
-        ChessPiece capturedPiece = getPiece(endPosition);
-        if (capturedPiece != null) {
-            updatePieceCount(capturedPiece, false);
-            updatePieceLocation(capturedPiece,endPosition,false);
-        }
-
-        if (move.getPromotionPiece() != null) {
-            updatePieceCount(movingPiece, false);
-            movingPiece = new ChessPiece(movingPiece.getTeamColor(), move.getPromotionPiece());
-            updatePieceCount(movingPiece, true);
-        }
+        boolean pieceCaptured = capturePiece(endPosition);
+        ChessPiece movingPiece = promotionMove(move);
 
         if (movingPiece.getPieceType() == ChessPiece.PieceType.KING) {
             ArrayList<ChessMove> normalKingMoves = (ArrayList<ChessMove>) movingPiece.pieceMoves(this, startPosition);
@@ -338,13 +328,35 @@ public class ChessBoard {
 
         if (movingPiece.getPieceType() == ChessPiece.PieceType.PAWN) {
             ArrayList<ChessMove> normalPawnMoves = (ArrayList<ChessMove>) movingPiece.pieceMoves(this, startPosition);
-            if (!normalPawnMoves.contains(move) && capturedPiece == null) {
+            if (!normalPawnMoves.contains(move) && !pieceCaptured) {
                 enPassantMove(move);
                 return;
             }
         }
 
         movePiece(movingPiece, move);
+    }
+
+    private ChessPiece promotionMove(ChessMove move) {
+        ChessPiece piece = getPiece(move.getStartPosition());
+        if (move.getPromotionPiece() != null) {
+            updatePieceCount(piece, false);
+            updatePieceCount(piece, true);
+            return new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
+        }
+        else {
+            return piece;
+        }
+    }
+
+    private boolean capturePiece(ChessPosition position) {
+        ChessPiece capturedPiece = getPiece(position);
+        if (capturedPiece != null) {
+            updatePieceCount(capturedPiece, false);
+            updatePieceLocation(capturedPiece,position,false);
+            return true;
+        }
+        return false;
     }
 
     private void movePiece(ChessPiece piece, ChessMove move) {
