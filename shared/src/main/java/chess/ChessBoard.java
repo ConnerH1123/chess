@@ -202,16 +202,8 @@ public class ChessBoard {
         whiteCastlingRights = whiteCastlingRights.setKingSide(kingSide);
     }
 
-
-    private CastlingRights getCastlingRights(ChessGame.TeamColor teamColor) {
-        return switch (teamColor) {
-            case WHITE -> whiteCastlingRights;
-            case BLACK -> blackCastlingRights;
-        };
-    }
-
     public boolean whiteKingSideCastle() {
-        if (isInCheck(ChessGame.TeamColor.WHITE) || !isEmptyPosition(1,6) || !isEmptyPosition(1,7)) {
+        if (isInCheck(ChessGame.TeamColor.WHITE) || isOccupied(1,6) || isOccupied(1,7)) {
             return false;
         }
         ChessBoard copy = copyBoard();
@@ -229,7 +221,7 @@ public class ChessBoard {
     }
 
     public boolean whiteQueenSideCastle() {
-        if (isInCheck(ChessGame.TeamColor.WHITE) || !isEmptyPosition(1,4) || !isEmptyPosition(1,3)) {
+        if (isInCheck(ChessGame.TeamColor.WHITE) || isOccupied(1,4) || isOccupied(1,3)) {
             return false;
         }
         ChessBoard copy = copyBoard();
@@ -248,7 +240,7 @@ public class ChessBoard {
 
 
     public boolean blackKingSideCastle() {
-        if (isInCheck(ChessGame.TeamColor.BLACK) || !isEmptyPosition(8,6) || !isEmptyPosition(8,7)) {
+        if (isInCheck(ChessGame.TeamColor.BLACK) || isOccupied(8,6) || isOccupied(8,7)) {
             return false;
         }
         ChessBoard copy = copyBoard();
@@ -266,7 +258,7 @@ public class ChessBoard {
     }
 
     public boolean blackQueenSideCastle() {
-        if (isInCheck(ChessGame.TeamColor.BLACK) || !isEmptyPosition(8,4) || !isEmptyPosition(8,3)) {
+        if (isInCheck(ChessGame.TeamColor.BLACK) || isOccupied(8,4) || isOccupied(8,3)) {
             return false;
         }
         ChessBoard copy = copyBoard();
@@ -284,8 +276,8 @@ public class ChessBoard {
     }
 
 
-    private boolean isEmptyPosition(int row, int col) {
-        return getPiece(new ChessPosition(row,col)) == null;
+    private boolean isOccupied(int row, int col) {
+        return getPiece(new ChessPosition(row,col)) != null;
     }
 
     public ChessBoard copyBoard() {
@@ -380,7 +372,6 @@ public class ChessBoard {
     }
 
     private void castle(ChessPiece piece, ChessMove move) {
-        ChessPosition startPosition = move.getStartPosition();
         ChessPosition endPosition = move.getEndPosition();
 
         movePiece(piece, move);
@@ -580,14 +571,6 @@ public class ChessBoard {
 
     public HashSet<ChessPosition> getBlackPieceLocations() {
         return blackPieceLocations;
-    }
-
-    public ChessPosition getWhiteKingLocation() {
-        return whiteKingLocation;
-    }
-
-    public ChessPosition getBlackKingLocation() {
-        return blackKingLocation;
     }
 
     @Override
