@@ -306,35 +306,41 @@ public class ChessBoard {
     }
 
     public void makeMove(ChessMove move) {
-        enPassantMoveList.clear();
-
         ChessPosition startPosition = move.getStartPosition();
         ChessPosition endPosition = move.getEndPosition();
-
         if (getPiece(startPosition) == null) {
             return;
         }
-
+        enPassantMoveList.clear();
         boolean pieceCaptured = capturePiece(endPosition);
         ChessPiece movingPiece = promotionMove(move);
+        boolean castled = castleMove(movingPiece, move);
+        boolean didEnPassant = enPassant(movingPiece, move, pieceCaptured);
+        if (!castled && !didEnPassant) {
+            movePiece(movingPiece, move);
+        }
+    }
 
-        if (movingPiece.getPieceType() == ChessPiece.PieceType.KING) {
-            ArrayList<ChessMove> normalKingMoves = (ArrayList<ChessMove>) movingPiece.pieceMoves(this, startPosition);
+    private boolean castleMove(ChessPiece piece, ChessMove move) {
+        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+            ArrayList<ChessMove> normalKingMoves = (ArrayList<ChessMove>) piece.pieceMoves(this, move.getStartPosition());
             if (!normalKingMoves.contains(move)) {
-                castle(movingPiece, move);
-                return;
+                castle(piece, move);
+                return true;
             }
         }
+        return false;
+    }
 
-        if (movingPiece.getPieceType() == ChessPiece.PieceType.PAWN) {
-            ArrayList<ChessMove> normalPawnMoves = (ArrayList<ChessMove>) movingPiece.pieceMoves(this, startPosition);
+    private boolean enPassant(ChessPiece piece, ChessMove move, boolean pieceCaptured ) {
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
+            ArrayList<ChessMove> normalPawnMoves = (ArrayList<ChessMove>) piece.pieceMoves(this, move.getStartPosition());
             if (!normalPawnMoves.contains(move) && !pieceCaptured) {
                 enPassantMove(move);
-                return;
+                return true;
             }
         }
-
-        movePiece(movingPiece, move);
+        return false;
     }
 
     private ChessPiece promotionMove(ChessMove move) {
