@@ -48,8 +48,12 @@ public class ChessBoard {
             return;
         }
         int increment;
-        if (isAdded) increment = 1;
-        else increment = -1;
+        if (isAdded) {
+            increment = 1;
+        }
+        else {
+            increment = -1;
+        }
         switch (piece.getTeamColor()) {
             case WHITE -> whitePieces.merge(piece.getPieceType(), increment, Integer::sum);
             case BLACK -> blackPieces.merge(piece.getPieceType(), increment, Integer::sum);
@@ -122,8 +126,12 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        ChessPiece[] rank1 = {ValidChessPiece.wRook, ValidChessPiece.wKnight, ValidChessPiece.wBishop, ValidChessPiece.wQueen, ValidChessPiece.wKing, ValidChessPiece.wBishop, ValidChessPiece.wKnight, ValidChessPiece.wRook};
-        ChessPiece[] rank8 = {ValidChessPiece.bRook, ValidChessPiece.bKnight, ValidChessPiece.bBishop, ValidChessPiece.bQueen, ValidChessPiece.bKing, ValidChessPiece.bBishop, ValidChessPiece.bKnight, ValidChessPiece.bRook};
+        ChessPiece[] rank1 = {ValidChessPiece.WHITE_ROOK, ValidChessPiece.WHITE_KNIGHT, ValidChessPiece.WHITE_BISHOP,
+                                ValidChessPiece.WHITE_QUEEN, ValidChessPiece.WHITE_KING, ValidChessPiece.WHITE_BISHOP,
+                                ValidChessPiece.WHITE_KNIGHT, ValidChessPiece.WHITE_ROOK};
+        ChessPiece[] rank8 = {ValidChessPiece.BLACK_ROOK, ValidChessPiece.BLACK_KNIGHT, ValidChessPiece.BLACK_BISHOP,
+                                ValidChessPiece.BLACK_QUEEN, ValidChessPiece.BLACK_KING, ValidChessPiece.BLACK_BISHOP,
+                                ValidChessPiece.BLACK_KNIGHT, ValidChessPiece.BLACK_ROOK};
 
         clearBoard();
         for (int i = 0; i < 8; i++) {
@@ -131,8 +139,8 @@ public class ChessBoard {
                 ChessPosition newPosition = new ChessPosition(i+1,j+1);
                 switch (i) {
                     case 0 -> addPiece(newPosition, rank1[j]);
-                    case 1 -> addPiece(newPosition, ValidChessPiece.wPawn);
-                    case 6 -> addPiece(newPosition, ValidChessPiece.bPawn);
+                    case 1 -> addPiece(newPosition, ValidChessPiece.WHITE_PAWN);
+                    case 6 -> addPiece(newPosition, ValidChessPiece.BLACK_PAWN);
                     case 7 -> addPiece(newPosition, rank8[j]);
                     default -> theBoard[i][j] = null;
                 }
