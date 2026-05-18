@@ -420,7 +420,7 @@ public class ChessBoard {
 
     private void updateCastleStatus(ChessPiece piece, ChessPosition position) {
         boolean kingMoved = piece.getPieceType() == ChessPiece.PieceType.KING;
-        boolean rookMovedFromInitialSquare = (piece.getPieceType() == ChessPiece.PieceType.ROOK && isStartingSquare(piece, position));
+        boolean rookMovedFromInitialSquare = (piece.getPieceType() == ChessPiece.PieceType.ROOK && isRookStartingSquare(piece, position));
         if (kingMoved) {
             switch (piece.getTeamColor()) {
                 case WHITE -> {
@@ -451,7 +451,7 @@ public class ChessBoard {
         }
     }
 
-    public boolean isStartingSquare(ChessPiece piece, ChessPosition position) {
+    public boolean isRookStartingSquare(ChessPiece piece, ChessPosition position) {
         if (piece == null) {
             return false;
         }
@@ -459,22 +459,8 @@ public class ChessBoard {
             case WHITE -> 1;
             case BLACK -> 8;
         };
-        int col1 = switch (piece.getPieceType()) {
-            case KING -> 5;
-            case QUEEN -> 4;
-            case BISHOP -> 3;
-            case KNIGHT -> 2;
-            case ROOK -> 1;
-            case PAWN -> 0;
-        };
-        int col2 = switch (piece.getPieceType()) {
-            case KING -> 5;
-            case QUEEN -> 4;
-            case BISHOP -> 6;
-            case KNIGHT -> 7;
-            case ROOK -> 8;
-            case PAWN -> 0;
-        };
+        int col1 = 1;
+        int col2 = 8;
         return (position.equals(new ChessPosition(row,col1)) || position.equals(new ChessPosition(row,col2)));
     }
 
@@ -506,8 +492,7 @@ public class ChessBoard {
             case BLACK -> blackPieceLocations;
         };
     }
-
-
+    
     private ChessPosition getKingPosition(ChessGame.TeamColor team) {
         return switch (team) {
             case WHITE -> whiteKingLocation;
