@@ -121,31 +121,8 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        ChessGame.TeamColor white = ChessGame.TeamColor.WHITE;
-        ChessGame.TeamColor black = ChessGame.TeamColor.BLACK;
-
-        ChessPiece.PieceType king = ChessPiece.PieceType.KING;
-        ChessPiece.PieceType queen = ChessPiece.PieceType.QUEEN;
-        ChessPiece.PieceType rook = ChessPiece.PieceType.ROOK;
-        ChessPiece.PieceType bishop = ChessPiece.PieceType.BISHOP;
-        ChessPiece.PieceType knight = ChessPiece.PieceType.KNIGHT;
-        ChessPiece.PieceType pawn = ChessPiece.PieceType.PAWN;
-
-        ChessPiece wKing = new ChessPiece(white, king);
-        ChessPiece wQueen = new ChessPiece(white, queen);
-        ChessPiece wRook = new ChessPiece(white, rook);
-        ChessPiece wBishop = new ChessPiece(white, bishop);
-        ChessPiece wKnight = new ChessPiece(white, knight);
-        ChessPiece wPawn = new ChessPiece(white, pawn);
-        ChessPiece bKing = new ChessPiece(black, king);
-        ChessPiece bQueen = new ChessPiece(black, queen);
-        ChessPiece bRook = new ChessPiece(black, rook);
-        ChessPiece bBishop = new ChessPiece(black, bishop);
-        ChessPiece bKnight = new ChessPiece(black, knight);
-        ChessPiece bPawn = new ChessPiece(black, pawn);
-
-        ChessPiece[] rank1 = {wRook, wKnight, wBishop, wQueen, wKing, wBishop, wKnight, wRook};
-        ChessPiece[] rank8 = {bRook, bKnight, bBishop, bQueen, bKing, bBishop, bKnight, bRook};
+        ChessPiece[] rank1 = {ValidChessPiece.wRook, ValidChessPiece.wKnight, ValidChessPiece.wBishop, ValidChessPiece.wQueen, ValidChessPiece.wKing, ValidChessPiece.wBishop, ValidChessPiece.wKnight, ValidChessPiece.wRook};
+        ChessPiece[] rank8 = {ValidChessPiece.bRook, ValidChessPiece.bKnight, ValidChessPiece.bBishop, ValidChessPiece.bQueen, ValidChessPiece.bKing, ValidChessPiece.bBishop, ValidChessPiece.bKnight, ValidChessPiece.bRook};
 
         clearBoard();
         for (int i = 0; i < 8; i++) {
@@ -155,10 +132,10 @@ public class ChessBoard {
                     addPiece(newPosition, rank1[j]);
                 }
                 else if (i == 1) {
-                    addPiece(newPosition, wPawn);
+                    addPiece(newPosition, ValidChessPiece.wPawn);
                 }
                 else if (i == 6) {
-                    addPiece(newPosition, bPawn);
+                    addPiece(newPosition, ValidChessPiece.bPawn);
                 }
                 else if (i == 7) {
                     addPiece(newPosition, rank8[j]);
