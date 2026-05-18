@@ -128,20 +128,12 @@ public class ChessBoard {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 ChessPosition newPosition = new ChessPosition(i+1,j+1);
-                if (i == 0) {
-                    addPiece(newPosition, rank1[j]);
-                }
-                else if (i == 1) {
-                    addPiece(newPosition, ValidChessPiece.wPawn);
-                }
-                else if (i == 6) {
-                    addPiece(newPosition, ValidChessPiece.bPawn);
-                }
-                else if (i == 7) {
-                    addPiece(newPosition, rank8[j]);
-                }
-                else {
-                    theBoard[i][j] = null;
+                switch (i) {
+                    case 0 -> addPiece(newPosition, rank1[j]);
+                    case 1 -> addPiece(newPosition, ValidChessPiece.wPawn);
+                    case 6 -> addPiece(newPosition, ValidChessPiece.bPawn);
+                    case 7 -> addPiece(newPosition, rank8[j]);
+                    default -> theBoard[i][j] = null;
                 }
             }
         }
@@ -349,24 +341,29 @@ public class ChessBoard {
     }
 
     private void castle(ChessPiece piece, ChessMove move) {
-        ChessPosition endPosition = move.getEndPosition();
-
         movePiece(piece, move);
 
+        ChessPosition endPosition = move.getEndPosition();
         int rRow = switch (piece.getTeamColor()) {
             case WHITE -> 1;
             case BLACK -> 8;
         };
-        int rStartingCol = switch (endPosition.getColumn()) {
-            case 3 -> 1;
-            case 7 -> 8;
-            default -> 0;
-        };
-        int rEndingCol = switch (endPosition.getColumn()) {
-            case 3 -> 4;
-            case 7 -> 6;
-            default -> 0;
-        };
+        int rStartingCol;
+        int rEndingCol;
+        switch (endPosition.getColumn()) {
+            case 3 -> {
+                rStartingCol = 1;
+                rEndingCol = 4;
+            }
+            case 7 -> {
+                rStartingCol = 8;
+                rEndingCol = 6;
+            }
+            default -> {
+                rStartingCol = 0;
+                rEndingCol = 0;
+            }
+        }
         ChessPosition rStartingPosition = new ChessPosition(rRow, rStartingCol);
         ChessPosition rEndingPosition = new ChessPosition(rRow, rEndingCol);
         ChessMove rookMove = new ChessMove(rStartingPosition, rEndingPosition, null);
@@ -378,9 +375,9 @@ public class ChessBoard {
         if (piece.getPieceType() != ChessPiece.PieceType.PAWN) {
             return;
         }
+
         int startRow = move.getStartPosition().getRow();
         int endRow = move.getEndPosition().getRow();
-
         if (Math.abs(startRow-endRow) != 2) {
             return;
         }
@@ -389,7 +386,6 @@ public class ChessBoard {
         ChessPosition rightAdjacentPosition = new ChessPosition(endRow, move.getEndPosition().getColumn()+1);
         ChessPiece leftAdjacentPiece = getPiece(leftAdjacentPosition);
         ChessPiece rightAdjacentPiece = getPiece(rightAdjacentPosition);
-
         ChessPosition behindPawn = new ChessPosition((startRow+endRow)/2, move.getEndPosition().getColumn());
 
         if (leftAdjacentPiece != null && leftAdjacentPiece.getPieceType() == ChessPiece.PieceType.PAWN) {
@@ -414,42 +410,43 @@ public class ChessBoard {
     }
 
     private void updateKingPosition(ChessPiece piece, ChessPosition position) {
-        if (piece == null) {
-            return;
-        }
-        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
-            if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-                whiteKingLocation = position;
-            }
-            else {
-                blackKingLocation = position;
+        if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING) {
+            switch (piece.getTeamColor()) {
+                case ChessGame.TeamColor.WHITE -> whiteKingLocation = position;
+                case ChessGame.TeamColor.BLACK -> blackKingLocation = position;
             }
         }
     }
 
     private void updateCastleStatus(ChessPiece piece, ChessPosition position) {
-        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-            if (piece.getPieceType() == ChessPiece.PieceType.KING) {
-                whiteCastlingRights = whiteCastlingRights.setQueenSide(false);
-                whiteCastlingRights = whiteCastlingRights.setKingSide(false);
-            }
-            else if (piece.getPieceType() == ChessPiece.PieceType.ROOK && isStartingSquare(piece, position) && position.getColumn() == 1) {
-                whiteCastlingRights = whiteCastlingRights.setQueenSide(false);
-            }
-            else if (piece.getPieceType() == ChessPiece.PieceType.ROOK && isStartingSquare(piece, position) && position.getColumn() == 8) {
-                whiteCastlingRights = whiteCastlingRights.setKingSide(false);
+        boolean kingMoved = piece.getPieceType() == ChessPiece.PieceType.KING;
+        boolean rookMovedFromInitialSquare = (piece.getPieceType() == ChessPiece.PieceType.ROOK && isStartingSquare(piece, position));
+        if (kingMoved) {
+            switch (piece.getTeamColor()) {
+                case WHITE -> {
+                    whiteCastlingRights = whiteCastlingRights.setQueenSide(false);
+                    whiteCastlingRights = whiteCastlingRights.setKingSide(false);
+                }
+                case BLACK -> {
+                    blackCastlingRights = blackCastlingRights.setQueenSide(false);
+                    blackCastlingRights = blackCastlingRights.setKingSide(false);
+                }
             }
         }
-        else {
-            if (piece.getPieceType() == ChessPiece.PieceType.KING) {
-                blackCastlingRights = blackCastlingRights.setQueenSide(false);
-                blackCastlingRights = blackCastlingRights.setKingSide(false);
-            }
-            else if (piece.getPieceType() == ChessPiece.PieceType.ROOK && isStartingSquare(piece, position) && position.getColumn() == 1) {
-                blackCastlingRights = blackCastlingRights.setQueenSide(false);
-            }
-            else if (piece.getPieceType() == ChessPiece.PieceType.ROOK && isStartingSquare(piece, position) && position.getColumn() == 8) {
-                blackCastlingRights = blackCastlingRights.setKingSide(false);
+        else if (rookMovedFromInitialSquare) {
+            switch (piece.getTeamColor()) {
+                case WHITE -> {
+                    switch (position.getColumn()) {
+                        case 1 -> whiteCastlingRights = whiteCastlingRights.setQueenSide(false);
+                        case 8 -> whiteCastlingRights = whiteCastlingRights.setKingSide(false);
+                    }
+                }
+                case BLACK -> {
+                    switch (position.getColumn()) {
+                        case 1 -> blackCastlingRights = blackCastlingRights.setQueenSide(false);
+                        case 8 -> blackCastlingRights = blackCastlingRights.setKingSide(false);
+                    }
+                }
             }
         }
     }
