@@ -67,9 +67,7 @@ public class ChessGame {
     private void removeIllegalMoves(ChessPosition position, ChessPiece piece, HashSet<ChessMove> legalMoves) {
         ArrayList<ChessMove> pieceMoves = (ArrayList<ChessMove>) piece.pieceMoves(chessboard, position);
         for (ChessMove move : pieceMoves) {
-            ChessBoard boardCopy = chessboard.copyBoard();
-            boardCopy.makeMove(move);
-            if (!boardCopy.isInCheck(piece.getTeamColor())) {
+            if (chessboard.moveDoesntExposeKing(piece.getTeamColor(),move)) {
                 legalMoves.add(move);
             }
         }
@@ -101,19 +99,19 @@ public class ChessGame {
     private static final ChessMove BLACK_KING_SIDE_CASTLE = new ChessMove(new ChessPosition(8,5),new ChessPosition(8,7), null);
 
     private void addQueenSideCastling(ChessPiece piece, HashSet<ChessMove> moves) {
-        if (piece.getTeamColor() == TeamColor.WHITE && chessboard.whiteQueenSideCastle()) {
+        if (piece.getTeamColor() == TeamColor.WHITE && chessboard.canCastle(TeamColor.WHITE, ChessBoard.CastleType.Queenside)) {
             moves.add(WHITE_QUEEN_SIDE_CASTLE);
         }
-        else if (piece.getTeamColor() == TeamColor.BLACK && chessboard.blackQueenSideCastle()) {
+        else if (piece.getTeamColor() == TeamColor.BLACK && chessboard.canCastle(TeamColor.BLACK, ChessBoard.CastleType.Queenside)) {
             moves.add(BLACK_QUEEN_SIDE_CASTLE);
         }
     }
 
     private void addKingSideCastling(ChessPiece piece, HashSet<ChessMove> moves) {
-        if (piece.getTeamColor() == TeamColor.WHITE && chessboard.whiteKingSideCastle()) {
+        if (piece.getTeamColor() == TeamColor.WHITE && chessboard.canCastle(TeamColor.WHITE, ChessBoard.CastleType.Kingside)) {
             moves.add(WHITE_KING_SIDE_CASTLE);
         }
-        else if (piece.getTeamColor() == TeamColor.BLACK && chessboard.blackKingSideCastle()) {
+        else if (piece.getTeamColor() == TeamColor.BLACK && chessboard.canCastle(TeamColor.BLACK, ChessBoard.CastleType.Kingside)) {
             moves.add(BLACK_KING_SIDE_CASTLE);
         }
     }

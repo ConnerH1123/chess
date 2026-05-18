@@ -161,82 +161,44 @@ public class ChessBoard {
         whiteCastlingRights = whiteCastlingRights.setKingSide(kingSide);
     }
 
-    public boolean whiteKingSideCastle() {
-        if (isInCheck(ChessGame.TeamColor.WHITE) || isOccupied(1,6) || isOccupied(1,7)) {
-            return false;
-        }
-        ChessBoard copy = copyBoard();
-        ChessMove partialCastle = new ChessMove(new ChessPosition(1,5),new ChessPosition(1,6),null);
-        copy.makeMove(partialCastle);
-        if (copy.isInCheck(ChessGame.TeamColor.WHITE)) {
-            return false;
-        }
-        ChessMove completeCastle = new ChessMove(new ChessPosition(1,6),new ChessPosition(1,7),null);
-        copy.makeMove(completeCastle);
-        if (copy.isInCheck(ChessGame.TeamColor.WHITE)) {
-            return false;
-        }
-        return true;
+    public enum CastleType {
+        Queenside,
+        Kingside
     }
 
-    public boolean whiteQueenSideCastle() {
-        if (isInCheck(ChessGame.TeamColor.WHITE) || isOccupied(1,4) || isOccupied(1,3)) {
-            return false;
+    public boolean canCastle(ChessGame.TeamColor team, CastleType side) {
+        int row = switch (team) {
+            case WHITE -> 1;
+            case BLACK -> 8;
+        };
+        int startCol = 5;
+        int middleCol = 0;
+        int endCol = 0;
+        switch (side) {
+            case Kingside -> {
+                middleCol = 6;
+                endCol = 7;
+            }
+            case Queenside -> {
+                middleCol = 4;
+                endCol = 3;
+            }
         }
-        ChessBoard copy = copyBoard();
-        ChessMove partialCastle = new ChessMove(new ChessPosition(1,5),new ChessPosition(1,4),null);
-        copy.makeMove(partialCastle);
-        if (copy.isInCheck(ChessGame.TeamColor.WHITE)) {
-            return false;
-        }
-        ChessMove completeCastle = new ChessMove(new ChessPosition(1,4),new ChessPosition(1,3),null);
-        copy.makeMove(completeCastle);
-        if (copy.isInCheck(ChessGame.TeamColor.WHITE)) {
-            return false;
-        }
-        return true;
+        ChessMove partialCastle = new ChessMove(new ChessPosition(row,startCol),new ChessPosition(row,middleCol),null);
+        ChessMove completeCastle = new ChessMove(new ChessPosition(row,startCol),new ChessPosition(row,endCol),null);
+        return (!isInCheck(team) && isEmpty(row,middleCol) && isEmpty(row,endCol) &&
+                    moveDoesntExposeKing(team, partialCastle) && moveDoesntExposeKing(team, completeCastle));
     }
 
-
-    public boolean blackKingSideCastle() {
-        if (isInCheck(ChessGame.TeamColor.BLACK) || isOccupied(8,6) || isOccupied(8,7)) {
-            return false;
-        }
+    public boolean moveDoesntExposeKing(ChessGame.TeamColor teamColor, ChessMove move) {
         ChessBoard copy = copyBoard();
-        ChessMove partialCastle = new ChessMove(new ChessPosition(8,5),new ChessPosition(8,6),null);
-        copy.makeMove(partialCastle);
-        if (copy.isInCheck(ChessGame.TeamColor.BLACK)) {
-            return false;
-        }
-        ChessMove completeCastle = new ChessMove(new ChessPosition(8,6),new ChessPosition(8,7),null);
-        copy.makeMove(completeCastle);
-        if (copy.isInCheck(ChessGame.TeamColor.BLACK)) {
-            return false;
-        }
-        return true;
+        ChessPiece piece = getPiece(move.getStartPosition());
+        copy.movePiece(piece,move);
+        return !copy.isInCheck(teamColor);
     }
 
-    public boolean blackQueenSideCastle() {
-        if (isInCheck(ChessGame.TeamColor.BLACK) || isOccupied(8,4) || isOccupied(8,3)) {
-            return false;
-        }
-        ChessBoard copy = copyBoard();
-        ChessMove partialCastle = new ChessMove(new ChessPosition(8,5),new ChessPosition(8,4),null);
-        copy.makeMove(partialCastle);
-        if (copy.isInCheck(ChessGame.TeamColor.BLACK)) {
-            return false;
-        }
-        ChessMove completeCastle = new ChessMove(new ChessPosition(8,4),new ChessPosition(8,3),null);
-        copy.makeMove(completeCastle);
-        if (copy.isInCheck(ChessGame.TeamColor.BLACK)) {
-            return false;
-        }
-        return true;
-    }
-
-
-    private boolean isOccupied(int row, int col) {
-        return getPiece(new ChessPosition(row,col)) != null;
+    private boolean isEmpty(int row, int col) {
+        return getPiece(new ChessPosition(row,col)) == null;
     }
 
     public ChessBoard copyBoard() {
