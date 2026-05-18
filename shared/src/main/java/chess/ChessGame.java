@@ -55,12 +55,11 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         HashSet<ChessMove> legalMoves = new HashSet<>();
         ChessPiece piece = chessboard.getPiece(startPosition);
-        if (piece == null) {
-            return legalMoves;
+        if (piece != null) {
+            removeIllegalMoves(startPosition, piece, legalMoves);
+            includeCastling(piece, legalMoves);
+            includeEnPassant(legalMoves);
         }
-        removeIllegalMoves(startPosition, piece, legalMoves);
-        includeCastling(piece, legalMoves);
-        includeEnPassant(legalMoves);
         return legalMoves;
     }
 
@@ -77,7 +76,7 @@ public class ChessGame {
         if (piece.getPieceType() != ChessPiece.PieceType.KING) {
             return;
         }
-        ChessBoard.CastlingRights castlingRights = getCastlingRights(piece.getTeamColor());
+        Castling.CastlingRights castlingRights = getCastlingRights(piece.getTeamColor());
         if (castlingRights.queenSide()) {
             addQueenSideCastling(piece, moves);
         }
@@ -86,7 +85,7 @@ public class ChessGame {
         }
     }
 
-    ChessBoard.CastlingRights getCastlingRights(TeamColor teamColor) {
+    Castling.CastlingRights getCastlingRights(TeamColor teamColor) {
         return switch (teamColor) {
             case WHITE -> chessboard.getWhiteCastlingRights();
             case BLACK -> chessboard.getBlackCastlingRights();
@@ -99,19 +98,19 @@ public class ChessGame {
     private static final ChessMove BLACK_KING_SIDE_CASTLE = new ChessMove(new ChessPosition(8,5),new ChessPosition(8,7), null);
 
     private void addQueenSideCastling(ChessPiece piece, HashSet<ChessMove> moves) {
-        if (piece.getTeamColor() == TeamColor.WHITE && chessboard.canCastle(TeamColor.WHITE, ChessBoard.CastleType.Queenside)) {
+        if (piece.getTeamColor() == TeamColor.WHITE && Castling.canCastle(chessboard, TeamColor.WHITE, Castling.CastleType.Queenside)) {
             moves.add(WHITE_QUEEN_SIDE_CASTLE);
         }
-        else if (piece.getTeamColor() == TeamColor.BLACK && chessboard.canCastle(TeamColor.BLACK, ChessBoard.CastleType.Queenside)) {
+        else if (piece.getTeamColor() == TeamColor.BLACK && Castling.canCastle(chessboard, TeamColor.BLACK, Castling.CastleType.Queenside)) {
             moves.add(BLACK_QUEEN_SIDE_CASTLE);
         }
     }
 
     private void addKingSideCastling(ChessPiece piece, HashSet<ChessMove> moves) {
-        if (piece.getTeamColor() == TeamColor.WHITE && chessboard.canCastle(TeamColor.WHITE, ChessBoard.CastleType.Kingside)) {
+        if (piece.getTeamColor() == TeamColor.WHITE && Castling.canCastle(chessboard, TeamColor.WHITE, Castling.CastleType.Kingside)) {
             moves.add(WHITE_KING_SIDE_CASTLE);
         }
-        else if (piece.getTeamColor() == TeamColor.BLACK && chessboard.canCastle(TeamColor.BLACK, ChessBoard.CastleType.Kingside)) {
+        else if (piece.getTeamColor() == TeamColor.BLACK && Castling.canCastle(chessboard, TeamColor.BLACK, Castling.CastleType.Kingside)) {
             moves.add(BLACK_KING_SIDE_CASTLE);
         }
     }

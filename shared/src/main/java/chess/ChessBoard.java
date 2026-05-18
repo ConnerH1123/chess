@@ -106,6 +106,17 @@ public class ChessBoard {
         return blackPieces;
     }
 
+    private Castling.CastlingRights whiteCastlingRights = new Castling.CastlingRights(false,false);
+    private Castling.CastlingRights blackCastlingRights = new Castling.CastlingRights(false,false);
+
+    public Castling.CastlingRights getBlackCastlingRights() {
+        return blackCastlingRights;
+    }
+
+    public Castling.CastlingRights getWhiteCastlingRights() {
+        return whiteCastlingRights;
+    }
+
     /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
@@ -127,28 +138,8 @@ public class ChessBoard {
                 }
             }
         }
-        blackCastlingRights = new CastlingRights(true,true);
-        whiteCastlingRights = new CastlingRights(true,true);
-    }
-
-    public record CastlingRights(boolean queenSide, boolean kingSide) {
-        public CastlingRights setQueenSide(boolean b) {
-            return new CastlingRights(b,this.kingSide);
-        }
-        public CastlingRights setKingSide(boolean b) {
-            return new CastlingRights(this.queenSide,b);
-        }
-    }
-
-    private CastlingRights whiteCastlingRights = new CastlingRights(false,false);
-    private CastlingRights blackCastlingRights = new CastlingRights(false,false);
-
-    public CastlingRights getBlackCastlingRights() {
-        return blackCastlingRights;
-    }
-
-    public CastlingRights getWhiteCastlingRights() {
-        return whiteCastlingRights;
+        blackCastlingRights = new Castling.CastlingRights(true,true);
+        whiteCastlingRights = new Castling.CastlingRights(true,true);
     }
 
     public void setBlackCastlingRights(boolean queenSide, boolean kingSide) {
@@ -161,44 +152,11 @@ public class ChessBoard {
         whiteCastlingRights = whiteCastlingRights.setKingSide(kingSide);
     }
 
-    public enum CastleType {
-        Queenside,
-        Kingside
-    }
-
-    public boolean canCastle(ChessGame.TeamColor team, CastleType side) {
-        int row = switch (team) {
-            case WHITE -> 1;
-            case BLACK -> 8;
-        };
-        int startCol = 5;
-        int middleCol = 0;
-        int endCol = 0;
-        switch (side) {
-            case Kingside -> {
-                middleCol = 6;
-                endCol = 7;
-            }
-            case Queenside -> {
-                middleCol = 4;
-                endCol = 3;
-            }
-        }
-        ChessMove partialCastle = new ChessMove(new ChessPosition(row,startCol),new ChessPosition(row,middleCol),null);
-        ChessMove completeCastle = new ChessMove(new ChessPosition(row,startCol),new ChessPosition(row,endCol),null);
-        return (!isInCheck(team) && isEmpty(row,middleCol) && isEmpty(row,endCol) &&
-                    moveDoesntExposeKing(team, partialCastle) && moveDoesntExposeKing(team, completeCastle));
-    }
-
     public boolean moveDoesntExposeKing(ChessGame.TeamColor teamColor, ChessMove move) {
         ChessBoard copy = copyBoard();
         ChessPiece piece = getPiece(move.getStartPosition());
         copy.movePiece(piece,move);
         return !copy.isInCheck(teamColor);
-    }
-
-    private boolean isEmpty(int row, int col) {
-        return getPiece(new ChessPosition(row,col)) == null;
     }
 
     public ChessBoard copyBoard() {
@@ -227,22 +185,11 @@ public class ChessBoard {
         enPassantMoveList.clear();
         boolean pieceCaptured = capturePiece(endPosition);
         ChessPiece movingPiece = promotionMove(move);
-        boolean castled = castleMove(movingPiece, move);
+        boolean castled = Castling.castleMove(this, movingPiece, move);
         boolean didEnPassant = enPassant(movingPiece, move, pieceCaptured);
         if (!castled && !didEnPassant) {
             movePiece(movingPiece, move);
         }
-    }
-
-    private boolean castleMove(ChessPiece piece, ChessMove move) {
-        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
-            ArrayList<ChessMove> normalKingMoves = (ArrayList<ChessMove>) piece.pieceMoves(this, move.getStartPosition());
-            if (!normalKingMoves.contains(move)) {
-                castle(piece, move);
-                return true;
-            }
-        }
-        return false;
     }
 
     private boolean enPassant(ChessPiece piece, ChessMove move, boolean pieceCaptured ) {
@@ -278,7 +225,7 @@ public class ChessBoard {
         return false;
     }
 
-    private void movePiece(ChessPiece piece, ChessMove move) {
+    public void movePiece(ChessPiece piece, ChessMove move) {
         ChessPosition startPosition = move.getStartPosition();
         ChessPosition endPosition = move.getEndPosition();
 
@@ -290,37 +237,6 @@ public class ChessBoard {
 
         theBoard[startPosition.getRow()-1][startPosition.getColumn()-1] = null;
         theBoard[endPosition.getRow()-1][endPosition.getColumn()-1] = piece;
-    }
-
-    private void castle(ChessPiece piece, ChessMove move) {
-        movePiece(piece, move);
-
-        ChessPosition endPosition = move.getEndPosition();
-        int rRow = switch (piece.getTeamColor()) {
-            case WHITE -> 1;
-            case BLACK -> 8;
-        };
-        int rStartingCol;
-        int rEndingCol;
-        switch (endPosition.getColumn()) {
-            case 3 -> {
-                rStartingCol = 1;
-                rEndingCol = 4;
-            }
-            case 7 -> {
-                rStartingCol = 8;
-                rEndingCol = 6;
-            }
-            default -> {
-                rStartingCol = 0;
-                rEndingCol = 0;
-            }
-        }
-        ChessPosition rStartingPosition = new ChessPosition(rRow, rStartingCol);
-        ChessPosition rEndingPosition = new ChessPosition(rRow, rEndingCol);
-        ChessMove rookMove = new ChessMove(rStartingPosition, rEndingPosition, null);
-
-        makeMove(rookMove);
     }
 
     private void updateEnPassantStatus(ChessPiece piece, ChessMove move) {

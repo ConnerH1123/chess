@@ -74,7 +74,7 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        ArrayList<ChessMove> possibleMoves = switch (theType) {
+        return switch (theType) {
             case KING -> {
                 ArrayList<ChessMove> kingMoves = new ArrayList<>();
                 Direction[] directionList = {UP, DOWN, LEFT, RIGHT, UP_LEFT_DIAG, UP_RIGHT_DIAG, DOWN_RIGHT_DIAG, DOWN_LEFT_DIAG};
@@ -114,7 +114,6 @@ public class ChessPiece {
                 yield pawnMoves;
             }
         };
-        return possibleMoves;
     }
 
     private ChessPosition getNewPosition(Direction direction, ChessPosition currentPosition) {
