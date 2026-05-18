@@ -95,10 +95,10 @@ public class ChessGame {
         };
     }
 
-    private final ChessMove WHITE_QUEEN_SIDE_CASTLE = new ChessMove(new ChessPosition(1,5),new ChessPosition(1,3), null);
-    private final ChessMove BLACK_QUEEN_SIDE_CASTLE = new ChessMove(new ChessPosition(8,5),new ChessPosition(8,3), null);
-    private final ChessMove WHITE_KING_SIDE_CASTLE = new ChessMove(new ChessPosition(1,5),new ChessPosition(1,7), null);
-    private final ChessMove BLACK_KING_SIDE_CASTLE = new ChessMove(new ChessPosition(8,5),new ChessPosition(8,7), null);
+    private static final ChessMove WHITE_QUEEN_SIDE_CASTLE = new ChessMove(new ChessPosition(1,5),new ChessPosition(1,3), null);
+    private static final ChessMove BLACK_QUEEN_SIDE_CASTLE = new ChessMove(new ChessPosition(8,5),new ChessPosition(8,3), null);
+    private static final ChessMove WHITE_KING_SIDE_CASTLE = new ChessMove(new ChessPosition(1,5),new ChessPosition(1,7), null);
+    private static final ChessMove BLACK_KING_SIDE_CASTLE = new ChessMove(new ChessPosition(8,5),new ChessPosition(8,7), null);
 
     private void addQueenSideCastling(ChessPiece piece, HashSet<ChessMove> moves) {
         if (piece.getTeamColor() == TeamColor.WHITE && chessboard.whiteQueenSideCastle()) {
