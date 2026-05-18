@@ -48,17 +48,11 @@ public class ChessBoard {
             return;
         }
         int increment;
-        if (isAdded) {
-            increment = 1;
-        }
-        else {
-            increment = -1;
-        }
-        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-            whitePieces.merge(piece.getPieceType(), increment, Integer::sum);
-        }
-        else {
-            blackPieces.merge(piece.getPieceType(), increment, Integer::sum);
+        if (isAdded) increment = 1;
+        else increment = -1;
+        switch (piece.getTeamColor()) {
+            case WHITE -> whitePieces.merge(piece.getPieceType(), increment, Integer::sum);
+            case BLACK -> blackPieces.merge(piece.getPieceType(), increment, Integer::sum);
         }
     }
 
@@ -68,19 +62,15 @@ public class ChessBoard {
         }
         ChessGame.TeamColor color = piece.getTeamColor();
         if (isAdded) {
-            if (color == ChessGame.TeamColor.WHITE) {
-                whitePieceLocations.add(position);
-            }
-            else {
-                blackPieceLocations.add(position);
+            switch (color) {
+                case WHITE -> whitePieceLocations.add(position);
+                case BLACK -> blackPieceLocations.add(position);
             }
         }
         else {
-            if (color == ChessGame.TeamColor.WHITE) {
-                whitePieceLocations.remove(position);
-            }
-            else {
-                blackPieceLocations.remove(position);
+            switch (color) {
+                case WHITE -> whitePieceLocations.remove(position);
+                case BLACK -> blackPieceLocations.remove(position);
             }
         }
     }
@@ -482,7 +472,7 @@ public class ChessBoard {
                 col1 = 1;
                 col2 = 8;
             }
-        };
+        }
         return (position.equals(new ChessPosition(row,col1)) || position.equals(new ChessPosition(row,col2)));
     }
 
