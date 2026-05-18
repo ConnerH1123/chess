@@ -11,30 +11,30 @@ import java.util.Objects;
  */
 public class ChessMove {
 
-    private final ChessPosition START_POS;
-    private final ChessPosition END_POS;
-    private final ChessPiece.PieceType PROMO_PIECE;
+    private final ChessPosition startPos;
+    private final ChessPosition endPos;
+    private final ChessPiece.PieceType promoPiece;
 
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
-        START_POS = startPosition;
-        END_POS = endPosition;
-        PROMO_PIECE = promotionPiece;
+        startPos = startPosition;
+        endPos = endPosition;
+        promoPiece = promotionPiece;
     }
 
     /**
      * @return ChessPosition of starting location
      */
     public ChessPosition getStartPosition() {
-        return START_POS;
+        return startPos;
     }
 
     /**
      * @return ChessPosition of ending location
      */
     public ChessPosition getEndPosition() {
-        return END_POS;
+        return endPos;
     }
 
     /**
@@ -44,7 +44,7 @@ public class ChessMove {
      * @return Type of piece to promote a pawn to, or null if no promotion
      */
     public ChessPiece.PieceType getPromotionPiece() {
-        return PROMO_PIECE;
+        return promoPiece;
     }
 
     @Override
@@ -53,16 +53,16 @@ public class ChessMove {
             return false;
         }
         ChessMove chessMove = (ChessMove) o;
-        return Objects.equals(START_POS, chessMove.START_POS) && Objects.equals(END_POS, chessMove.END_POS) && PROMO_PIECE == chessMove.PROMO_PIECE;
+        return Objects.equals(startPos, chessMove.startPos) && Objects.equals(endPos, chessMove.endPos) && promoPiece == chessMove.promoPiece;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(START_POS, END_POS, PROMO_PIECE);
+        return Objects.hash(startPos, endPos, promoPiece);
     }
 
     @Override
     public String toString() {
-        return String.format("%s -> %s", START_POS, END_POS);
+        return String.format("%s -> %s", startPos, endPos);
     }
 }

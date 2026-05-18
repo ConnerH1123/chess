@@ -12,32 +12,32 @@ import java.util.Objects;
  */
 public class ChessPiece {
 
-    private final ChessGame.TeamColor COLOR;
-    private final PieceType TYPE;
+    private final ChessGame.TeamColor theColor;
+    private final PieceType theType;
 
     //Array int pairs that have the horizontal and vertical transformation (i.e. [x,y])
-    private final Direction UP = new Direction(0,1);
-    private final Direction DOWN = new Direction(0,-1);
-    private final Direction LEFT = new Direction(-1,0);
-    private final Direction RIGHT = new Direction(1,0);
-    private final Direction UP_LEFT_DIAG = new Direction(-1,1);
-    private final Direction UP_RIGHT_DIAG = new Direction(1,1);
-    private final Direction DOWN_LEFT_DIAG = new Direction(-1,-1);
-    private final Direction DOWN_RIGHT_DIAG = new Direction(1,-1);
-    private final Direction UP_RIGHT_L = new Direction(1,2);
-    private final Direction UP_LEFT_L = new Direction(-1,2);
-    private final Direction LEFT_UP_L = new Direction(-2,1);
-    private final Direction LEFT_DOWN_L = new Direction(-2,-1);
-    private final Direction DOWN_LEFT_L = new Direction(-1,-2);
-    private final Direction DOWN_RIGHT_L = new Direction(1,-2);
-    private final Direction RIGHT_DOWN_L = new Direction(2,-1);
-    private final Direction RIGHT_UP_L = new Direction(2,1);
+    private static final Direction UP = new Direction(0,1);
+    private static final Direction DOWN = new Direction(0,-1);
+    private static final Direction LEFT = new Direction(-1,0);
+    private static final Direction RIGHT = new Direction(1,0);
+    private static final Direction UP_LEFT_DIAG = new Direction(-1,1);
+    private static final Direction UP_RIGHT_DIAG = new Direction(1,1);
+    private static final Direction DOWN_LEFT_DIAG = new Direction(-1,-1);
+    private static final Direction DOWN_RIGHT_DIAG = new Direction(1,-1);
+    private static final Direction UP_RIGHT_L = new Direction(1,2);
+    private static final Direction UP_LEFT_L = new Direction(-1,2);
+    private static final Direction LEFT_UP_L = new Direction(-2,1);
+    private static final Direction LEFT_DOWN_L = new Direction(-2,-1);
+    private static final Direction DOWN_LEFT_L = new Direction(-1,-2);
+    private static final Direction DOWN_RIGHT_L = new Direction(1,-2);
+    private static final Direction RIGHT_DOWN_L = new Direction(2,-1);
+    private static final Direction RIGHT_UP_L = new Direction(2,1);
 
     private record Direction(int x, int y) {}
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
-        COLOR = pieceColor;
-        TYPE = type;
+        theColor = pieceColor;
+        theType = type;
     }
 
     /**
@@ -56,14 +56,14 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        return COLOR;
+        return theColor;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        return TYPE;
+        return theType;
     }
 
     /**
@@ -74,7 +74,7 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        ArrayList<ChessMove> possibleMoves = switch (TYPE) {
+        ArrayList<ChessMove> possibleMoves = switch (theType) {
             case KING -> {
                 ArrayList<ChessMove> kingMoves = new ArrayList<>();
                 Direction[] directionList = {UP, DOWN, LEFT, RIGHT, UP_LEFT_DIAG, UP_RIGHT_DIAG, DOWN_RIGHT_DIAG, DOWN_LEFT_DIAG};
@@ -150,7 +150,7 @@ public class ChessPiece {
     private boolean isEnemyPiece(ChessBoard board, ChessPosition position) {
         if (isInBounds(position)) {
             ChessPiece piece = board.getPiece(position);
-            return (piece != null && piece.getTeamColor() != COLOR);
+            return (piece != null && piece.getTeamColor() != theColor);
         }
         return false;
     }
@@ -197,7 +197,7 @@ public class ChessPiece {
      * e.g. if PAWN is BLACK direction is DOWN
      */
     private Direction getPawnDirection() {
-        return switch (COLOR) {
+        return switch (theColor) {
             case WHITE -> UP;
             case BLACK -> DOWN;
         };
@@ -207,7 +207,7 @@ public class ChessPiece {
      * e.g. returns true if PAWN is BLACK and on the 1st rank
      */
     private boolean isPromotionRank(ChessPosition position) {
-        return switch (COLOR) {
+        return switch (theColor) {
             case WHITE -> position.getRow() == 8;
             case BLACK -> position.getRow() == 1;
         };
@@ -244,7 +244,7 @@ public class ChessPiece {
      * Returns true if PAWN is BLACK and on the 7th rank
      */
     private boolean isInitialPawnSquare(ChessPosition position) {
-        return switch (COLOR) {
+        return switch (theColor) {
             case WHITE -> position.getRow() == 2;
             case BLACK -> position.getRow() == 7;
         };
@@ -268,7 +268,7 @@ public class ChessPiece {
      * Adds a diagonal pawn movement if applicable
      */
     private void pawnCaptureMovement(ChessBoard board, ChessPosition currentPosition, ArrayList<ChessMove> moves) {
-        Direction[] directionList = switch (COLOR) {
+        Direction[] directionList = switch (theColor) {
             case WHITE -> new Direction[]{UP_LEFT_DIAG, UP_RIGHT_DIAG};
             case BLACK -> new Direction[]{DOWN_LEFT_DIAG, DOWN_RIGHT_DIAG};
         };
@@ -286,21 +286,21 @@ public class ChessPiece {
             return false;
         }
         ChessPiece that = (ChessPiece) o;
-        return COLOR == that.COLOR && TYPE == that.TYPE;
+        return theColor == that.theColor && theType == that.theType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(COLOR, TYPE);
+        return Objects.hash(theColor, theType);
     }
 
     @Override
     public String toString() {
-        String team = switch (COLOR) {
+        String team = switch (theColor) {
             case WHITE -> "w";
             case BLACK -> "b";
         };
-        String piece = switch (TYPE) {
+        String piece = switch (theType) {
             case KING -> "K";
             case QUEEN -> "Q";
             case ROOK -> "R";
