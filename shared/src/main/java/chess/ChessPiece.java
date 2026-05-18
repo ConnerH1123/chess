@@ -171,16 +171,16 @@ public class ChessPiece {
     /**
      * Helper rec for moveUntilStopped
      */
-    private void moveUntilStoppedRec(ChessBoard board, ChessPosition OGposition, ChessPosition currentPosition, Direction direction, ArrayList<ChessMove> moves) {
+    private void moveUntilStoppedRec(ChessBoard board, ChessPosition originalPosition, ChessPosition currentPosition, Direction direction, ArrayList<ChessMove> moves) {
         ChessPosition newPosition = getNewPosition(direction, currentPosition);
         if (isEnemyPiece(board, newPosition)) {
-            ChessMove newMove = new ChessMove(OGposition, newPosition, null);
+            ChessMove newMove = new ChessMove(originalPosition, newPosition, null);
             moves.add(newMove);
         }
         else if (isEmpty(board, newPosition)) {
-            ChessMove newMove = new ChessMove(OGposition, newPosition, null);
+            ChessMove newMove = new ChessMove(originalPosition, newPosition, null);
             moves.add(newMove);
-            moveUntilStoppedRec(board, OGposition, newPosition, direction, moves);
+            moveUntilStoppedRec(board, originalPosition, newPosition, direction, moves);
         }
     }
 
