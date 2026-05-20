@@ -5,15 +5,16 @@ import io.javalin.Javalin;
 import io.javalin.http.Context;
 
 import java.util.Map;
-
+import service.*;
 
 public class Server {
 
     private final Javalin javalin;
+    //private final Service service = Service();
+
 
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
-                .post("/echo", this::echo)
                 .post("/user",this::register)
                 .post("/session", this::login)
                 .delete("/session", this::logout)
@@ -21,9 +22,6 @@ public class Server {
                 .post("/game", this::createGame)
                 .put("/game", this::joinGame)
                 .delete("/db", this::clear);
-
-        // Register your endpoints and exception handlers here.
-
     }
 
     private void echo(Context context) {

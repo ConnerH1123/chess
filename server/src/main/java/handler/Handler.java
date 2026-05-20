@@ -1,0 +1,36 @@
+package handler;
+
+import dataaccess.*;
+import service.UserService;
+
+public class Handler {
+    private final UserDAO userDAO = new MemoryUserDAO();
+    private final AuthDAO authDAO = new MemoryAuthDAO();
+    //private final GameDAO gameDAO = new MemoryGameDAO();
+
+    private final UserService userService = new UserService(userDAO, authDAO);
+    //private final GameService gameService = new GameService(gameDAO, authDAO);
+    //private final ClearService clearService = new ClearService(userDAO, gameDAO, authDAO);
+
+    public UserService.RegisterResult register(UserService.RegisterRequest r) throws DataAccessException {
+        return userService.register(r);
+    }
+
+    //public LoginResult login(LoginRequest r) {
+    //return userService.login(r);
+    //}
+
+    //public LogoutResult logout(LogoutRequest r) {
+    //return userService.logout(r);
+    //}
+
+    //CreateResult create(CreateRequest r) {
+    //return gameService.create(r);
+    //}
+
+    //JoinResult join(JoinRequest r) {}
+
+    //ListResult list(ListRequest r) {}
+
+    //ClearResult clear();
+}
