@@ -15,14 +15,14 @@ public class UserService {
         this.authDAO = authDAO;
     }
 
-    public RegisterResult register(RegisterRequest r) throws DataAccessException {
+    public RegisterResult register(RegisterRequest r) throws AlreadyTakenException {
         String username = r.username();
         String password = r.password();
         String email = r.email();
 
         UserData userData = userDAO.getUser(username);
         if (userData != null) {
-            throw new AlreadyTakenException("username already taken");
+            throw new AlreadyTakenException("Error: username already taken");
         }
 
         UserData newUserData = new UserData(username, password, email);

@@ -12,7 +12,7 @@ public class Handler {
     //private final GameService gameService = new GameService(gameDAO, authDAO);
     //private final ClearService clearService = new ClearService(userDAO, gameDAO, authDAO);
 
-    public UserService.RegisterResult register(UserService.RegisterRequest r) throws DataAccessException {
+    public UserService.RegisterResult register(UserService.RegisterRequest r) throws AlreadyTakenException {
         return userService.register(r);
     }
 

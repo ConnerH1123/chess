@@ -1,16 +1,19 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.AlreadyTakenException;
+import handler.Handler;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
 import java.util.Map;
+
 import service.*;
 
 public class Server {
 
     private final Javalin javalin;
-    //private final Service service = Service();
+    private final Handler handler = new Handler();
 
 
     public Server() {
@@ -37,7 +40,27 @@ public class Server {
     //Body: {"username": "", "password": "", "email": ""}
     //Returns: {"username": "", "authToken": ""}
     private void register(Context ctx) {
+        UserService.RegisterRequest registerRequest = new Gson().fromJson(ctx.body(), UserService.RegisterRequest.class);
+        try {
+            UserService.RegisterResult registerResult = handler.register(registerRequest);
+            ctx.result(new Gson().toJson(registerResult));
+        } catch (AlreadyTakenException e) {
+            exceptionHandler(e, ctx);
+        }
+    }
 
+    private void exceptionHandler(Exception e, Context ctx) {
+        String exceptionType = e.getClass().getSimpleName();
+        if (exceptionType.equals("AlreadyTakenException")) {
+            int errorCode = 403;
+            String errorMessage = e.getMessage();
+            ctx.status(errorCode);
+            ctx.result(errorMessageToJSON(errorMessage, errorCode));
+        }
+    }
+
+    private String errorMessageToJSON(String message, int errorCode) {
+        return new Gson().toJson(Map.of("message", message, "status", errorCode));
     }
 
     //Body: {"username": "", "password": ""}
