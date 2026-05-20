@@ -2,11 +2,13 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.AlreadyTakenException;
+import dataaccess.BadRequestException;
 import handler.Handler;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
 import java.util.Map;
+import java.util.Objects;
 
 import service.*;
 
@@ -43,6 +45,7 @@ public class Server {
         UserService.RegisterRequest registerRequest = new Gson().fromJson(ctx.body(), UserService.RegisterRequest.class);
         try {
             UserService.RegisterResult registerResult = handler.register(registerRequest);
+            ctx.status(200);
             ctx.result(new Gson().toJson(registerResult));
         } catch (AlreadyTakenException e) {
             exceptionHandler(e, ctx);
@@ -51,12 +54,19 @@ public class Server {
 
     private void exceptionHandler(Exception e, Context ctx) {
         String exceptionType = e.getClass().getSimpleName();
+        int errorCode;
+        String errorMessage = e.getMessage();
         if (exceptionType.equals("AlreadyTakenException")) {
-            int errorCode = 403;
-            String errorMessage = e.getMessage();
-            ctx.status(errorCode);
-            ctx.result(errorMessageToJSON(errorMessage, errorCode));
+            errorCode = 403;
         }
+        else if (exceptionType.equals("BadRequestException")) {
+            errorCode = 400;
+        }
+        else {
+            errorCode = 500;
+        }
+        ctx.status(errorCode);
+        ctx.result(errorMessageToJSON(errorMessage, errorCode));
     }
 
     private String errorMessageToJSON(String message, int errorCode) {
