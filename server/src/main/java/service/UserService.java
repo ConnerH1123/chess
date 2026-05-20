@@ -59,6 +59,15 @@ public class UserService {
     public record LoginRequest(String username, String password) {}
     public record LoginResult(String username, String authToken) {}
 
+    public void logout(LogoutRequest r) throws UnauthorizedException{
+        String authToken = r.authToken();
+        AuthData authData = authDAO.getAuth(authToken);
+        if (authData == null) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+        authDAO.deleteAuth(authToken);
+    }
 
-    // public LogoutResult logout(LogoutRequest r) {}
+    public record LogoutRequest(String authToken) {}
+
 }

@@ -21,9 +21,9 @@ public class Handler {
         return userService.login(r);
     }
 
-    //public LogoutResult logout(LogoutRequest r) {
-    //return userService.logout(r);
-    //}
+    public void logout(LogoutRequest r) throws UnauthorizedException {
+        userService.logout(r);
+    }
 
     //CreateResult create(CreateRequest r) {
     //return gameService.create(r);

@@ -2,6 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.*;
+import service.UserService.*;
 import handler.Handler;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
@@ -32,10 +33,10 @@ public class Server {
     //Returns: {"username": "", "authToken": ""}
     private void register(Context ctx) {
         //String[] parameters = {"username", "password", "email"};
-        //contextContains(ctx, parameters));
-        UserService.RegisterRequest registerRequest = new Gson().fromJson(ctx.body(), UserService.RegisterRequest.class);
+        //contextContainsBody(ctx, parameters));
+        RegisterRequest registerRequest = new Gson().fromJson(ctx.body(), RegisterRequest.class);
         try {
-            UserService.RegisterResult registerResult = handler.register(registerRequest);
+            RegisterResult registerResult = handler.register(registerRequest);
             ctx.status(200);
             ctx.result(new Gson().toJson(registerResult));
         } catch (AlreadyTakenException e) {
@@ -47,10 +48,10 @@ public class Server {
     //Returns: {"username": "", "authToken": ""}
     private void login(Context ctx) {
         //String[] parameters = {"username", "password"};
-        //contextContains(ctx, parameters));
-        UserService.LoginRequest loginRequest = new Gson().fromJson(ctx.body(), UserService.LoginRequest.class);
+        //contextContainsBody(ctx, parameters));
+        LoginRequest loginRequest = new Gson().fromJson(ctx.body(), LoginRequest.class);
         try {
-            UserService.LoginResult loginResult = handler.login(loginRequest);
+            LoginResult loginResult = handler.login(loginRequest);
             ctx.status(200);
             ctx.result(new Gson().toJson(loginResult));
         } catch (UnauthorizedException e) {
@@ -58,12 +59,21 @@ public class Server {
         }
     }
 
-    //Header: authToken
+    //Header: Authorization: authToken
     //Returns: {}
     private void logout(Context ctx) {
-
+        String header = "Authorization";
+        //contextContainsHeader(ctx, header);
+        String json = "{Authorization: " + ctx.header(header) + "}";
+        //Somehow authToken is not getting put into logoutRequest;
+        LogoutRequest logoutRequest = new Gson().fromJson(json, LogoutRequest.class);
+        try {
+            handler.logout(logoutRequest);
+            ctx.status(200);
+        } catch (UnauthorizedException e) {
+            exceptionHandler(e, ctx);
+        }
     }
-
     //Header: authToken
     //Returns: {"games": [{"gameID": <gameID>, "whiteUsername": "", "blackUsername": "", "gameName": ""}]}
     private void listGames(Context ctx) {
