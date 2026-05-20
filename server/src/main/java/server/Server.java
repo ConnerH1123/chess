@@ -29,16 +29,6 @@ public class Server {
                 .delete("/db", this::clear);
     }
 
-    private void echo(Context context) {
-        // Convert body json to object
-        Map bodyObject = getBodyObject(context, Map.class);
-
-        // Convert bodyObject back to json and send to client
-        String json = new Gson().toJson(bodyObject) + "\n";
-        context.json(json);
-    }
-
-
     //Body: {"username": "", "password": "", "email": ""}
     //Returns: {"username": "", "authToken": ""}
     private void register(Context ctx) {
@@ -50,27 +40,6 @@ public class Server {
         } catch (AlreadyTakenException e) {
             exceptionHandler(e, ctx);
         }
-    }
-
-    private void exceptionHandler(Exception e, Context ctx) {
-        String exceptionType = e.getClass().getSimpleName();
-        int errorCode;
-        String errorMessage = e.getMessage();
-        if (exceptionType.equals("AlreadyTakenException")) {
-            errorCode = 403;
-        }
-        else if (exceptionType.equals("BadRequestException")) {
-            errorCode = 400;
-        }
-        else {
-            errorCode = 500;
-        }
-        ctx.status(errorCode);
-        ctx.result(errorMessageToJSON(errorMessage, errorCode));
-    }
-
-    private String errorMessageToJSON(String message, int errorCode) {
-        return new Gson().toJson(Map.of("message", message, "status", errorCode));
     }
 
     //Body: {"username": "", "password": ""}
@@ -110,19 +79,25 @@ public class Server {
 
     }
 
-    private static <T> T getBodyObject(Context context, Class<T> theClass) {
-        var bodyObject = new Gson().fromJson(context.body(), theClass);
-
-        if (bodyObject == null) {
-            throw new RuntimeException("missing required body");
+    private void exceptionHandler(Exception e, Context ctx) {
+        String exceptionType = e.getClass().getSimpleName();
+        int errorCode;
+        String errorMessage = e.getMessage();
+        if (exceptionType.equals("BadRequestException")) {
+            errorCode = 400;
         }
-
-        return bodyObject;
+        else if (exceptionType.equals("AlreadyTakenException")) {
+            errorCode = 403;
+        }
+        else {
+            errorCode = 500;
+        }
+        ctx.status(errorCode);
+        ctx.result(errorMessageToJSON(errorMessage, errorCode));
     }
 
-    public int run(int desiredPort) {
-        javalin.start(desiredPort);
-        return javalin.port();
+    private String errorMessageToJSON(String message, int errorCode) {
+        return new Gson().toJson(Map.of("message", message, "status", errorCode));
     }
 
     public void stop() {
