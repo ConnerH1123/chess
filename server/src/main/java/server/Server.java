@@ -1,8 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.AlreadyTakenException;
-import dataaccess.BadRequestException;
+import dataaccess.*;
 import handler.Handler;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
@@ -32,6 +31,8 @@ public class Server {
     //Body: {"username": "", "password": "", "email": ""}
     //Returns: {"username": "", "authToken": ""}
     private void register(Context ctx) {
+        //String[] parameters = {"username", "password", "email"};
+        //contextContains(ctx, parameters));
         UserService.RegisterRequest registerRequest = new Gson().fromJson(ctx.body(), UserService.RegisterRequest.class);
         try {
             UserService.RegisterResult registerResult = handler.register(registerRequest);
@@ -45,7 +46,16 @@ public class Server {
     //Body: {"username": "", "password": ""}
     //Returns: {"username": "", "authToken": ""}
     private void login(Context ctx) {
-
+        //String[] parameters = {"username", "password"};
+        //contextContains(ctx, parameters));
+        UserService.LoginRequest loginRequest = new Gson().fromJson(ctx.body(), UserService.LoginRequest.class);
+        try {
+            UserService.LoginResult loginResult = handler.login(loginRequest);
+            ctx.status(200);
+            ctx.result(new Gson().toJson(loginResult));
+        } catch (UnauthorizedException e) {
+            exceptionHandler(e, ctx);
+        }
     }
 
     //Header: authToken
@@ -85,6 +95,9 @@ public class Server {
         String errorMessage = e.getMessage();
         if (exceptionType.equals("BadRequestException")) {
             errorCode = 400;
+        }
+        if (exceptionType.equals("UnauthorizedException")) {
+            errorCode = 401;
         }
         else if (exceptionType.equals("AlreadyTakenException")) {
             errorCode = 403;

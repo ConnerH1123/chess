@@ -2,6 +2,7 @@ package handler;
 
 import dataaccess.*;
 import service.UserService;
+import service.UserService.*;
 
 public class Handler {
     private final UserDAO userDAO = new MemoryUserDAO();
@@ -12,13 +13,13 @@ public class Handler {
     //private final GameService gameService = new GameService(gameDAO, authDAO);
     //private final ClearService clearService = new ClearService(userDAO, gameDAO, authDAO);
 
-    public UserService.RegisterResult register(UserService.RegisterRequest r) throws AlreadyTakenException {
+    public RegisterResult register(RegisterRequest r) throws AlreadyTakenException {
         return userService.register(r);
     }
 
-    //public LoginResult login(LoginRequest r) {
-    //return userService.login(r);
-    //}
+    public LoginResult login(LoginRequest r) throws UnauthorizedException {
+        return userService.login(r);
+    }
 
     //public LogoutResult logout(LogoutRequest r) {
     //return userService.logout(r);
