@@ -100,6 +100,11 @@ public class Server {
         return new Gson().toJson(Map.of("message", message, "status", errorCode));
     }
 
+    public int run(int desiredPort) {
+        javalin.start(desiredPort);
+        return javalin.port();
+    }
+
     public void stop() {
         javalin.stop();
     }
