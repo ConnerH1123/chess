@@ -1,9 +1,7 @@
 package service;
 
 import chess.ChessGame;
-import dataaccess.AuthDAO;
-import dataaccess.GameDAO;
-import dataaccess.UnauthorizedException;
+import dataaccess.*;
 import model.*;
 
 public class GameService {
@@ -43,5 +41,27 @@ public class GameService {
     public record ListRequest(String authToken) {}
     public record ListResult(GameData[] games) {}
 
-    //public JoinResult join(JoinRequest r) {}
+    public void join(JoinRequest r) throws DataAccessException {
+        String authToken = r.authToken();
+        String playerColor = r.playerColor();
+        int gameID = r.gameID();
+        AuthData authData = authDAO.getAuth(authToken);
+        if (authData == null) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+        String username = authData.username();
+        GameData gameData = gameDAO.getGame(gameID);
+        if (gameData == null) {
+            throw new BadRequestException("Error: gameID does not exist");
+        }
+        if (playerColor.equals("WHITE") && !gameData.whiteUsername().isEmpty()) {
+            throw new AlreadyTakenException("Error: user already taken");
+        }
+        if (playerColor.equals("BLACK") && !gameData.blackUsername().isEmpty()) {
+            throw new AlreadyTakenException("Error: user already taken");
+        }
+        gameDAO.updateGame(gameID, playerColor, username);
+    }
+
+    public record JoinRequest(String authToken, String playerColor, int gameID) {}
 }

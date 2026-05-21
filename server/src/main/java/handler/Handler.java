@@ -36,9 +36,9 @@ public class Handler {
         return gameService.list(r);
     }
 
-    //public JoinResult join(JoinRequest r) {
-        //return gameService.join(r);
-    //}
+    public void join(JoinRequest r) throws DataAccessException {
+        gameService.join(r);
+    }
 
     //public ClearResult clear();
 }

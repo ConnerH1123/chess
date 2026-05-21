@@ -112,6 +112,15 @@ public class Server {
     //Body: {"playerColor": "", "gameID": <gameID>}
     //Returns: {}
     private void joinGame(Context ctx) {
+        String header = "Authorization";
+        String json = "{\"authToken\": \"" + ctx.header(header) + "\", " + ctx.body().substring(3);
+        JoinRequest joinRequest = new Gson().fromJson(json, JoinRequest.class);
+        try {
+            handler.join(joinRequest);
+            ctx.status(200);
+        } catch (DataAccessException e) {
+            exceptionHandler(e, ctx);
+        }
     }
 
     //Returns: {}
