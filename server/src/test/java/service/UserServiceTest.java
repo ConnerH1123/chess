@@ -5,6 +5,7 @@ import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestTemplate;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -24,8 +25,8 @@ public class UserServiceTest {
     @Test
     public void testRegisterAddsUser() {
         String username = "bob";
-        String password = "bob";
-        String email = "bob";
+        String password = "soup";
+        String email = "jive";
         UserService.RegisterRequest r = new UserService.RegisterRequest(username, password, email);
         try {
             userService.register(r);
@@ -39,9 +40,9 @@ public class UserServiceTest {
 
     @Test
     public void testNeedsUniqueUsername() {
-        String username = "bob";
-        String password = "bob";
-        String email = "bob";
+        String username = "joe";
+        String password = "joe mama";
+        String email = "xD";
         UserService.RegisterRequest r = new UserService.RegisterRequest(username, password, email);
         try {
             userService.register(r);
@@ -53,6 +54,45 @@ public class UserServiceTest {
             fail("AlreadyTakenException should have been thrown");
         } catch (AlreadyTakenException e) {
             //Passes if no exception is thrown
+        }
+    }
+
+    @Test
+    public void testLogin() {
+        String username = "joe";
+        String password = "joe mama";
+        String email = "xD";
+        UserService.RegisterRequest r = new UserService.RegisterRequest(username, password, email);
+        try {
+            userService.register(r);
+        } catch (Exception e) {
+            fail("Exception thrown during initial register");
+        }
+        UserService.LoginRequest login = new UserService.LoginRequest(username, password);
+        try {
+            userService.login(login);
+        } catch (Exception e) {
+            fail("Exception thrown during initial register");
+        }
+    }
+
+    @Test
+    public void testLoginInvalidPassword() {
+        String username = "joe";
+        String password = "joe mama";
+        String email = "xD";
+        UserService.RegisterRequest r = new UserService.RegisterRequest(username, password, email);
+        try {
+            userService.register(r);
+        } catch (Exception e) {
+            fail("Exception thrown during initial register");
+        }
+        UserService.LoginRequest login = new UserService.LoginRequest(username, "password");
+        try {
+            userService.login(login);
+            fail("Exception not thrown for invalid password");
+        } catch (UnauthorizedException e) {
+            //Pass if exception is thrown
         }
     }
 }
