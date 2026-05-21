@@ -32,12 +32,13 @@ public class Handler {
         return gameService.create(r);
     }
 
+    public ListResult list(ListRequest r) throws UnauthorizedException {
+        return gameService.list(r);
+    }
 
-    //JoinResult join(JoinRequest r) {
+    //public JoinResult join(JoinRequest r) {
         //return gameService.join(r);
     //}
 
-    //ListResult list(ListRequest r) {}
-
-    //ClearResult clear();
+    //public ClearResult clear();
 }

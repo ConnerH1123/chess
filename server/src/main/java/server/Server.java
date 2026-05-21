@@ -94,16 +94,17 @@ public class Server {
     //Header: authToken
     //Returns: {"games": [{"gameID": <gameID>, "whiteUsername": "", "blackUsername": "", "gameName": ""}]}
     private void listGames(Context ctx) {
-        //String header = "Authorization";
+        String header = "Authorization";
         //contextContainsHeader(ctx, header);
-        //String json = "{\"authToken\": \"" + ctx.header(header) + "\"}";
-        //ListRequest listRequest = new Gson().fromJson(json, ListRequest.class);
-        //try {
-            //handler.list(listRequest);
-            //ctx.status(200);
-        //} catch (UnauthorizedException e) {
-            //exceptionHandler(e, ctx);
-        //}
+        String json = "{\"authToken\": \"" + ctx.header(header) + "\"}";
+        ListRequest listRequest = new Gson().fromJson(json, ListRequest.class);
+        try {
+            ListResult listResult = handler.list(listRequest);
+            ctx.status(200);
+            ctx.result(new Gson().toJson(listResult));
+        } catch (UnauthorizedException e) {
+            exceptionHandler(e, ctx);
+        }
     }
 
 

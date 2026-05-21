@@ -30,6 +30,18 @@ public class GameService {
     public record CreateRequest(String authToken, String gameName) {};
     public record CreateResult(int gameID) {};
 
-    //JoinResult join(JoinRequest r) {}
-    //ListResult list(ListRequest r) {}
+    public ListResult list(ListRequest r) throws UnauthorizedException {
+        String authToken = r.authToken();
+        AuthData authData = authDAO.getAuth(authToken);
+        if (authData == null) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+        GameData[] games = gameDAO.listGames();
+        return new ListResult(games);
+    }
+
+    public record ListRequest(String authToken) {}
+    public record ListResult(GameData[] games) {}
+
+    //public JoinResult join(JoinRequest r) {}
 }
