@@ -61,11 +61,14 @@ public class GameService {
         if (gameData == null) {
             throw new BadRequestException("Error: gameID does not exist");
         }
-        if (playerColor.equals("WHITE") && !gameData.whiteUsername().isEmpty()) {
+        if (playerColor.equals("WHITE") && gameData.whiteUsername() != null) {
             throw new AlreadyTakenException("Error: user already taken");
         }
-        if (playerColor.equals("BLACK") && !gameData.blackUsername().isEmpty()) {
+        if (playerColor.equals("BLACK") && gameData.blackUsername() != null) {
             throw new AlreadyTakenException("Error: user already taken");
+        }
+        if (!playerColor.equals("BLACK") && !playerColor.equals("WHITE")) {
+            throw new BadRequestException("Error: invalid player color");
         }
         gameDAO.updateGame(gameID, playerColor, username);
     }
