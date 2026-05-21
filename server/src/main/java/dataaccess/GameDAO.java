@@ -8,6 +8,5 @@ public interface GameDAO {
     abstract GameData getGame(int gameID);
     abstract GameData[] listGames();
     abstract void updateGame(int gameID, String playerColor, String username);
-    abstract void deleteGame(int gameID);
     abstract void deleteAllGames();
 }
