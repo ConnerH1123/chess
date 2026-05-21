@@ -115,7 +115,7 @@ public class UserServiceTest {
             fail("Exception thrown during initial register");
         }
     }
-    
+
     @Test
     public void testLogoutIncorrectAuthorization() {
         String username = "joe";

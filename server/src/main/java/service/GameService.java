@@ -16,7 +16,7 @@ public class GameService {
     public CreateResult create(CreateRequest r) throws DataAccessException{
         String authToken = r.authToken();
         String gameName = r.gameName();
-        Integer gameID = (Integer)(gameDAO.size()+1);
+        int gameID = gameDAO.size() + 1;
         AuthData authData = authDAO.getAuth(authToken);
         if (authData == null) {
             throw new UnauthorizedException("Error: unauthorized");
@@ -33,7 +33,7 @@ public class GameService {
             return new CreateRequest(authToken, this.gameName);
         }
     }
-    public record CreateResult(Integer gameID) {};
+    public record CreateResult(int gameID) {};
 
     public ListResult list(ListRequest r) throws UnauthorizedException {
         String authToken = r.authToken();
