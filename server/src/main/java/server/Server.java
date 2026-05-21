@@ -65,7 +65,6 @@ public class Server {
         String header = "Authorization";
         //contextContainsHeader(ctx, header);
         String json = "{Authorization: " + ctx.header(header) + "}";
-        //Somehow authToken is not getting put into logoutRequest;
         LogoutRequest logoutRequest = new Gson().fromJson(json, LogoutRequest.class);
         try {
             handler.logout(logoutRequest);
@@ -103,6 +102,9 @@ public class Server {
         String exceptionType = e.getClass().getSimpleName();
         int errorCode;
         String errorMessage = e.getMessage();
+        if (errorMessage == null || errorMessage.isEmpty()) {
+            errorMessage = "null";
+        }
         if (exceptionType.equals("BadRequestException")) {
             errorCode = 400;
         }
