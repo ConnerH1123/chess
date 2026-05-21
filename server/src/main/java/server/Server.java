@@ -8,8 +8,8 @@ import handler.Handler;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import service.*;
 
@@ -49,8 +49,13 @@ public class Server {
     //Returns: {"username": "", "authToken": ""}
     private void login(Context ctx) {
         //String[] parameters = {"username", "password"};
-        //contextContainsBody(ctx, parameters));
         LoginRequest loginRequest = new Gson().fromJson(ctx.body(), LoginRequest.class);
+        if (loginRequest.username() == null) {
+            exceptionHandler(new BadRequestException("Error: username required"), ctx);
+        }
+        if (loginRequest.password() == null) {
+            exceptionHandler(new BadRequestException("Error: password required"), ctx);
+        }
         try {
             LoginResult loginResult = handler.login(loginRequest);
             ctx.status(200);
