@@ -95,4 +95,45 @@ public class UserServiceTest {
             //Pass if exception is thrown
         }
     }
+
+    @Test
+    public void testLogout() {
+        String username = "joe";
+        String password = "joe mama";
+        String email = "xD";
+        UserService.RegisterRequest r = new UserService.RegisterRequest(username, password, email);
+        UserService.RegisterResult result = new UserService.RegisterResult(username, username);
+        try {
+            result = userService.register(r);
+        } catch (Exception e) {
+            fail("Exception thrown during initial register");
+        }
+        UserService.LogoutRequest logout = new UserService.LogoutRequest(result.authToken());
+        try {
+            userService.logout(logout);
+        } catch (Exception e) {
+            fail("Exception thrown during initial register");
+        }
+    }
+    
+    @Test
+    public void testLogoutIncorrectAuthorization() {
+        String username = "joe";
+        String password = "joe mama";
+        String email = "xD";
+        UserService.RegisterRequest r = new UserService.RegisterRequest(username, password, email);
+        UserService.RegisterResult result = new UserService.RegisterResult(username, username);
+        try {
+            result = userService.register(r);
+        } catch (Exception e) {
+            fail("Exception thrown during initial register");
+        }
+        UserService.LogoutRequest logout = new UserService.LogoutRequest(password);
+        try {
+            userService.logout(logout);
+            fail("Exception not thrown for invalid password");
+        } catch (UnauthorizedException e) {
+            //Pass if exception is thrown
+        }
+    }
 }
