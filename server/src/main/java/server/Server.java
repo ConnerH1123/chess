@@ -37,10 +37,13 @@ public class Server {
         //contextContainsBody(ctx, parameters));
         RegisterRequest registerRequest = new Gson().fromJson(ctx.body(), RegisterRequest.class);
         try {
+            if (registerRequest.username() == null || registerRequest.password() == null || registerRequest.email() == null) {
+                throw new BadRequestException("Error: missing field");
+            }
             RegisterResult registerResult = handler.register(registerRequest);
             ctx.status(200);
             ctx.result(new Gson().toJson(registerResult));
-        } catch (AlreadyTakenException e) {
+        } catch (DataAccessException e) {
             exceptionHandler(e, ctx);
         }
     }
@@ -140,7 +143,7 @@ public class Server {
         if (exceptionType.equals("BadRequestException")) {
             errorCode = 400;
         }
-        if (exceptionType.equals("UnauthorizedException")) {
+        else if (exceptionType.equals("UnauthorizedException")) {
             errorCode = 401;
         }
         else if (exceptionType.equals("AlreadyTakenException")) {
