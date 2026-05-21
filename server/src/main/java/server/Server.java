@@ -88,10 +88,13 @@ public class Server {
         String json = "{\"authToken\": \"" + ctx.header(header) + "\", " + ctx.body().substring(3);
         CreateRequest createRequest = new Gson().fromJson(json, CreateRequest.class);
         try {
+            if (createRequest.gameName() == null) {
+                throw new BadRequestException("Error: missing field");
+            }
             CreateResult createResult = handler.create(createRequest);
             ctx.status(200);
             ctx.result(new Gson().toJson(createResult));
-        } catch (UnauthorizedException e) {
+        } catch (DataAccessException e) {
             exceptionHandler(e, ctx);
         }
     }
@@ -121,6 +124,9 @@ public class Server {
         String json = "{\"authToken\": \"" + ctx.header(header) + "\", " + ctx.body().substring(3);
         JoinRequest joinRequest = new Gson().fromJson(json, JoinRequest.class);
         try {
+            if (joinRequest.playerColor() == null || joinRequest.gameID() == null) {
+                throw new BadRequestException("Error: missing field");
+            }
             handler.join(joinRequest);
             ctx.status(200);
         } catch (DataAccessException e) {

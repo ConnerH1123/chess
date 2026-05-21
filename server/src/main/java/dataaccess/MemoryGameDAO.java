@@ -10,13 +10,13 @@ public class MemoryGameDAO implements GameDAO{
 
     @Override
     public void createGame(String gameName) {
-        int gameID = gameDatabase.size();
+        Integer gameID = (Integer)(gameDatabase.size() + 1);
         GameData gameData = new GameData(gameID, "","", gameName, new ChessGame());
         gameDatabase.put(gameID, gameData);
     }
 
     @Override
-    public int size() {
+    public Integer size() {
         return gameDatabase.size();
     }
 

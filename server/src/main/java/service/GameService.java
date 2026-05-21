@@ -16,7 +16,7 @@ public class GameService {
     public CreateResult create(CreateRequest r) throws UnauthorizedException{
         String authToken = r.authToken();
         String gameName = r.gameName();
-        int gameID = gameDAO.size();
+        Integer gameID = (Integer)(gameDAO.size()+1);
         AuthData authData = authDAO.getAuth(authToken);
         if (authData == null) {
             throw new UnauthorizedException("Error: unauthorized");
@@ -26,7 +26,7 @@ public class GameService {
     }
 
     public record CreateRequest(String authToken, String gameName) {};
-    public record CreateResult(int gameID) {};
+    public record CreateResult(Integer gameID) {};
 
     public ListResult list(ListRequest r) throws UnauthorizedException {
         String authToken = r.authToken();
@@ -63,5 +63,5 @@ public class GameService {
         gameDAO.updateGame(gameID, playerColor, username);
     }
 
-    public record JoinRequest(String authToken, String playerColor, int gameID) {}
+    public record JoinRequest(String authToken, String playerColor, Integer gameID) {}
 }
