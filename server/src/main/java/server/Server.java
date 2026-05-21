@@ -3,6 +3,7 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.*;
 import service.UserService.*;
+import service.GameService.*;
 import handler.Handler;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
@@ -64,7 +65,7 @@ public class Server {
     private void logout(Context ctx) {
         String header = "Authorization";
         //contextContainsHeader(ctx, header);
-        String json = "{Authorization: " + ctx.header(header) + "}";
+        String json = "{\"authToken\": \"" + ctx.header(header) + "\"}";
         LogoutRequest logoutRequest = new Gson().fromJson(json, LogoutRequest.class);
         try {
             handler.logout(logoutRequest);
@@ -73,24 +74,43 @@ public class Server {
             exceptionHandler(e, ctx);
         }
     }
-    //Header: authToken
-    //Returns: {"games": [{"gameID": <gameID>, "whiteUsername": "", "blackUsername": "", "gameName": ""}]}
-    private void listGames(Context ctx) {
-
-    }
 
     //Header: authToken
     //Body: {"gameName": ""}
-    //Returns: {"games": [{"gameID": <gameID>, "whiteUsername": "", "blackUsername": "", "gameName": ""}]}
+    //Returns: {"gameID": <gameID>}
     private void createGame(Context ctx) {
-
+        String header = "Authorization";
+        String json = "{\"authToken\": \"" + ctx.header(header) + "\", " + ctx.body().substring(3);
+        CreateRequest createRequest = new Gson().fromJson(json, CreateRequest.class);
+        try {
+            CreateResult createResult = handler.create(createRequest);
+            ctx.status(200);
+            ctx.result(new Gson().toJson(createResult));
+        } catch (UnauthorizedException e) {
+            exceptionHandler(e, ctx);
+        }
     }
+
+    //Header: authToken
+    //Returns: {"games": [{"gameID": <gameID>, "whiteUsername": "", "blackUsername": "", "gameName": ""}]}
+    private void listGames(Context ctx) {
+        //String header = "Authorization";
+        //contextContainsHeader(ctx, header);
+        //String json = "{\"authToken\": \"" + ctx.header(header) + "\"}";
+        //ListRequest listRequest = new Gson().fromJson(json, ListRequest.class);
+        //try {
+            //handler.list(listRequest);
+            //ctx.status(200);
+        //} catch (UnauthorizedException e) {
+            //exceptionHandler(e, ctx);
+        //}
+    }
+
 
     //Header: authToken
     //Body: {"playerColor": "", "gameID": <gameID>}
     //Returns: {}
     private void joinGame(Context ctx) {
-
     }
 
     //Returns: {}
