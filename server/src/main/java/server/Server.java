@@ -50,17 +50,14 @@ public class Server {
     private void login(Context ctx) {
         //String[] parameters = {"username", "password"};
         LoginRequest loginRequest = new Gson().fromJson(ctx.body(), LoginRequest.class);
-        if (loginRequest.username() == null) {
-            exceptionHandler(new BadRequestException("Error: username required"), ctx);
-        }
-        if (loginRequest.password() == null) {
-            exceptionHandler(new BadRequestException("Error: password required"), ctx);
-        }
         try {
+            if (loginRequest.username() == null || loginRequest.password() == null) {
+                throw new BadRequestException("Error: missing field");
+            }
             LoginResult loginResult = handler.login(loginRequest);
             ctx.status(200);
             ctx.result(new Gson().toJson(loginResult));
-        } catch (UnauthorizedException e) {
+        } catch (DataAccessException e) {
             exceptionHandler(e, ctx);
         }
     }
