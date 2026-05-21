@@ -5,6 +5,8 @@ import service.UserService;
 import service.UserService.*;
 import service.GameService;
 import service.GameService.*;
+import service.ClearService;
+import service.ClearService.*;
 
 
 public class Handler {
@@ -14,7 +16,7 @@ public class Handler {
 
     private final UserService userService = new UserService(userDAO, authDAO);
     private final GameService gameService = new GameService(gameDAO, authDAO);
-    //private final ClearService clearService = new ClearService(userDAO, gameDAO, authDAO);
+    private final ClearService clearService = new ClearService(userDAO, gameDAO, authDAO);
 
     public RegisterResult register(RegisterRequest r) throws AlreadyTakenException {
         return userService.register(r);
@@ -40,5 +42,7 @@ public class Handler {
         gameService.join(r);
     }
 
-    //public ClearResult clear();
+    public void clear() {
+        clearService.clear();
+    }
 }

@@ -125,7 +125,7 @@ public class Server {
 
     //Returns: {}
     private void clear(Context ctx) {
-
+        handler.clear();
     }
 
     private void exceptionHandler(Exception e, Context ctx) {
