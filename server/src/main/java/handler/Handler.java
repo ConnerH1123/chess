@@ -30,7 +30,7 @@ public class Handler {
         userService.logout(r);
     }
 
-    public CreateResult create(CreateRequest r) throws UnauthorizedException {
+    public CreateResult create(CreateRequest r) throws DataAccessException {
         return gameService.create(r);
     }
 

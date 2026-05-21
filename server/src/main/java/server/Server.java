@@ -13,6 +13,8 @@ import java.util.Map;
 
 import service.*;
 
+import javax.xml.crypto.Data;
+
 public class Server {
 
     private final Javalin javalin;
@@ -69,13 +71,11 @@ public class Server {
     //Returns: {}
     private void logout(Context ctx) {
         String header = "Authorization";
-        //contextContainsHeader(ctx, header);
-        String json = "{\"authToken\": \"" + ctx.header(header) + "\"}";
-        LogoutRequest logoutRequest = new Gson().fromJson(json, LogoutRequest.class);
+        LogoutRequest logoutRequest = new LogoutRequest(ctx.header(header));
         try {
             handler.logout(logoutRequest);
             ctx.status(200);
-        } catch (UnauthorizedException e) {
+        } catch (DataAccessException e) {
             exceptionHandler(e, ctx);
         }
     }
@@ -85,12 +85,10 @@ public class Server {
     //Returns: {"gameID": <gameID>}
     private void createGame(Context ctx) {
         String header = "Authorization";
-        String json = "{\"authToken\": \"" + ctx.header(header) + "\", " + ctx.body().substring(3);
-        CreateRequest createRequest = new Gson().fromJson(json, CreateRequest.class);
+        String authToken = ctx.header(header);
+        CreateRequest createRequest = new Gson().fromJson(ctx.body(), CreateRequest.class);
+        createRequest = createRequest.setAuthToken(authToken);
         try {
-            if (createRequest.gameName() == null) {
-                throw new BadRequestException("Error: missing field");
-            }
             CreateResult createResult = handler.create(createRequest);
             ctx.status(200);
             ctx.result(new Gson().toJson(createResult));
@@ -103,14 +101,13 @@ public class Server {
     //Returns: {"games": [{"gameID": <gameID>, "whiteUsername": "", "blackUsername": "", "gameName": ""}]}
     private void listGames(Context ctx) {
         String header = "Authorization";
-        //contextContainsHeader(ctx, header);
-        String json = "{\"authToken\": \"" + ctx.header(header) + "\"}";
-        ListRequest listRequest = new Gson().fromJson(json, ListRequest.class);
+        String authToken = ctx.header(header);
+        ListRequest listRequest = new ListRequest(authToken);
         try {
             ListResult listResult = handler.list(listRequest);
             ctx.status(200);
             ctx.result(new Gson().toJson(listResult));
-        } catch (UnauthorizedException e) {
+        } catch (DataAccessException e) {
             exceptionHandler(e, ctx);
         }
     }
@@ -121,8 +118,9 @@ public class Server {
     //Returns: {}
     private void joinGame(Context ctx) {
         String header = "Authorization";
-        String json = "{\"authToken\": \"" + ctx.header(header) + "\", " + ctx.body().substring(3);
-        JoinRequest joinRequest = new Gson().fromJson(json, JoinRequest.class);
+        String authToken = ctx.header(header);
+        JoinRequest joinRequest = new Gson().fromJson(ctx.body(), JoinRequest.class);
+        joinRequest = joinRequest.setAuthToken(authToken);
         try {
             if (joinRequest.playerColor() == null || joinRequest.gameID() == null) {
                 throw new BadRequestException("Error: missing field");

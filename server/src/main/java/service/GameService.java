@@ -13,7 +13,7 @@ public class GameService {
         this.authDAO = authDAO;
     }
 
-    public CreateResult create(CreateRequest r) throws UnauthorizedException{
+    public CreateResult create(CreateRequest r) throws DataAccessException{
         String authToken = r.authToken();
         String gameName = r.gameName();
         Integer gameID = (Integer)(gameDAO.size()+1);
@@ -21,11 +21,18 @@ public class GameService {
         if (authData == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }
+        if (gameName == null) {
+            throw new BadRequestException("Error: game name required");
+        }
         gameDAO.createGame(gameName);
         return new CreateResult(gameID);
     }
 
-    public record CreateRequest(String authToken, String gameName) {};
+    public record CreateRequest(String authToken, String gameName) {
+        public CreateRequest setAuthToken(String authToken) {
+            return new CreateRequest(authToken, this.gameName);
+        }
+    }
     public record CreateResult(Integer gameID) {};
 
     public ListResult list(ListRequest r) throws UnauthorizedException {
@@ -63,5 +70,9 @@ public class GameService {
         gameDAO.updateGame(gameID, playerColor, username);
     }
 
-    public record JoinRequest(String authToken, String playerColor, Integer gameID) {}
+    public record JoinRequest(String authToken, String playerColor, Integer gameID) {
+        public JoinRequest setAuthToken(String authToken) {
+            return new JoinRequest(authToken, this.playerColor, this.gameID);
+        }
+    }
 }
