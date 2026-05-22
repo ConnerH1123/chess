@@ -7,11 +7,12 @@ import model.AuthData;
 import java.util.Objects;
 import java.util.UUID;
 
-public class UserService {
+public class UserService extends Authorizable {
     private final UserDAO userDAO;
     private final AuthDAO authDAO;
 
     public UserService(UserDAO userDAO, AuthDAO authDAO) {
+        super(authDAO);
         this.userDAO = userDAO;
         this.authDAO = authDAO;
     }
@@ -41,12 +42,10 @@ public class UserService {
     public LoginResult login(LoginRequest r) throws UnauthorizedException{
         String username = r.username();
         String password = r.password();
-
         UserData userData = userDAO.getUser(username);
         if (userData == null || !Objects.equals(password, userData.password())) {
             throw new UnauthorizedException("Error: unauthorized");
         }
-
         String authToken = generateAuthToken();
         AuthData authData = new AuthData(authToken, username);
         authDAO.createAuth(authData);
@@ -63,11 +62,4 @@ public class UserService {
     }
 
     public record LogoutRequest(String authToken) {}
-
-    public void authorize(String authToken) throws UnauthorizedException{
-        AuthData authData = authDAO.getAuth(authToken);
-        if (authData == null) {
-            throw new UnauthorizedException("Error: unauthorized");
-        }
-    }
 }

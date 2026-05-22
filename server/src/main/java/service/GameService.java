@@ -3,20 +3,19 @@ package service;
 import dataaccess.*;
 import model.*;
 
-public class GameService {
+public class GameService extends Authorizable {
     private final GameDAO gameDAO;
-    private final AuthDAO authDAO;
 
     public GameService(GameDAO gameDAO, AuthDAO authDAO) {
+        super(authDAO);
         this.gameDAO = gameDAO;
-        this.authDAO = authDAO;
     }
 
     public CreateResult create(CreateRequest r) throws UnauthorizedException{
-        String gameName = r.gameName();
-        int gameID = gameDAO.size() + 1;
         authorize(r.authToken());
+        String gameName = r.gameName();
         gameDAO.createGame(gameName);
+        int gameID = gameDAO.size();
         return new CreateResult(gameID);
     }
 
@@ -45,6 +44,17 @@ public class GameService {
         if (gameData == null) {
             throw new BadRequestException("Error: gameID does not exist");
         }
+        validatePlayerColor(gameData, playerColor);
+        gameDAO.updateGame(gameID, playerColor, username);
+    }
+
+    public record JoinRequest(String authToken, String playerColor, Integer gameID) {
+        public JoinRequest setAuthToken(String authToken) {
+            return new JoinRequest(authToken, this.playerColor, this.gameID);
+        }
+    }
+
+    private void validatePlayerColor(GameData gameData, String playerColor) throws DataAccessException {
         switch (playerColor) {
             case "WHITE" -> {
                 if (gameData.whiteUsername() != null) {
@@ -58,20 +68,5 @@ public class GameService {
             }
             default -> throw new BadRequestException("Error: invalid player color");
         }
-        gameDAO.updateGame(gameID, playerColor, username);
-    }
-
-    public record JoinRequest(String authToken, String playerColor, Integer gameID) {
-        public JoinRequest setAuthToken(String authToken) {
-            return new JoinRequest(authToken, this.playerColor, this.gameID);
-        }
-    }
-
-    public AuthData authorize(String authToken) throws UnauthorizedException{
-        AuthData authData = authDAO.getAuth(authToken);
-        if (authData == null) {
-            throw new UnauthorizedException("Error: unauthorized");
-        }
-        return authData;
     }
 }
