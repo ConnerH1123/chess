@@ -8,7 +8,7 @@ public interface AuthDAO {
      *
      * @param authData authToken and username
      */
-    abstract void createAuth(AuthData authData);
+    void createAuth(AuthData authData);
 
     /**
      * Given auth token returns auth data
@@ -16,17 +16,17 @@ public interface AuthDAO {
      * @param authToken String authorization token
      * @return Return auth data or null
      */
-    abstract AuthData getAuth(String authToken);
+    AuthData getAuth(String authToken);
 
     /**
      * Clears auth data given auth token
      *
      * @param authToken String authorization token
      */
-    abstract void deleteAuth(String authToken);
+    void deleteAuth(String authToken);
 
     /**
      * Clears database
      */
-    abstract void deleteAllAuths();
+    void deleteAllAuths();
 }

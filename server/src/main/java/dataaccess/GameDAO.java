@@ -8,14 +8,14 @@ public interface GameDAO {
      *
      * @param gameName Name of game
      */
-    abstract void createGame(String gameName);
+    void createGame(String gameName);
 
     /**
      * Returns size of database
      *
      * @return Number of games in database
      */
-    abstract Integer size();
+    Integer size();
 
     /**
      * Given gameID retrieves game
@@ -23,14 +23,14 @@ public interface GameDAO {
      * @param gameID ID of game (int greater than 0)
      * @return Game data or null
      */
-    abstract GameData getGame(int gameID);
+    GameData getGame(int gameID);
 
     /**
      * Lists games in database
      *
      * @return Array of game data
      */
-    abstract GameData[] listGames();
+    GameData[] listGames();
 
     /**
      * Adds user to game
@@ -39,10 +39,10 @@ public interface GameDAO {
      * @param playerColor Side that player wishes to play as
      * @param username Name of user
      */
-    abstract void updateGame(int gameID, String playerColor, String username);
+    void updateGame(int gameID, String playerColor, String username);
 
     /**
      * Clears database
      */
-    abstract void deleteAllGames();
+    void deleteAllGames();
 }
