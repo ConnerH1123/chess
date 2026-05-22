@@ -10,7 +10,7 @@ public class MemoryGameDAO implements GameDAO{
 
     @Override
     public void createGame(String gameName) {
-        Integer gameID = (Integer)(gameDatabase.size() + 1);
+        int gameID = gameDatabase.size() + 1;
         GameData gameData = new GameData(gameID, null,null, gameName, new ChessGame());
         gameDatabase.put(gameID, gameData);
     }
@@ -38,17 +38,12 @@ public class MemoryGameDAO implements GameDAO{
 
     @Override
     public void updateGame(int gameID, String playerColor, String username) {
-        GameData game = gameDatabase.get(gameID);
-        GameData newGameData;
-        if (playerColor.equals("WHITE")) {
-            newGameData = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
-        }
-        else if (playerColor.equals("BLACK")) {
-            newGameData = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
-        }
-        else {
-            newGameData = game;
-        }
+        GameData currentGameData = gameDatabase.get(gameID);
+        GameData newGameData = switch (playerColor) {
+            case "WHITE" -> new GameData(currentGameData.gameID(), username, currentGameData.blackUsername(), currentGameData.gameName(), currentGameData.game());
+            case "BLACK" -> new GameData(currentGameData.gameID(), currentGameData.whiteUsername(), username, currentGameData.gameName(), currentGameData.game());
+            default -> currentGameData;
+        };
         gameDatabase.put(gameID, newGameData);
     }
 
