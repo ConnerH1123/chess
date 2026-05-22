@@ -20,12 +20,9 @@ public class UserService {
         String username = r.username();
         String password = r.password();
         String email = r.email();
-
-        UserData userData = userDAO.getUser(username);
-        if (userData != null) {
+        if (userDAO.getUser(username) != null) {
             throw new AlreadyTakenException("Error: username already taken");
         }
-
         UserData newUserData = new UserData(username, password, email);
         userDAO.createUser(newUserData);
         String authToken = generateAuthToken();
@@ -61,13 +58,16 @@ public class UserService {
 
     public void logout(LogoutRequest r) throws UnauthorizedException{
         String authToken = r.authToken();
-        AuthData authData = authDAO.getAuth(authToken);
-        if (authData == null) {
-            throw new UnauthorizedException("Error: unauthorized");
-        }
+        authorize(authToken);
         authDAO.deleteAuth(authToken);
     }
 
     public record LogoutRequest(String authToken) {}
 
+    public void authorize(String authToken) throws UnauthorizedException{
+        AuthData authData = authDAO.getAuth(authToken);
+        if (authData == null) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+    }
 }

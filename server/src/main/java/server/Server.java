@@ -8,12 +8,9 @@ import handler.Handler;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import service.*;
-
-import javax.xml.crypto.Data;
 
 public class Server {
 
@@ -35,8 +32,6 @@ public class Server {
     //Body: {"username": "", "password": "", "email": ""}
     //Returns: {"username": "", "authToken": ""}
     private void register(Context ctx) {
-        //String[] parameters = {"username", "password", "email"};
-        //contextContainsBody(ctx, parameters));
         RegisterRequest registerRequest = new Gson().fromJson(ctx.body(), RegisterRequest.class);
         try {
             if (registerRequest.username() == null || registerRequest.password() == null || registerRequest.email() == null) {
@@ -53,7 +48,6 @@ public class Server {
     //Body: {"username": "", "password": ""}
     //Returns: {"username": "", "authToken": ""}
     private void login(Context ctx) {
-        //String[] parameters = {"username", "password"};
         LoginRequest loginRequest = new Gson().fromJson(ctx.body(), LoginRequest.class);
         try {
             if (loginRequest.username() == null || loginRequest.password() == null) {
@@ -86,9 +80,12 @@ public class Server {
     private void createGame(Context ctx) {
         String header = "Authorization";
         String authToken = ctx.header(header);
-        CreateRequest createRequest = new Gson().fromJson(ctx.body(), CreateRequest.class);
-        createRequest = createRequest.setAuthToken(authToken);
+        CreateRequest partialCreateRequest = new Gson().fromJson(ctx.body(), CreateRequest.class);
+        CreateRequest createRequest = partialCreateRequest.setAuthToken(authToken);
         try {
+            if (createRequest.gameName() == null) {
+                throw new BadRequestException("Error: game name required");
+            }
             CreateResult createResult = handler.create(createRequest);
             ctx.status(200);
             ctx.result(new Gson().toJson(createResult));
@@ -112,15 +109,14 @@ public class Server {
         }
     }
 
-
     //Header: authToken
     //Body: {"playerColor": "", "gameID": <gameID>}
     //Returns: {}
     private void joinGame(Context ctx) {
         String header = "Authorization";
         String authToken = ctx.header(header);
-        JoinRequest joinRequest = new Gson().fromJson(ctx.body(), JoinRequest.class);
-        joinRequest = joinRequest.setAuthToken(authToken);
+        JoinRequest partialJoinRequest = new Gson().fromJson(ctx.body(), JoinRequest.class);
+        JoinRequest joinRequest = partialJoinRequest.setAuthToken(authToken);
         try {
             if (joinRequest.playerColor() == null || joinRequest.gameID() == null) {
                 throw new BadRequestException("Error: missing field");
@@ -144,18 +140,12 @@ public class Server {
         if (errorMessage == null || errorMessage.isEmpty()) {
             errorMessage = "null";
         }
-        if (exceptionType.equals("BadRequestException")) {
-            errorCode = 400;
-        }
-        else if (exceptionType.equals("UnauthorizedException")) {
-            errorCode = 401;
-        }
-        else if (exceptionType.equals("AlreadyTakenException")) {
-            errorCode = 403;
-        }
-        else {
-            errorCode = 500;
-        }
+        errorCode = switch (exceptionType) {
+            case "BadRequestException" -> 400;
+            case "UnauthorizedException" -> 401;
+            case "AlreadyTakenException" -> 403;
+            default -> 500;
+        };
         ctx.status(errorCode);
         ctx.result(errorMessageToJSON(errorMessage, errorCode));
     }

@@ -13,17 +13,10 @@ public class GameService {
         this.authDAO = authDAO;
     }
 
-    public CreateResult create(CreateRequest r) throws DataAccessException{
-        String authToken = r.authToken();
+    public CreateResult create(CreateRequest r) throws UnauthorizedException{
         String gameName = r.gameName();
         int gameID = gameDAO.size() + 1;
-        AuthData authData = authDAO.getAuth(authToken);
-        if (authData == null) {
-            throw new UnauthorizedException("Error: unauthorized");
-        }
-        if (gameName == null) {
-            throw new BadRequestException("Error: game name required");
-        }
+        authorize(r.authToken());
         gameDAO.createGame(gameName);
         return new CreateResult(gameID);
     }
@@ -36,11 +29,7 @@ public class GameService {
     public record CreateResult(int gameID) {};
 
     public ListResult list(ListRequest r) throws UnauthorizedException {
-        String authToken = r.authToken();
-        AuthData authData = authDAO.getAuth(authToken);
-        if (authData == null) {
-            throw new UnauthorizedException("Error: unauthorized");
-        }
+        authorize(r.authToken());
         GameData[] games = gameDAO.listGames();
         return new ListResult(games);
     }
@@ -50,13 +39,11 @@ public class GameService {
 
     public void join(JoinRequest r) throws DataAccessException {
         String authToken = r.authToken();
+        authorize(authToken);
+        AuthData authData = authDAO.getAuth(authToken);
+        String username = authData.username();
         String playerColor = r.playerColor();
         int gameID = r.gameID();
-        AuthData authData = authDAO.getAuth(authToken);
-        if (authData == null) {
-            throw new UnauthorizedException("Error: unauthorized");
-        }
-        String username = authData.username();
         GameData gameData = gameDAO.getGame(gameID);
         if (gameData == null) {
             throw new BadRequestException("Error: gameID does not exist");
@@ -76,6 +63,13 @@ public class GameService {
     public record JoinRequest(String authToken, String playerColor, Integer gameID) {
         public JoinRequest setAuthToken(String authToken) {
             return new JoinRequest(authToken, this.playerColor, this.gameID);
+        }
+    }
+
+    public void authorize(String authToken) throws UnauthorizedException{
+        AuthData authData = authDAO.getAuth(authToken);
+        if (authData == null) {
+            throw new UnauthorizedException("Error: unauthorized");
         }
     }
 }
