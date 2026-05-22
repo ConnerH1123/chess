@@ -1,6 +1,5 @@
 package service;
 
-import chess.ChessGame;
 import dataaccess.*;
 import model.*;
 
@@ -26,7 +25,7 @@ public class GameService {
             return new CreateRequest(authToken, this.gameName);
         }
     }
-    public record CreateResult(int gameID) {};
+    public record CreateResult(int gameID) {}
 
     public ListResult list(ListRequest r) throws UnauthorizedException {
         authorize(r.authToken());
@@ -38,9 +37,7 @@ public class GameService {
     public record ListResult(GameData[] games) {}
 
     public void join(JoinRequest r) throws DataAccessException {
-        String authToken = r.authToken();
-        authorize(authToken);
-        AuthData authData = authDAO.getAuth(authToken);
+        AuthData authData = authorize(r.authToken());
         String username = authData.username();
         String playerColor = r.playerColor();
         int gameID = r.gameID();
@@ -48,14 +45,18 @@ public class GameService {
         if (gameData == null) {
             throw new BadRequestException("Error: gameID does not exist");
         }
-        if (playerColor.equals("WHITE") && gameData.whiteUsername() != null) {
-            throw new AlreadyTakenException("Error: user already taken");
-        }
-        if (playerColor.equals("BLACK") && gameData.blackUsername() != null) {
-            throw new AlreadyTakenException("Error: user already taken");
-        }
-        if (!playerColor.equals("BLACK") && !playerColor.equals("WHITE")) {
-            throw new BadRequestException("Error: invalid player color");
+        switch (playerColor) {
+            case "WHITE" -> {
+                if (gameData.whiteUsername() != null) {
+                    throw new AlreadyTakenException("Error: user already taken");
+                }
+            }
+            case "BLACK" -> {
+                if (gameData.blackUsername() != null) {
+                    throw new AlreadyTakenException("Error: user already taken");
+                }
+            }
+            default -> throw new BadRequestException("Error: invalid player color");
         }
         gameDAO.updateGame(gameID, playerColor, username);
     }
@@ -66,10 +67,11 @@ public class GameService {
         }
     }
 
-    public void authorize(String authToken) throws UnauthorizedException{
+    public AuthData authorize(String authToken) throws UnauthorizedException{
         AuthData authData = authDAO.getAuth(authToken);
         if (authData == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }
+        return authData;
     }
 }
