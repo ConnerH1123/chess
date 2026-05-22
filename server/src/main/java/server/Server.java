@@ -7,9 +7,7 @@ import service.GameService.*;
 import handler.Handler;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
-
 import java.util.Map;
-
 import service.*;
 
 public class Server {
@@ -27,105 +25,83 @@ public class Server {
                 .post("/game", this::createGame)
                 .put("/game", this::joinGame)
                 .delete("/db", this::clear);
+
+        javalin.exception(DataAccessException.class, this::handleDataAccessException);
     }
 
     //Body: {"username": "", "password": "", "email": ""}
     //Returns: {"username": "", "authToken": ""}
-    private void register(Context ctx) {
+    private void register(Context ctx) throws DataAccessException {
         RegisterRequest registerRequest = new Gson().fromJson(ctx.body(), RegisterRequest.class);
-        try {
-            if (registerRequest.username() == null || registerRequest.password() == null || registerRequest.email() == null) {
-                throw new BadRequestException("Error: missing field");
-            }
-            RegisterResult registerResult = handler.register(registerRequest);
-            ctx.status(200);
-            ctx.result(new Gson().toJson(registerResult));
-        } catch (DataAccessException e) {
-            exceptionHandler(e, ctx);
+        if (registerRequest.username() == null || registerRequest.password() == null || registerRequest.email() == null) {
+            throw new BadRequestException("Error: missing field");
         }
+        RegisterResult registerResult = handler.register(registerRequest);
+        ctx.status(200);
+        ctx.result(new Gson().toJson(registerResult));
     }
 
     //Body: {"username": "", "password": ""}
     //Returns: {"username": "", "authToken": ""}
-    private void login(Context ctx) {
+    private void login(Context ctx) throws DataAccessException {
         LoginRequest loginRequest = new Gson().fromJson(ctx.body(), LoginRequest.class);
-        try {
-            if (loginRequest.username() == null || loginRequest.password() == null) {
-                throw new BadRequestException("Error: missing field");
-            }
-            LoginResult loginResult = handler.login(loginRequest);
-            ctx.status(200);
-            ctx.result(new Gson().toJson(loginResult));
-        } catch (DataAccessException e) {
-            exceptionHandler(e, ctx);
+        if (loginRequest.username() == null || loginRequest.password() == null) {
+            throw new BadRequestException("Error: missing field");
         }
+        LoginResult loginResult = handler.login(loginRequest);
+        ctx.status(200);
+        ctx.result(new Gson().toJson(loginResult));
     }
 
     //Header: Authorization: authToken
     //Returns: {}
-    private void logout(Context ctx) {
+    private void logout(Context ctx) throws DataAccessException {
         String header = "Authorization";
         LogoutRequest logoutRequest = new LogoutRequest(ctx.header(header));
-        try {
-            handler.logout(logoutRequest);
-            ctx.status(200);
-        } catch (DataAccessException e) {
-            exceptionHandler(e, ctx);
-        }
+        handler.logout(logoutRequest);
+        ctx.status(200);
     }
 
     //Header: authToken
     //Body: {"gameName": ""}
     //Returns: {"gameID": <gameID>}
-    private void createGame(Context ctx) {
+    private void createGame(Context ctx) throws DataAccessException {
         String header = "Authorization";
         String authToken = ctx.header(header);
         CreateRequest partialCreateRequest = new Gson().fromJson(ctx.body(), CreateRequest.class);
         CreateRequest createRequest = partialCreateRequest.setAuthToken(authToken);
-        try {
-            if (createRequest.gameName() == null) {
-                throw new BadRequestException("Error: game name required");
-            }
-            CreateResult createResult = handler.create(createRequest);
-            ctx.status(200);
-            ctx.result(new Gson().toJson(createResult));
-        } catch (DataAccessException e) {
-            exceptionHandler(e, ctx);
+        if (createRequest.gameName() == null) {
+            throw new BadRequestException("Error: game name required");
         }
+        CreateResult createResult = handler.create(createRequest);
+        ctx.status(200);
+        ctx.result(new Gson().toJson(createResult));
     }
 
     //Header: authToken
     //Returns: {"games": [{"gameID": <gameID>, "whiteUsername": "", "blackUsername": "", "gameName": ""}]}
-    private void listGames(Context ctx) {
+    private void listGames(Context ctx) throws DataAccessException {
         String header = "Authorization";
         String authToken = ctx.header(header);
         ListRequest listRequest = new ListRequest(authToken);
-        try {
-            ListResult listResult = handler.list(listRequest);
-            ctx.status(200);
-            ctx.result(new Gson().toJson(listResult));
-        } catch (DataAccessException e) {
-            exceptionHandler(e, ctx);
-        }
+        ListResult listResult = handler.list(listRequest);
+        ctx.status(200);
+        ctx.result(new Gson().toJson(listResult));
     }
 
     //Header: authToken
     //Body: {"playerColor": "", "gameID": <gameID>}
     //Returns: {}
-    private void joinGame(Context ctx) {
+    private void joinGame(Context ctx) throws DataAccessException {
         String header = "Authorization";
         String authToken = ctx.header(header);
         JoinRequest partialJoinRequest = new Gson().fromJson(ctx.body(), JoinRequest.class);
         JoinRequest joinRequest = partialJoinRequest.setAuthToken(authToken);
-        try {
-            if (joinRequest.playerColor() == null || joinRequest.gameID() == null) {
-                throw new BadRequestException("Error: missing field");
-            }
-            handler.join(joinRequest);
-            ctx.status(200);
-        } catch (DataAccessException e) {
-            exceptionHandler(e, ctx);
+        if (joinRequest.playerColor() == null || joinRequest.gameID() == null) {
+            throw new BadRequestException("Error: missing field");
         }
+        handler.join(joinRequest);
+        ctx.status(200);
     }
 
     //Returns: {}
@@ -133,14 +109,13 @@ public class Server {
         handler.clear();
     }
 
-    private void exceptionHandler(Exception e, Context ctx) {
+    private void handleDataAccessException(DataAccessException e, Context ctx) {
         String exceptionType = e.getClass().getSimpleName();
-        int errorCode;
         String errorMessage = e.getMessage();
         if (errorMessage == null || errorMessage.isEmpty()) {
             errorMessage = "null";
         }
-        errorCode = switch (exceptionType) {
+        int errorCode = switch (exceptionType) {
             case "BadRequestException" -> 400;
             case "UnauthorizedException" -> 401;
             case "AlreadyTakenException" -> 403;
