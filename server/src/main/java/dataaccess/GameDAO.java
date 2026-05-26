@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.GameData;
 
 public interface GameDAO {
@@ -35,11 +36,20 @@ public interface GameDAO {
     /**
      * Adds user to game
      *
-     * @param gameID ID of game
+     * @param gameID ID of game to be updated
      * @param playerColor Side that player wishes to play as
      * @param username Name of user
      */
     void updateGame(int gameID, String playerColor, String username);
+
+
+    /**
+     * Updates the board
+     *
+     * @param gameID ID of game to be updated
+     * @param updatedGame Updated board to overwrite current board
+     */
+    void updateGame(int gameID, ChessGame updatedGame);
 
     /**
      * Clears database

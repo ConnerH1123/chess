@@ -48,6 +48,13 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     @Override
+    public void updateGame(int gameID, ChessGame updatedGame) {
+        GameData currentGameData = gameDatabase.get(gameID);
+        GameData newGameData = new GameData(currentGameData.gameID(), currentGameData.whiteUsername(), currentGameData.blackUsername(), currentGameData.gameName(), updatedGame);
+        gameDatabase.put(gameID, newGameData);
+    }
+
+    @Override
     public void deleteAllGames() {
         gameDatabase.clear();
     }
