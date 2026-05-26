@@ -3,6 +3,7 @@ package service;
 import dataaccess.*;
 import model.UserData;
 import model.AuthData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -43,7 +44,7 @@ public class UserService extends Authorizable {
         String username = r.username();
         String password = r.password();
         UserData userData = userDAO.getUser(username);
-        if (userData == null || !Objects.equals(password, userData.password())) {
+        if (userData == null || (!Objects.equals(password, userData.password())) && !BCrypt.checkpw(password, userData.password())) {
             throw new UnauthorizedException("Error: unauthorized");
         }
         String authToken = generateAuthToken();

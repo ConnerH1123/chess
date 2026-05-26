@@ -30,9 +30,18 @@ public class MySqlUserDAO extends SqlDatabase implements UserDAO {
     }
 
     @Override
-    public UserData getUser(String username) {
-
-        return null;
+    public UserData getUser(String username) throws DataAccessException {
+        String statement = "SELECT username, password, email FROM user WHERE username=?";
+        try (ResultSet resultSet = queryDatabase(statement, username)) {
+            if (resultSet.next()) {
+                String password = resultSet.getString("password");
+                String email = resultSet.getString("email");
+                return new UserData(username, password, email);
+            }
+            return null;
+        } catch (Exception e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     @Override
