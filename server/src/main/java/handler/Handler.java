@@ -18,15 +18,15 @@ public class Handler {
     private final GameService gameService = new GameService(gameDAO, authDAO);
     private final ClearService clearService = new ClearService(userDAO, gameDAO, authDAO);
 
-    public RegisterResult register(RegisterRequest r) throws AlreadyTakenException {
+    public RegisterResult register(RegisterRequest r) throws DataAccessException {
         return userService.register(r);
     }
 
-    public LoginResult login(LoginRequest r) throws UnauthorizedException {
+    public LoginResult login(LoginRequest r) throws DataAccessException {
         return userService.login(r);
     }
 
-    public void logout(LogoutRequest r) throws UnauthorizedException {
+    public void logout(LogoutRequest r) throws DataAccessException {
         userService.logout(r);
     }
 
@@ -42,7 +42,7 @@ public class Handler {
         gameService.join(r);
     }
 
-    public void clear() {
+    public void clear() throws DataAccessException {
         clearService.clear();
     }
 }

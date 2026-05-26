@@ -24,16 +24,20 @@ public class ClearServiceTest {
 
     @Test
     public void testClear() {
-        userDAO.createUser(new UserData("username", "password", "email"));
-        authDAO.createAuth(new AuthData("authToken", "username"));
-        gameDAO.createGame("game1");
-        gameDAO.createGame("game2");
-        gameDAO.createGame("game3");
-        clearService.clear();
-        Assertions.assertNull(userDAO.getUser("username"));
-        Assertions.assertNull(authDAO.getAuth("authToken"));
-        Assertions.assertNull(gameDAO.getGame(1));
-        Assertions.assertNull(gameDAO.getGame(2));
-        Assertions.assertNull(gameDAO.getGame(3));
+        try {
+            userDAO.createUser(new UserData("username", "password", "email"));
+            authDAO.createAuth(new AuthData("authToken", "username"));
+            gameDAO.createGame("game1");
+            gameDAO.createGame("game2");
+            gameDAO.createGame("game3");
+            clearService.clear();
+            Assertions.assertNull(userDAO.getUser("username"));
+            Assertions.assertNull(authDAO.getAuth("authToken"));
+            Assertions.assertNull(gameDAO.getGame(1));
+            Assertions.assertNull(gameDAO.getGame(2));
+            Assertions.assertNull(gameDAO.getGame(3));
+        } catch (Exception e) {
+            Assertions.fail("Exception was thrown");
+        }
     }
 }

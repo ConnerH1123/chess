@@ -8,7 +8,7 @@ public interface UserDAO {
      *
      * @param userData Username, password, and email of user
      */
-    void createUser(UserData userData);
+    void createUser(UserData userData) throws DataAccessException;
 
     /**
      * Given username, returns user data
@@ -16,10 +16,10 @@ public interface UserDAO {
      * @param username The username of the user
      * @return User data or null
      */
-    UserData getUser(String username);
+    UserData getUser(String username) throws DataAccessException;
 
     /**
      * Clears database
      */
-    void deleteAllUsers();
+    void deleteAllUsers() throws DataAccessException;
 }

@@ -17,7 +17,7 @@ public class UserService extends Authorizable {
         this.authDAO = authDAO;
     }
 
-    public RegisterResult register(RegisterRequest r) throws AlreadyTakenException {
+    public RegisterResult register(RegisterRequest r) throws DataAccessException {
         String username = r.username();
         String password = r.password();
         String email = r.email();
@@ -39,7 +39,7 @@ public class UserService extends Authorizable {
         return UUID.randomUUID().toString();
     }
 
-    public LoginResult login(LoginRequest r) throws UnauthorizedException{
+    public LoginResult login(LoginRequest r) throws DataAccessException {
         String username = r.username();
         String password = r.password();
         UserData userData = userDAO.getUser(username);
@@ -55,7 +55,7 @@ public class UserService extends Authorizable {
     public record LoginRequest(String username, String password) {}
     public record LoginResult(String username, String authToken) {}
 
-    public void logout(LogoutRequest r) throws UnauthorizedException{
+    public void logout(LogoutRequest r) throws DataAccessException{
         String authToken = r.authToken();
         authorize(authToken);
         authDAO.deleteAuth(authToken);

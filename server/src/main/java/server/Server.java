@@ -106,7 +106,7 @@ public class Server {
     }
 
     //Returns: {}
-    private void clear(Context ctx) {
+    private void clear(Context ctx) throws DataAccessException {
         handler.clear();
     }
 

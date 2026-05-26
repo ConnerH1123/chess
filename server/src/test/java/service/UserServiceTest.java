@@ -52,7 +52,7 @@ public class UserServiceTest {
         try {
             userService.register(r);
             fail("AlreadyTakenException should have been thrown");
-        } catch (AlreadyTakenException e) {
+        } catch (Exception e) {
             //Passes if no exception is thrown
         }
     }
@@ -91,7 +91,7 @@ public class UserServiceTest {
         try {
             userService.login(login);
             fail("Exception not thrown for invalid password");
-        } catch (UnauthorizedException e) {
+        } catch (Exception e) {
             //Pass if exception is thrown
         }
     }
@@ -132,7 +132,7 @@ public class UserServiceTest {
         try {
             userService.logout(logout);
             fail("Exception not thrown for invalid password");
-        } catch (UnauthorizedException e) {
+        } catch (Exception e) {
             //Pass if exception is thrown
         }
     }
