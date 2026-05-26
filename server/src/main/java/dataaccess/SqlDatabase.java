@@ -22,7 +22,7 @@ public class SqlDatabase {
         }
     }
 
-    int updateDatabase(String statement, Object... params) throws DataAccessException {
+    void updateDatabase(String statement, Object... params) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (int i = 0; i < params.length; i++) {
@@ -35,17 +35,34 @@ public class SqlDatabase {
                     }
                 }
                 ps.executeUpdate();
-
-                ResultSet rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-
-                return 0;
+//                Uncomment if I want to return the generated key
+//                ResultSet rs = ps.getGeneratedKeys();
+//                if (rs.next()) {
+//                    return rs.getInt(1);
+//                }
+//
+//                return 0;
             }
         } catch (Exception e) {
             throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
         }
     }
+
+//    void queryDatabase(String statement) throws DataAccessException {
+//        try (Connection conn = DatabaseManager.getConnection()) {
+//            try (var preparedStatement = conn.prepareStatement("SELECT id, name, type FROM pet WHERE type=?")) {
+//                preparedStatement.setString(1, findType);
+//                try (var rs = preparedStatement.executeQuery()) {
+//                    while (rs.next()) {
+//                        var id = rs.getInt("id");
+//                        var name = rs.getString("name");
+//                        var type = rs.getString("type");
+//                    }
+//                }
+//            }
+//        } catch (Exception e) {
+//            throw new DataAccessException(String.format("unable to query database: %s, %s", statement, e.getMessage()));
+//        }
+//    }
 
 }

@@ -1,11 +1,8 @@
 package dataaccess;
 
-import com.google.gson.Gson;
-
 import model.UserData;
 import java.sql.*;
-import static java.sql.Statement.RETURN_GENERATED_KEYS;
-import static java.sql.Types.NULL;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class MySqlUserDAO extends SqlDatabase implements UserDAO {
 
@@ -28,16 +25,19 @@ public class MySqlUserDAO extends SqlDatabase implements UserDAO {
     @Override
     public void createUser(UserData userData) throws DataAccessException {
         String statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
-        updateDatabase(statement, userData.username(), userData.password(), userData.email());
+        String hashedPassword = BCrypt.hashpw(userData.password(), BCrypt.gensalt());
+        updateDatabase(statement, userData.username(), hashedPassword, userData.email());
     }
 
     @Override
     public UserData getUser(String username) {
+
         return null;
     }
 
     @Override
-    public void deleteAllUsers() {
-
+    public void deleteAllUsers() throws DataAccessException {
+        var statement = "TRUNCATE user";
+        updateDatabase(statement);
     }
 }
