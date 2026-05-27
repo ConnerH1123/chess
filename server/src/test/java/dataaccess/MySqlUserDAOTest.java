@@ -7,6 +7,7 @@ public class MySqlUserDAOTest {
     private static DatabaseManager db;
     private UserDAO userDAO;
 
+
     @AfterEach
     public void tearDown() {
         try {
