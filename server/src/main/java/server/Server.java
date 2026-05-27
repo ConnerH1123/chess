@@ -13,11 +13,17 @@ import service.*;
 
 public class Server {
 
-    private final Javalin javalin;
-    private final Handler handler = new Handler();
+    private Javalin javalin;
+    private Handler handler;
 
 
     public Server() {
+        try {
+            handler = new Handler();
+        } catch (DataAccessException e) {
+            System.out.print(e.getMessage());
+            return;
+        }
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
                 .post("/user",this::register)
                 .post("/session", this::login)

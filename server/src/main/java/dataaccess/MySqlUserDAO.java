@@ -59,7 +59,7 @@ public class MySqlUserDAO extends SqlDatabase implements UserDAO {
 
     @Override
     public void deleteAllUsers() throws DataAccessException {
-        var statement = "TRUNCATE " + tableName;
+        var statement = "TRUNCATE IF EXISTS " + tableName;
         updateDatabase(statement);
     }
 }

@@ -10,9 +10,19 @@ import service.ClearService.*;
 
 
 public class Handler {
-    private final UserDAO userDAO = new MemoryUserDAO();
-    private final AuthDAO authDAO = new MemoryAuthDAO();
-    private final GameDAO gameDAO = new MemoryGameDAO();
+    private UserDAO userDAO;
+    private AuthDAO authDAO;
+    private GameDAO gameDAO;
+
+    public Handler() throws DataAccessException {
+        try {
+            userDAO = new MySqlUserDAO();
+            authDAO = new MemoryAuthDAO();
+            gameDAO = new MemoryGameDAO();
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("unable to load database: %s", e.getMessage()));
+        }
+    }
 
     private final UserService userService = new UserService(userDAO, authDAO);
     private final GameService gameService = new GameService(gameDAO, authDAO);
