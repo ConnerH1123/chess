@@ -1,7 +1,6 @@
 package dataaccess;
 
 import model.AuthData;
-import model.UserData;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -58,12 +57,14 @@ public class MySqlAuthDAO extends SqlDatabase implements AuthDAO{
     }
 
     @Override
-    public void deleteAuth(String authToken) {
-
+    public void deleteAuth(String authToken) throws DataAccessException {
+        String statement = "DELETE FROM " + tableName + " WHERE authToken=?";
+        updateDatabase(statement, authToken);
     }
 
     @Override
-    public void deleteAllAuths() {
-
+    public void deleteAllAuths() throws DataAccessException {
+        var statement = "TRUNCATE " + tableName;
+        updateDatabase(statement);
     }
 }

@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.AuthData;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,12 @@ public class MySqlAuthDAOTest {
     public void setUp() throws DataAccessException {
         authDAO = new MySqlAuthDAO();
     }
+
+    @AfterEach
+    public void tearDown() throws DataAccessException {
+        authDAO.deleteAllAuths();
+    }
+
 
     @Test
     public void testCreateAuth() {
@@ -34,6 +41,21 @@ public class MySqlAuthDAOTest {
             AuthData actualData = authDAO.getAuth(authToken);
             Assertions.assertEquals(expectedData.username(), actualData.username());
             Assertions.assertEquals(expectedData.authToken(), actualData.authToken());
+        } catch (Exception e) {
+            Assertions.fail(e);
+        }
+    }
+
+    @Test
+    public void testDeleteAllAuths() {
+        try {
+            AuthData authData = new AuthData("token", "username");
+            authDAO.createAuth(authData);
+            authData = new AuthData("otherToken", "username");
+            authDAO.createAuth(authData);
+            authData = new AuthData("lastToken", "username");
+            authDAO.createAuth(authData);
+            authDAO.deleteAllAuths();
         } catch (Exception e) {
             Assertions.fail(e);
         }

@@ -17,12 +17,8 @@ public class MySqlUserDAOTest {
     }
 
     @AfterEach
-    public void tearDown() {
-        try {
-            userDAO.deleteAllUsers();
-        } catch (Exception e) {
-            //
-        }
+    public void tearDown() throws DataAccessException {
+        userDAO.deleteAllUsers();
     }
 
     @AfterAll
