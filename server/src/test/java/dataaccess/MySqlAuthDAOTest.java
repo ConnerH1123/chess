@@ -47,6 +47,21 @@ public class MySqlAuthDAOTest {
     }
 
     @Test
+    public void testDeleteAuth() {
+        try {
+            AuthData authData = new AuthData("token", "username");
+            authDAO.createAuth(authData);
+            authData = new AuthData("otherToken", "username");
+            authDAO.createAuth(authData);
+            authData = new AuthData("lastToken", "username");
+            authDAO.createAuth(authData);
+            authDAO.deleteAuth("otherToken");
+        } catch (Exception e) {
+            Assertions.fail(e);
+        }
+    }
+
+    @Test
     public void testDeleteAllAuths() {
         try {
             AuthData authData = new AuthData("token", "username");
