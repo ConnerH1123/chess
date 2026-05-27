@@ -33,8 +33,12 @@ public class SqlDatabase {
     }
 
     void updateDatabase(String statement, Object... params) throws DataAccessException {
+        System.out.println("DEBUG: updateDatabase() called");
+        System.out.println("DEBUG: Getting connection...");
         try (Connection connection = DatabaseManager.getConnection()) {
+            System.out.println("DEBUG: Connection obtained, preparing statement");
             try (PreparedStatement preparedStatement = connection.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+                System.out.println("DEBUG: Statement prepared, loading " + params.length + " parameters");
                 for (int i = 0; i < params.length; i++) {
                     Object param = params[i];
                     switch (param) {
@@ -44,7 +48,9 @@ public class SqlDatabase {
                         default -> throw new DataAccessException("Error: invalid parameter(s) passed");
                     }
                 }
+                System.out.println("DEBUG: Executing update...");
                 preparedStatement.executeUpdate();
+                System.out.println("DEBUG: Update executed");
 //                Uncomment if I want to return the generated key
 //                ResultSet rs = ps.getGeneratedKeys();
 //                if (rs.next()) {
@@ -53,7 +59,12 @@ public class SqlDatabase {
 //
 //                return 0;
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
+            System.err.println("DEBUG: SQLException in updateDatabase()");
+            System.err.println("DEBUG: Error Code: " + e.getErrorCode());
+            System.err.println("DEBUG: SQL State: " + e.getSQLState());
+            System.err.println("DEBUG: Error Message: " + e.getMessage());
+            e.printStackTrace();
             throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
         }
     }

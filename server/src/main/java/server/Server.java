@@ -18,12 +18,19 @@ public class Server {
 
 
     public Server() {
+        handler = null;
         try {
+            System.out.println("DEBUG: creating new handler...");
             handler = new Handler();
+            System.out.println("DEBUG: handler created");
         } catch (DataAccessException e) {
-            System.out.print(e.getMessage());
-            return;
+            System.err.println("=== HANDLER INITIALIZATION ERROR ===");
+            e.printStackTrace();
+            System.err.println("Error message: " + e.getMessage());
+            System.err.println("=====================================");
         }
+
+        System.out.println("DEBUG: Setting up javalin...");
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
                 .post("/user",this::register)
                 .post("/session", this::login)
@@ -34,11 +41,13 @@ public class Server {
                 .delete("/db", this::clear);
 
         javalin.exception(DataAccessException.class, this::handleDataAccessException);
+        System.out.println("DEBUG: javalin setup completed");
     }
 
     //Body: {"username": "", "password": "", "email": ""}
     //Returns: {"username": "", "authToken": ""}
     private void register(Context ctx) throws DataAccessException {
+        System.out.println("DEBUG: register() called in server");
         RegisterRequest registerRequest = new Gson().fromJson(ctx.body(), RegisterRequest.class);
         if (registerRequest.username() == null || registerRequest.password() == null || registerRequest.email() == null) {
             throw new BadRequestException("Error: missing field");
@@ -51,6 +60,7 @@ public class Server {
     //Body: {"username": "", "password": ""}
     //Returns: {"username": "", "authToken": ""}
     private void login(Context ctx) throws DataAccessException {
+        System.out.println("DEBUG: login() called in server");
         LoginRequest loginRequest = new Gson().fromJson(ctx.body(), LoginRequest.class);
         if (loginRequest.username() == null || loginRequest.password() == null) {
             throw new BadRequestException("Error: missing field");
@@ -63,6 +73,7 @@ public class Server {
     //Header: Authorization: authToken
     //Returns: {}
     private void logout(Context ctx) throws DataAccessException {
+        System.out.println("DEBUG: logout() called in server");
         String header = "Authorization";
         LogoutRequest logoutRequest = new LogoutRequest(ctx.header(header));
         handler.logout(logoutRequest);
@@ -113,6 +124,7 @@ public class Server {
 
     //Returns: {}
     private void clear(Context ctx) throws DataAccessException {
+        System.out.println("DEBUG: clear() called in server");
         handler.clear();
     }
 
