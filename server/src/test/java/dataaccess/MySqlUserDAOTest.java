@@ -27,7 +27,7 @@ public class MySqlUserDAOTest {
 
     @AfterAll
     public static void completeTearDown() throws DataAccessException {
-        String statement = "DROP TABLE test";
+        String statement = "DROP TABLE IF EXISTS test";
         try (Connection connection = DatabaseManager.getConnection()) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
                 preparedStatement.executeUpdate();

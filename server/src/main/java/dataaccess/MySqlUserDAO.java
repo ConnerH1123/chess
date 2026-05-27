@@ -22,12 +22,10 @@ public class MySqlUserDAO extends SqlDatabase implements UserDAO {
 
     private String[] loadStatements() {
         return new String[]{"CREATE TABLE IF NOT EXISTS  " + tableName + " (\n" +
-                "`id` int NOT NULL AUTO_INCREMENT,\n" +
                 "`username` varchar(256) NOT NULL,\n" +
                 "`password` varchar(256) NOT NULL,\n" +
                 "`email` varchar(256) NOT NULL,\n" +
-                "PRIMARY KEY (`id`),\n" +
-                "INDEX(username)\n" +
+                "PRIMARY KEY (`username`)\n" +
                 ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
         };
     }
