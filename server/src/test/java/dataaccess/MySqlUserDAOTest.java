@@ -7,7 +7,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 
 public class MySqlUserDAOTest {
-    private static DatabaseManager db;
     private UserDAO userDAO;
 
 

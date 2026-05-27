@@ -1,18 +1,17 @@
 package dataaccess;
 
 import model.AuthData;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 
 public class MySqlAuthDAOTest {
-    private static DatabaseManager db;
     private AuthDAO authDAO;
 
     @BeforeEach
     public void setUp() throws DataAccessException {
-        authDAO = new MySqlAuthDAO();
+        authDAO = new MySqlAuthDAO("test");
     }
 
     @AfterEach
@@ -20,6 +19,17 @@ public class MySqlAuthDAOTest {
         authDAO.deleteAllAuths();
     }
 
+    @AfterAll
+    public static void completeTearDown() throws DataAccessException {
+        String statement = "DROP TABLE IF EXISTS test";
+        try (Connection connection = DatabaseManager.getConnection()) {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
+                preparedStatement.executeUpdate();
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
+        }
+    }
 
     @Test
     public void testCreateAuth() {
