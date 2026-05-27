@@ -13,7 +13,18 @@ public class DatabaseManager {
      * Load the database information for the db.properties file.
      */
     static {
-        loadPropertiesFromResources();
+        System.out.println("DEBUG: DatabaseManager static initializer starting...");
+        try {
+            loadPropertiesFromResources();
+            System.out.println("DEBUG: Properties loaded successfully");
+            System.out.println("DEBUG: databaseName = " + databaseName);
+            System.out.println("DEBUG: dbUsername = " + dbUsername);
+            System.out.println("DEBUG: connectionUrl = " + connectionUrl);
+        } catch (Exception e) {
+            System.err.println("DEBUG: Exception during static initialization:");
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     /**
@@ -21,10 +32,21 @@ public class DatabaseManager {
      */
     static public void createDatabase() throws DataAccessException {
         var statement = "CREATE DATABASE IF NOT EXISTS " + databaseName;
+        System.out.println("DEBUG: createDatabase() called");
+        System.out.println("DEBUG: Connection URL: " + connectionUrl);
+        System.out.println("DEBUG: Username: " + dbUsername);
+        System.out.println("DEBUG: SQL: " + statement);
         try (var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
              var preparedStatement = conn.prepareStatement(statement)) {
+            System.out.println("DEBUG: Connection established, executing statement...");
             preparedStatement.executeUpdate();
+            System.out.println("DEBUG: Database creation successful");
         } catch (SQLException ex) {
+            System.err.println("DEBUG: SQLException during createDatabase()");
+            System.err.println("DEBUG: Error Code: " + ex.getErrorCode());
+            System.err.println("DEBUG: SQL State: " + ex.getSQLState());
+            System.err.println("DEBUG: Error Message: " + ex.getMessage());
+            ex.printStackTrace();
             throw new DataAccessException("failed to create database", ex);
         }
     }
@@ -72,6 +94,6 @@ public class DatabaseManager {
 
         var host = props.getProperty("db.host");
         var port = Integer.parseInt(props.getProperty("db.port"));
-        connectionUrl = String.format("jdbc:mysql://%s:%d", host, port);
+        connectionUrl = String.format("jdbc:mysql://%s:%d?allowPublicKeyRetrieval=true&useSSL=false", host, port);
     }
 }
