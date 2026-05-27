@@ -4,8 +4,6 @@ import model.UserData;
 import java.sql.*;
 import org.mindrot.jbcrypt.BCrypt;
 
-import static java.sql.Types.NULL;
-
 public class MySqlUserDAO extends SqlDatabase implements UserDAO {
 
     public MySqlUserDAO() throws DataAccessException {
