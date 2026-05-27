@@ -3,10 +3,18 @@ package dataaccess;
 import model.UserData;
 import org.junit.jupiter.api.*;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+
 public class MySqlUserDAOTest {
     private static DatabaseManager db;
     private UserDAO userDAO;
 
+
+    @BeforeEach
+    public void setUp() throws DataAccessException {
+        userDAO = new MySqlUserDAO("test");
+    }
 
     @AfterEach
     public void tearDown() {
@@ -15,13 +23,23 @@ public class MySqlUserDAOTest {
         } catch (Exception e) {
             //
         }
+    }
 
+    @AfterAll
+    public static void completeTearDown() throws DataAccessException {
+        String statement = "DROP TABLE test";
+        try (Connection connection = DatabaseManager.getConnection()) {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
+                preparedStatement.executeUpdate();
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
+        }
     }
 
     @Test
     public void testCreateUser() {
         try {
-            userDAO = new MySqlUserDAO();
             UserData userData = new UserData("joe", "joe mama", "xD");
             userDAO.createUser(userData);
         } catch (Exception e) {
@@ -32,7 +50,6 @@ public class MySqlUserDAOTest {
     @Test
     public void testGetUser() {
         try {
-            userDAO = new MySqlUserDAO();
             String username = "joe";
             String password = "joe mama";
             String email = "xD";
@@ -49,7 +66,6 @@ public class MySqlUserDAOTest {
     @Test
     public void testDeleteAllUsers() {
         try {
-            userDAO = new MySqlUserDAO();
             UserData userData = new UserData("Bob", "password", "email");
             userDAO.createUser(userData);
             userData = new UserData("Sue", "password", "email");
