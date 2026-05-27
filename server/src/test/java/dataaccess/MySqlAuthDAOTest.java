@@ -24,4 +24,19 @@ public class MySqlAuthDAOTest {
         }
     }
 
+    @Test
+    public void testGetAuth() {
+        try {
+            String authToken = "authToken";
+            String username = "username";
+            AuthData expectedData = new AuthData(authToken, username);
+            authDAO.createAuth(expectedData);
+            AuthData actualData = authDAO.getAuth(authToken);
+            Assertions.assertEquals(expectedData.username(), actualData.username());
+            Assertions.assertEquals(expectedData.authToken(), actualData.authToken());
+        } catch (Exception e) {
+            Assertions.fail(e);
+        }
+    }
+
 }

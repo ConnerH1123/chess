@@ -1,6 +1,12 @@
 package dataaccess;
 
 import model.AuthData;
+import model.UserData;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class MySqlAuthDAO extends SqlDatabase implements AuthDAO{
     private final String tableName;
@@ -33,8 +39,22 @@ public class MySqlAuthDAO extends SqlDatabase implements AuthDAO{
     }
 
     @Override
-    public AuthData getAuth(String authToken) {
-        return null;
+    public AuthData getAuth(String authToken) throws DataAccessException {
+        String statement = "SELECT authToken, username FROM " + tableName + " WHERE authToken=?";
+        try (Connection connection = DatabaseManager.getConnection()) {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
+                preparedStatement.setString(1,authToken);
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        String username = resultSet.getString("username");
+                        return new AuthData(authToken, username);
+                    }
+                    return null;
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("unable to query database: %s, %s", statement, e.getMessage()));
+        }
     }
 
     @Override

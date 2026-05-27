@@ -52,7 +52,7 @@ public class MySqlUserDAO extends SqlDatabase implements UserDAO {
                     return null;
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             throw new DataAccessException(String.format("unable to query database: %s, %s", statement, e.getMessage()));
         }
     }
