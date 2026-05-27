@@ -9,12 +9,9 @@ public class MySqlUserDAO extends SqlDatabase implements UserDAO {
     private final String tableName;
 
     public MySqlUserDAO() throws DataAccessException {
-        System.out.println("DEBUG: MySqlUserDAO() initialization started");
         tableName = "user";
         String[] createStatements = loadStatements();
-        System.out.println("DEBUG: Configuring database...");
         configureDatabase(createStatements);
-        System.out.println("DEBUG: Database configured!");
     }
 
     public MySqlUserDAO(String tableName) throws DataAccessException {
@@ -35,17 +32,13 @@ public class MySqlUserDAO extends SqlDatabase implements UserDAO {
 
     @Override
     public void createUser(UserData userData) throws DataAccessException {
-        System.out.println("DEBUG: createUser() called");
         String statement = "INSERT INTO " + tableName + " (username, password, email) VALUES (?, ?, ?)";
-        System.out.println("DEBUG: hashing password...");
         String hashedPassword = BCrypt.hashpw(userData.password(), BCrypt.gensalt());
-        System.out.println("DEBUG: Password hashed");
         updateDatabase(statement, userData.username(), hashedPassword, userData.email());
     }
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
-        System.out.println("DEBUG: getUser() called");
         String statement = "SELECT username, password, email FROM " + tableName + " WHERE username=?";
         try (Connection connection = DatabaseManager.getConnection()) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
@@ -66,8 +59,7 @@ public class MySqlUserDAO extends SqlDatabase implements UserDAO {
 
     @Override
     public void deleteAllUsers() throws DataAccessException {
-        System.out.println("DEBUG: deleteAllUsers() called");
-        var statement = "TRUNCATE IF EXISTS " + tableName;
+        var statement = "TRUNCATE " + tableName;
         updateDatabase(statement);
     }
 }
