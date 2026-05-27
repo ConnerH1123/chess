@@ -4,6 +4,8 @@ import model.UserData;
 import java.sql.*;
 import org.mindrot.jbcrypt.BCrypt;
 
+import static java.sql.Types.NULL;
+
 public class MySqlUserDAO extends SqlDatabase implements UserDAO {
 
     public MySqlUserDAO() throws DataAccessException {
@@ -32,15 +34,20 @@ public class MySqlUserDAO extends SqlDatabase implements UserDAO {
     @Override
     public UserData getUser(String username) throws DataAccessException {
         String statement = "SELECT username, password, email FROM user WHERE username=?";
-        try (ResultSet resultSet = queryDatabase(statement, username)) {
-            if (resultSet.next()) {
-                String password = resultSet.getString("password");
-                String email = resultSet.getString("email");
-                return new UserData(username, password, email);
+        try (Connection connection = DatabaseManager.getConnection()) {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
+                preparedStatement.setString(1,username);
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        String password = resultSet.getString("password");
+                        String email = resultSet.getString("email");
+                        return new UserData(username, password, email);
+                    }
+                    return null;
+                }
             }
-            return null;
         } catch (Exception e) {
-            throw new DataAccessException(e.getMessage());
+            throw new DataAccessException(String.format("unable to query database: %s, %s", statement, e.getMessage()));
         }
     }
 
