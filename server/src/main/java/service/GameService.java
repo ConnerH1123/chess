@@ -11,7 +11,7 @@ public class GameService extends Authorizable {
         this.gameDAO = gameDAO;
     }
 
-    public CreateResult create(CreateRequest r) throws UnauthorizedException{
+    public CreateResult create(CreateRequest r) throws DataAccessException {
         authorize(r.authToken());
         String gameName = r.gameName();
         gameDAO.createGame(gameName);
@@ -26,7 +26,7 @@ public class GameService extends Authorizable {
     }
     public record CreateResult(int gameID) {}
 
-    public ListResult list(ListRequest r) throws UnauthorizedException {
+    public ListResult list(ListRequest r) throws DataAccessException {
         authorize(r.authToken());
         GameData[] games = gameDAO.listGames();
         return new ListResult(games);

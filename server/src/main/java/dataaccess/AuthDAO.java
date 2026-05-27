@@ -8,7 +8,7 @@ public interface AuthDAO {
      *
      * @param authData authToken and username
      */
-    void createAuth(AuthData authData);
+    void createAuth(AuthData authData) throws DataAccessException;
 
     /**
      * Given auth token returns auth data
@@ -16,17 +16,17 @@ public interface AuthDAO {
      * @param authToken String authorization token
      * @return Return auth data or null
      */
-    AuthData getAuth(String authToken);
+    AuthData getAuth(String authToken) throws DataAccessException;
 
     /**
      * Clears auth data given auth token
      *
      * @param authToken String authorization token
      */
-    void deleteAuth(String authToken);
+    void deleteAuth(String authToken) throws DataAccessException;
 
     /**
      * Clears database
      */
-    void deleteAllAuths();
+    void deleteAllAuths() throws DataAccessException;
 }

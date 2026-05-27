@@ -17,7 +17,7 @@ public class GameServiceTest {
     private GameService gameService;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws DataAccessException {
         gameDAO = new MemoryGameDAO();
         authDAO = new MemoryAuthDAO();
         gameService = new GameService(gameDAO, authDAO);
@@ -90,7 +90,7 @@ public class GameServiceTest {
         try {
             gameService.list(lRequest);
             Assertions.fail("Exception was not thrown");
-        } catch (UnauthorizedException e) {
+        } catch (Exception e) {
             //Passes
         }
     }

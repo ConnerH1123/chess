@@ -49,7 +49,7 @@ public class Handler {
         return gameService.create(r);
     }
 
-    public ListResult list(ListRequest r) throws UnauthorizedException {
+    public ListResult list(ListRequest r) throws DataAccessException {
         return gameService.list(r);
     }
 

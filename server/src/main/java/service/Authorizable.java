@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
 import dataaccess.UnauthorizedException;
 import model.AuthData;
 
@@ -11,7 +12,7 @@ public class Authorizable {
         this.authDAO = authDAO;
     }
 
-    public AuthData authorize(String authToken) throws UnauthorizedException {
+    public AuthData authorize(String authToken) throws DataAccessException {
         AuthData authData = authDAO.getAuth(authToken);
         if (authData == null) {
             throw new UnauthorizedException("Error: unauthorized");
