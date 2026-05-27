@@ -48,6 +48,18 @@ public class MySqlUserDAOTest {
     }
 
     @Test
+    public void testCreateUserDuplicate() {
+        try {
+            UserData userData = new UserData("joe", "joe mama", "xD");
+            userDAO.createUser(userData);
+            userDAO.createUser(userData);
+            Assertions.fail("Shouldn't support duplicate entrees");
+        } catch (Exception e) {
+            //
+        }
+    }
+
+    @Test
     public void testGetUser() {
         try {
             String username = "joe";
@@ -58,6 +70,20 @@ public class MySqlUserDAOTest {
             UserData actualData = userDAO.getUser(username);
             Assertions.assertEquals(expectedData.username(), actualData.username());
             Assertions.assertEquals(expectedData.email(), actualData.email());
+        } catch (Exception e) {
+            Assertions.fail(e);
+        }
+    }
+
+    @Test
+    public void testGetAbsentUser() {
+        try {
+            String username = "joe";
+            String password = "joe mama";
+            String email = "xD";
+            UserData userData = new UserData(username, password, email);
+            userDAO.createUser(userData);
+            Assertions.assertNull(userDAO.getUser("username"));
         } catch (Exception e) {
             Assertions.fail(e);
         }
