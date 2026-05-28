@@ -24,7 +24,7 @@ public interface GameDAO {
      * @param gameID ID of game (int greater than 0)
      * @return Game data or null
      */
-    GameData getGame(int gameID);
+    GameData getGame(int gameID) throws DataAccessException;
 
     /**
      * Lists games in database

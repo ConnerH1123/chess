@@ -2,32 +2,56 @@ package dataaccess;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
+import model.AuthData;
 import model.GameData;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class MySqlGameDAO extends SqlDatabase implements GameDAO {
     private final String tableName;
-    private int size = 0;
+    private int size;
+
+    private int getSize() throws DataAccessException {
+        String statement = "SELECT COUNT(*) AS rowCount FROM " + tableName;
+        try (Connection connection = DatabaseManager.getConnection()) {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        return resultSet.getInt("rowCount");
+                    }
+                    return 0;
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("unable to query database: %s, %s", statement, e.getMessage()));
+        }
+    }
 
     public MySqlGameDAO() throws DataAccessException {
         tableName = "game";
         String[] createStatements = loadStatements();
         configureDatabase(createStatements);
+        size = getSize();
     }
 
     public MySqlGameDAO(String tableName) throws DataAccessException {
         this.tableName = tableName;
         String[] createStatements = loadStatements();
         configureDatabase(createStatements);
+        size = getSize();
     }
 
     private String[] loadStatements() {
         return new String[]{"CREATE TABLE IF NOT EXISTS  " + tableName + " (\n" +
-                "`gameId` int NOT NULL AUTO_INCREMENT,\n" +
+                "`gameID` int NOT NULL AUTO_INCREMENT,\n" +
                 "`whiteUsername` varchar(256) DEFAULT NULL,\n" +
                 "`blackUsername` varchar(256) DEFAULT NULL,\n" +
                 "`gameName` varchar(256) NOT NULL,\n" +
                 "`json` TEXT DEFAULT NULL,\n" +
-                "PRIMARY KEY (`gameId`)\n" +
+                "PRIMARY KEY (`gameID`)\n" +
                 ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
         };
     }
@@ -45,8 +69,26 @@ public class MySqlGameDAO extends SqlDatabase implements GameDAO {
     }
 
     @Override
-    public GameData getGame(int gameID) {
-        return null;
+    public GameData getGame(int gameID) throws DataAccessException {
+        String statement = "SELECT gameID, whiteUsername, blackUsername, gameName, json FROM " + tableName + " WHERE gameID=?";
+        try (Connection connection = DatabaseManager.getConnection()) {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
+                preparedStatement.setInt(1,gameID);
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        String whiteUsername = resultSet.getString("whiteUsername");
+                        String blackUsername = resultSet.getString("blackUsername");
+                        String gameName = resultSet.getString("gameName");
+                        String json = resultSet.getString("json");
+                        ChessGame game = new Gson().fromJson(json, ChessGame.class);
+                        return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+                    }
+                    return null;
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("unable to query database: %s, %s", statement, e.getMessage()));
+        }
     }
 
     @Override
