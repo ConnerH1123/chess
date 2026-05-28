@@ -3,6 +3,8 @@ package dataaccess;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.ResultSet;
+
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
@@ -21,7 +23,7 @@ public class SqlDatabase {
         }
     }
 
-    void updateDatabase(String statement, Object... params) throws DataAccessException {
+    int updateDatabase(String statement, Object... params) throws DataAccessException {
         try (Connection connection = DatabaseManager.getConnection()) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (int i = 0; i < params.length; i++) {
@@ -34,13 +36,12 @@ public class SqlDatabase {
                     }
                 }
                 preparedStatement.executeUpdate();
-//                Uncomment if I want to return the generated key
-//                ResultSet rs = ps.getGeneratedKeys();
-//                if (rs.next()) {
-//                    return rs.getInt(1);
-//                }
-//
-//                return 0;
+                ResultSet rs = preparedStatement.getGeneratedKeys();
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+
+                return 0;
             }
         } catch (SQLException e) {
             throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));

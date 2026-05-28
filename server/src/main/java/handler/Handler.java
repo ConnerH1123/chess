@@ -10,20 +10,16 @@ import service.ClearService.*;
 
 
 public class Handler {
-    private UserDAO userDAO;
-    private AuthDAO authDAO;
-    private GameDAO gameDAO;
 
-    private UserService userService = new UserService(userDAO, authDAO);
-    private GameService gameService = new GameService(gameDAO, authDAO);
-    private ClearService clearService = new ClearService(userDAO, gameDAO, authDAO);
-
+    private final UserService userService;
+    private final GameService gameService;
+    private final ClearService clearService;
 
     public Handler() throws DataAccessException {
         try {
-            userDAO = new MySqlUserDAO();
-            authDAO = new MemoryAuthDAO();
-            gameDAO = new MemoryGameDAO();
+            UserDAO userDAO = new MySqlUserDAO();
+            AuthDAO authDAO = new MySqlAuthDAO();
+            GameDAO gameDAO = new MemoryGameDAO();
             userService = new UserService(userDAO, authDAO);
             gameService = new GameService(gameDAO, authDAO);
             clearService = new ClearService(userDAO, gameDAO, authDAO);

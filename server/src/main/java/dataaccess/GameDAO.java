@@ -9,7 +9,7 @@ public interface GameDAO {
      *
      * @param gameName Name of game
      */
-    void createGame(String gameName);
+    void createGame(String gameName) throws DataAccessException;
 
     /**
      * Returns size of database

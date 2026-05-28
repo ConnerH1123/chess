@@ -7,7 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class MySqlAuthDAO extends SqlDatabase implements AuthDAO{
+public class MySqlAuthDAO extends SqlDatabase implements AuthDAO {
     private final String tableName;
 
     public MySqlAuthDAO() throws DataAccessException {
