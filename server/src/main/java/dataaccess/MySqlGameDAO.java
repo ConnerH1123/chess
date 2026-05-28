@@ -127,8 +127,10 @@ public class MySqlGameDAO extends SqlDatabase implements GameDAO {
     }
 
     @Override
-    public void updateGame(int gameID, ChessGame updatedGame) {
-
+    public void updateGame(int gameID, ChessGame updatedGame) throws DataAccessException {
+        String statement = "UPDATE " + tableName + " SET json=? WHERE gameID=?";
+        String json = new Gson().toJson(updatedGame);
+        updateDatabase(statement, gameID, json);
     }
 
     @Override

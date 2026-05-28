@@ -49,7 +49,7 @@ public interface GameDAO {
      * @param gameID ID of game to be updated
      * @param updatedGame Updated board to overwrite current board
      */
-    void updateGame(int gameID, ChessGame updatedGame);
+    void updateGame(int gameID, ChessGame updatedGame) throws DataAccessException;
 
     /**
      * Clears database
