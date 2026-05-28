@@ -19,7 +19,7 @@ public class Handler {
         try {
             UserDAO userDAO = new MySqlUserDAO();
             AuthDAO authDAO = new MySqlAuthDAO();
-            GameDAO gameDAO = new MemoryGameDAO();
+            GameDAO gameDAO = new MySqlGameDAO();
             userService = new UserService(userDAO, authDAO);
             gameService = new GameService(gameDAO, authDAO);
             clearService = new ClearService(userDAO, gameDAO, authDAO);

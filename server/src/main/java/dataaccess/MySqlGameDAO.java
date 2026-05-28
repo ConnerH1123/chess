@@ -110,6 +110,7 @@ public class MySqlGameDAO extends SqlDatabase implements GameDAO {
                         String json = resultSet.getString("json");
                         ChessGame game = new Gson().fromJson(json, ChessGame.class);
                         games[i] = new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+                        i++;
                     }
                     return games;
                 }
@@ -146,5 +147,6 @@ public class MySqlGameDAO extends SqlDatabase implements GameDAO {
     public void deleteAllGames() throws DataAccessException {
         var statement = "TRUNCATE " + tableName;
         updateDatabase(statement);
+        size = 0;
     }
 }
