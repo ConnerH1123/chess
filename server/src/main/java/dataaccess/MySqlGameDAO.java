@@ -70,6 +70,9 @@ public class MySqlGameDAO extends SqlDatabase implements GameDAO {
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
+        if (gameID < 0 || gameID > size) {
+            throw new DataAccessException("Error: gameID outside of bounds");
+        }
         String statement = "SELECT gameID, whiteUsername, blackUsername, gameName, json FROM " + tableName + " WHERE gameID=?";
         try (Connection connection = DatabaseManager.getConnection()) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
@@ -118,6 +121,9 @@ public class MySqlGameDAO extends SqlDatabase implements GameDAO {
 
     @Override
     public void updateGame(int gameID, String playerColor, String username) throws DataAccessException {
+        if (gameID < 0 || gameID > size) {
+            throw new DataAccessException("Error: gameID outside of bounds");
+        }
         String statement = switch (playerColor) {
             case "WHITE" -> "UPDATE " + tableName + " SET whiteUsername=? WHERE gameID=?";
             case "BLACK" -> "UPDATE " + tableName + " SET blackUsername=? WHERE gameID=?";
@@ -128,6 +134,9 @@ public class MySqlGameDAO extends SqlDatabase implements GameDAO {
 
     @Override
     public void updateGame(int gameID, ChessGame updatedGame) throws DataAccessException {
+        if (gameID < 0 || gameID > size) {
+            throw new DataAccessException("Error: gameID outside of bounds");
+        }
         String statement = "UPDATE " + tableName + " SET json=? WHERE gameID=?";
         String json = new Gson().toJson(updatedGame);
         updateDatabase(statement, gameID, json);

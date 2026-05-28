@@ -12,7 +12,7 @@ public class MySqlGameDAOTest {
 
     @BeforeEach
     public void setUp() throws DataAccessException {
-        gameDAO = new MySqlGameDAO();
+        gameDAO = new MySqlGameDAO("test");
     }
 
     @AfterEach
@@ -58,6 +58,18 @@ public class MySqlGameDAOTest {
     }
 
     @Test
+    public void testGetInvalidGame() {
+        try {
+            String gameName = "not checkers xD";
+            gameDAO.createGame(gameName);
+            gameDAO.getGame(3);
+            Assertions.fail("Shouldn't have 3 games");
+        } catch (Exception e) {
+            //Pass
+        }
+    }
+
+    @Test
     public void testListGames() {
         try {
             gameDAO.createGame("game1");
@@ -78,6 +90,28 @@ public class MySqlGameDAOTest {
             gameDAO.updateGame(1,"WHITE","jeff");
         } catch (Exception e) {
             Assertions.fail(e);
+        }
+    }
+
+    @Test
+    public void testUpdateGameBadColor() {
+        try {
+            gameDAO.createGame("game1");
+            gameDAO.updateGame(1,"GREEN","jeff");
+            Assertions.fail("Green is not a valid color");
+        } catch (Exception e) {
+            //
+        }
+    }
+
+    @Test
+    public void testUpdateGameBadID() {
+        try {
+            gameDAO.createGame("game1");
+            gameDAO.updateGame(4,"WHITE","jeff");
+            Assertions.fail("Not enough games");
+        } catch (Exception e) {
+            //
         }
     }
 
