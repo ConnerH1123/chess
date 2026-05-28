@@ -8,25 +8,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class MySqlGameDAO extends SqlDatabase implements GameDAO {
     private final String tableName;
     private int size;
 
     private int getSize() throws DataAccessException {
-        String statement = "SELECT COUNT(*) AS rowCount FROM " + tableName;
-        try (Connection connection = DatabaseManager.getConnection()) {
-            try (PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                    if (resultSet.next()) {
-                        return resultSet.getInt("rowCount");
-                    }
-                    return 0;
-                }
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(String.format("Error: unable to query database: %s, %s", statement, e.getMessage()));
-        }
+        return getTableSize(tableName);
     }
 
     public MySqlGameDAO() throws DataAccessException {
@@ -72,51 +61,36 @@ public class MySqlGameDAO extends SqlDatabase implements GameDAO {
         if (gameID < 0 || gameID > size) {
             throw new DataAccessException("Error: gameID outside of bounds");
         }
-        String statement = "SELECT gameID, whiteUsername, blackUsername, gameName, json FROM " + tableName + " WHERE gameID=?";
-        try (Connection connection = DatabaseManager.getConnection()) {
-            try (PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
-                preparedStatement.setInt(1,gameID);
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                    if (resultSet.next()) {
-                        String whiteUsername = resultSet.getString("whiteUsername");
-                        String blackUsername = resultSet.getString("blackUsername");
-                        String gameName = resultSet.getString("gameName");
-                        String json = resultSet.getString("json");
-                        ChessGame game = new Gson().fromJson(json, ChessGame.class);
-                        return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
-                    }
-                    return null;
-                }
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(String.format("Error: unable to query database: %s, %s", statement, e.getMessage()));
+        String statement = "SELECT whiteUsername, blackUsername, gameName, json FROM " + tableName + " WHERE gameID=?";
+        ArrayList<String[]> queryResponse = queryDatabase(statement, 4, gameID);
+        if (queryResponse.isEmpty()) {
+            return null;
         }
+        String whiteUsername = queryResponse.getFirst()[0];
+        String blackUsername = queryResponse.getFirst()[1];
+        String gameName = queryResponse.getFirst()[2];
+        String json = queryResponse.getFirst()[3];
+        ChessGame game = new Gson().fromJson(json, ChessGame.class);
+        return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
     }
 
     @Override
     public GameData[] listGames() throws DataAccessException {
         String statement = "SELECT gameID, whiteUsername, blackUsername, gameName, json FROM " + tableName;
-        try (Connection connection = DatabaseManager.getConnection()) {
-            try (PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                    GameData[] games = new GameData[size];
-                    int i = 0;
-                    while (resultSet.next()) {
-                        int gameID = resultSet.getInt("gameID");
-                        String whiteUsername = resultSet.getString("whiteUsername");
-                        String blackUsername = resultSet.getString("blackUsername");
-                        String gameName = resultSet.getString("gameName");
-                        String json = resultSet.getString("json");
-                        ChessGame game = new Gson().fromJson(json, ChessGame.class);
-                        games[i] = new GameData(gameID, whiteUsername, blackUsername, gameName, game);
-                        i++;
-                    }
-                    return games;
-                }
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(String.format("Error: unable to query database: %s, %s", statement, e.getMessage()));
+        ArrayList<String[]> queryResponse = queryDatabase(statement, 5);
+        GameData[] games = new GameData[size];
+        int i = 0;
+        for (String[] row : queryResponse) {
+            int gameID = Integer.parseInt(row[0]);
+            String whiteUsername = row[1];
+            String blackUsername = row[2];
+            String gameName = row[3];
+            String json = row[4];
+            ChessGame game = new Gson().fromJson(json, ChessGame.class);
+            games[i] = new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+            i++;
         }
+        return games;
     }
 
     @Override

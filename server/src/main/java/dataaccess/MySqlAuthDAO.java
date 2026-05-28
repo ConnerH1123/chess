@@ -1,11 +1,7 @@
 package dataaccess;
 
 import model.AuthData;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class MySqlAuthDAO extends SqlDatabase implements AuthDAO {
     private final String tableName;
@@ -35,25 +31,18 @@ public class MySqlAuthDAO extends SqlDatabase implements AuthDAO {
     public void createAuth(AuthData authData) throws DataAccessException {
         String statement = "INSERT INTO " + tableName + " (authToken, username) VALUES (?, ?)";
         updateDatabase(statement, authData.authToken(), authData.username());
+
     }
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
-        String statement = "SELECT authToken, username FROM " + tableName + " WHERE authToken=?";
-        try (Connection connection = DatabaseManager.getConnection()) {
-            try (PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
-                preparedStatement.setString(1,authToken);
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                    if (resultSet.next()) {
-                        String username = resultSet.getString("username");
-                        return new AuthData(authToken, username);
-                    }
-                    return null;
-                }
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(String.format("Error: unable to query database: %s, %s", statement, e.getMessage()));
+        String statement = "SELECT username FROM " + tableName + " WHERE authToken=?";
+        ArrayList<String[]> queryResponse = queryDatabase(statement, 1, authToken);
+        if (queryResponse.isEmpty()) {
+            return null;
         }
+        String username = queryResponse.getFirst()[0];
+        return new AuthData(authToken, username);
     }
 
     @Override
