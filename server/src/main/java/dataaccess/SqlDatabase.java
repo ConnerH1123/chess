@@ -27,6 +27,7 @@ public class SqlDatabase {
     int updateDatabase(String statement, Object... params) throws DataAccessException {
         try (Connection connection = DatabaseManager.getConnection()) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+                //FIX DUPLICATE
                 for (int i = 0; i < params.length; i++) {
                     Object param = params[i];
                     switch (param) {
@@ -52,6 +53,7 @@ public class SqlDatabase {
     ArrayList<String[]> queryDatabase(String statement, int columnCount, Object... params) throws DataAccessException {
         try (Connection connection = DatabaseManager.getConnection()) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
+                //FIX DUPLICATE
                 for (int i = 0; i < params.length; i++) {
                     Object param = params[i];
                     switch (param) {
@@ -65,6 +67,7 @@ public class SqlDatabase {
                     ArrayList<String[]> rows = new ArrayList<>();
                     while(resultSet.next()) {
                         String[] currentRow = new String[columnCount];
+                        //FIX DEEP NESTING
                         for(int i = 1;i<=columnCount;i++){
                             currentRow[i-1]=resultSet.getString(i);
                         }
