@@ -31,7 +31,7 @@ public interface GameDAO {
      *
      * @return Array of game data
      */
-    GameData[] listGames();
+    GameData[] listGames() throws DataAccessException;
 
     /**
      * Adds user to game

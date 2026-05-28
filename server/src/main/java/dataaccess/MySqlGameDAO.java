@@ -92,8 +92,28 @@ public class MySqlGameDAO extends SqlDatabase implements GameDAO {
     }
 
     @Override
-    public GameData[] listGames() {
-        return new GameData[0];
+    public GameData[] listGames() throws DataAccessException {
+        String statement = "SELECT gameID, whiteUsername, blackUsername, gameName, json FROM " + tableName;
+        try (Connection connection = DatabaseManager.getConnection()) {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    GameData[] games = new GameData[size];
+                    int i = 0;
+                    while (resultSet.next()) {
+                        int gameID = resultSet.getInt("gameID");
+                        String whiteUsername = resultSet.getString("whiteUsername");
+                        String blackUsername = resultSet.getString("blackUsername");
+                        String gameName = resultSet.getString("gameName");
+                        String json = resultSet.getString("json");
+                        ChessGame game = new Gson().fromJson(json, ChessGame.class);
+                        games[i] = new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+                    }
+                    return games;
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("unable to query database: %s, %s", statement, e.getMessage()));
+        }
     }
 
     @Override
