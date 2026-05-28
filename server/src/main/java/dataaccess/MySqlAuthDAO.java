@@ -52,7 +52,7 @@ public class MySqlAuthDAO extends SqlDatabase implements AuthDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new DataAccessException(String.format("unable to query database: %s, %s", statement, e.getMessage()));
+            throw new DataAccessException(String.format("Error: unable to query database: %s, %s", statement, e.getMessage()));
         }
     }
 
