@@ -2,9 +2,10 @@ package dataaccess;
 
 import chess.ChessGame;
 import model.GameData;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 
 public class MySqlGameDAOTest {
     private GameDAO gameDAO;
@@ -12,6 +13,23 @@ public class MySqlGameDAOTest {
     @BeforeEach
     public void setUp() throws DataAccessException {
         gameDAO = new MySqlGameDAO();
+    }
+
+    @AfterEach
+    public void tearDown() throws DataAccessException {
+        gameDAO.deleteAllGames();
+    }
+
+    @AfterAll
+    public static void completeTearDown() throws DataAccessException {
+        String statement = "DROP TABLE IF EXISTS test";
+        try (Connection connection = DatabaseManager.getConnection()) {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
+                preparedStatement.executeUpdate();
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
+        }
     }
 
     @Test
@@ -34,6 +52,33 @@ public class MySqlGameDAOTest {
             Assertions.assertEquals(expectedData.blackUsername(), actualData.blackUsername());
             Assertions.assertEquals(expectedData.gameName(), actualData.gameName());
             Assertions.assertEquals(expectedData.game(), actualData.game());
+        } catch (Exception e) {
+            Assertions.fail(e);
+        }
+    }
+
+    @Test
+    public void testListGames() {
+        try {
+            gameDAO.createGame("game1");
+            gameDAO.createGame("game2");
+            gameDAO.createGame("game3");
+            gameDAO.createGame("game4");
+            GameData[] games = gameDAO.listGames();
+            Assertions.assertEquals(4, games.length);
+        } catch (Exception e) {
+            Assertions.fail(e);
+        }
+    }
+
+    @Test
+    public void testDeleteAllGames() {
+        try {
+            gameDAO.createGame("game1");
+            gameDAO.createGame("game2");
+            gameDAO.createGame("game3");
+            gameDAO.createGame("game4");
+            gameDAO.deleteAllGames();
         } catch (Exception e) {
             Assertions.fail(e);
         }

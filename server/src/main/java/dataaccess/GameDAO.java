@@ -54,5 +54,5 @@ public interface GameDAO {
     /**
      * Clears database
      */
-    void deleteAllGames();
+    void deleteAllGames() throws DataAccessException;
 }

@@ -127,7 +127,8 @@ public class MySqlGameDAO extends SqlDatabase implements GameDAO {
     }
 
     @Override
-    public void deleteAllGames() {
-
+    public void deleteAllGames() throws DataAccessException {
+        var statement = "TRUNCATE " + tableName;
+        updateDatabase(statement);
     }
 }
