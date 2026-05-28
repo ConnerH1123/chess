@@ -40,7 +40,7 @@ public interface GameDAO {
      * @param playerColor Side that player wishes to play as
      * @param username Name of user
      */
-    void updateGame(int gameID, String playerColor, String username);
+    void updateGame(int gameID, String playerColor, String username) throws DataAccessException;
 
 
     /**

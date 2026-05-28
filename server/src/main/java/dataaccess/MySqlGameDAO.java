@@ -117,8 +117,13 @@ public class MySqlGameDAO extends SqlDatabase implements GameDAO {
     }
 
     @Override
-    public void updateGame(int gameID, String playerColor, String username) {
-
+    public void updateGame(int gameID, String playerColor, String username) throws DataAccessException {
+        String statement = switch (playerColor) {
+            case "WHITE" -> "UPDATE " + tableName + " SET whiteUsername=? WHERE gameID=?";
+            case "BLACK" -> "UPDATE " + tableName + " SET blackUsername=? WHERE gameID=?";
+            default -> throw new DataAccessException("Error: invalid color");
+        };
+        updateDatabase(statement, username, gameID);
     }
 
     @Override

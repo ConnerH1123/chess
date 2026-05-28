@@ -72,6 +72,16 @@ public class MySqlGameDAOTest {
     }
 
     @Test
+    public void testUpdateGame() {
+        try {
+            gameDAO.createGame("game1");
+            gameDAO.updateGame(1,"WHITE","jeff");
+        } catch (Exception e) {
+            Assertions.fail(e);
+        }
+    }
+
+    @Test
     public void testDeleteAllGames() {
         try {
             gameDAO.createGame("game1");
