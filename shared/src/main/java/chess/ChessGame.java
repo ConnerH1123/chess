@@ -117,6 +117,12 @@ public class ChessGame {
         }
     }
 
+    /**
+     * If piece is a King, include castling in its moves if possible
+     *
+     * @param piece Piece in question
+     * @param moves Possible moves of the piece
+     */
     private void includeCastling(ChessPiece piece, HashSet<ChessMove> moves) {
         if (piece.getPieceType() != ChessPiece.PieceType.KING) {
             return;
@@ -126,13 +132,26 @@ public class ChessGame {
         addKingsideCastling(castlingRights.kingSide(), piece, moves);
     }
 
-    Castling.CastlingRights getCastlingRights(TeamColor teamColor) {
+    /**
+     * Returns given team's CastlingRights object
+     *
+     * @param teamColor Color of team
+     * @return Given team's CastlingRights object
+     */
+    private Castling.CastlingRights getCastlingRights(TeamColor teamColor) {
         return switch (teamColor) {
             case WHITE -> chessboard.getWhiteCastlingRights();
             case BLACK -> chessboard.getBlackCastlingRights();
         };
     }
 
+    /**
+     * If possible, adds queenside castling to the piece's legal moves
+     *
+     * @param castleEnabled Boolean which represents queenside castling rights
+     * @param piece Piece in question
+     * @param moves Legal moves of given piece
+     */
     private void addQueensideCastling(Boolean castleEnabled, ChessPiece piece, HashSet<ChessMove> moves) {
         TeamColor color = piece.getTeamColor();
         if (castleEnabled && Castling.canCastle(chessboard, color, Castling.CastleType.Queenside)) {
@@ -143,6 +162,13 @@ public class ChessGame {
         }
     }
 
+    /**
+     * If possible, adds kingside castling to the piece's legal moves
+     *
+     * @param castleEnabled Boolean which represents kingside castling rights
+     * @param piece Piece in question
+     * @param moves Legal moves of given piece
+     */
     private void addKingsideCastling(Boolean castleEnabled, ChessPiece piece, HashSet<ChessMove> moves) {
         TeamColor color = piece.getTeamColor();
         if (castleEnabled && Castling.canCastle(chessboard, color, Castling.CastleType.Kingside)) {
@@ -153,6 +179,11 @@ public class ChessGame {
         }
     }
 
+    /**
+     * If possible, adds en passant to the piece's legal moves
+     *
+     * @param moves List of the piece's legal moves
+     */
     private void includeEnPassant(HashSet<ChessMove> moves) {
         ArrayList<ChessMove> enPassantMoves = chessboard.getEnPassantMoves();
         if (enPassantMoves != null) {
@@ -178,6 +209,9 @@ public class ChessGame {
         }
     }
 
+    /**
+     * Flips who's turn it is
+     */
     private void changeTeamTurn() {
         switch (teamTurn) {
             case WHITE -> teamTurn = TeamColor.BLACK;
@@ -205,11 +239,23 @@ public class ChessGame {
         return (isInCheck(teamColor) && hasNoLegalMoves(teamColor));
     }
 
+    /**
+     * Determines if the given team has legal moves
+     *
+     * @param teamColor Color of team in question
+     * @return True if team has no legal moves
+     */
     private boolean hasNoLegalMoves(TeamColor teamColor) {
         HashSet<ChessMove> allLegalMoves = generateLegalMoves(teamColor);
         return (allLegalMoves.isEmpty());
     }
 
+    /**
+     * Returns a set of all possible moves of the given team
+     *
+     * @param team Color of team
+     * @return Set of aggregate legal moves
+     */
     private HashSet<ChessMove> generateLegalMoves(TeamColor team) {
         HashSet<ChessMove> moves = new HashSet<>();
         HashSet<ChessPosition> piecePositions = chessboard.getFriendlyLocations(team);
