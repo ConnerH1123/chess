@@ -23,6 +23,38 @@ public class Castling {
         Kingside
     }
 
+    public static boolean isCastleEnabled(ChessBoard board, ChessGame.TeamColor team, CastleType side) {
+        ChessPosition a1 = new ChessPosition(1,1);
+        ChessPosition e1 = new ChessPosition(1,5);
+        ChessPosition h1 = new ChessPosition(1,8);
+        ChessPosition a8 = new ChessPosition(8,1);
+        ChessPosition e8 = new ChessPosition(8,5);
+        ChessPosition h8 = new ChessPosition(8,8);
+
+        ChessPosition kingStartPos = new ChessPosition(4,4); //Temp values
+        ChessPosition rookStartPos = new ChessPosition(4,4); //Temp values
+        switch (team) {
+            case WHITE -> {
+                kingStartPos = e1;
+                switch (side) {
+                    case Kingside -> rookStartPos = h1;
+                    case Queenside -> rookStartPos = a1;
+                }
+
+            }
+            case BLACK -> {
+                kingStartPos = e8;
+                switch (side) {
+                    case Kingside -> rookStartPos = h8;
+                    case Queenside -> rookStartPos = a8;
+                }
+            }
+        }
+        ChessPiece king = board.getPiece(kingStartPos);
+        ChessPiece rook = board.getPiece(rookStartPos);
+        return (board.isStartingSquare(rook, rookStartPos) && board.isStartingSquare(king, kingStartPos));
+    }
+
     public static boolean canCastle(ChessBoard theBoard, ChessGame.TeamColor team, CastleType side) {
         int row = switch (team) {
             case WHITE -> 1;

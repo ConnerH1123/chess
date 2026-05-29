@@ -47,37 +47,14 @@ public class ChessGame {
         resetCastleStatus();
     }
 
+    /**
+     * If kings and rooks are in starting positions, castling rights are updated accordingly
+     */
     private void resetCastleStatus() {
-        ChessPosition a1 = new ChessPosition(1,1);
-        ChessPosition e1 = new ChessPosition(1,5);
-        ChessPosition h1 = new ChessPosition(1,8);
-        ChessPosition a8 = new ChessPosition(8,1);
-        ChessPosition e8 = new ChessPosition(8,5);
-        ChessPosition h8 = new ChessPosition(8,8);
-
-        ChessPiece wRook1 = chessboard.getPiece(a1);
-        ChessPiece wKing = chessboard.getPiece(e1);
-        ChessPiece wRook2 = chessboard.getPiece(h1);
-        ChessPiece bRook1 = chessboard.getPiece(a8);
-        ChessPiece bKing = chessboard.getPiece(e8);
-        ChessPiece bRook2 = chessboard.getPiece(h8);
-
-        boolean wQueenside = false;
-        boolean wKingside = false;
-        boolean bQueenside = false;
-        boolean bKingside = false;
-        if (chessboard.isStartingSquare(wRook1, a1) && chessboard.isStartingSquare(wKing, e1)) {
-            wQueenside = true;
-        }
-        if (chessboard.isStartingSquare(wRook2, h1) && chessboard.isStartingSquare(wKing, e1)) {
-            wKingside = true;
-        }
-        if (chessboard.isStartingSquare(bRook1, a8) && chessboard.isStartingSquare(bKing, e8)) {
-            bQueenside = true;
-        }
-        if (chessboard.isStartingSquare(bRook2, h8) && chessboard.isStartingSquare(bKing, e8)) {
-            bKingside = true;
-        }
+        boolean wQueenside = Castling.isCastleEnabled(chessboard, TeamColor.WHITE, Castling.CastleType.Queenside);
+        boolean wKingside = Castling.isCastleEnabled(chessboard, TeamColor.WHITE, Castling.CastleType.Kingside);
+        boolean bQueenside = Castling.isCastleEnabled(chessboard, TeamColor.BLACK, Castling.CastleType.Queenside);
+        boolean bKingside = Castling.isCastleEnabled(chessboard, TeamColor.BLACK, Castling.CastleType.Kingside);
         chessboard.setWhiteCastlingRights(wQueenside,wKingside);
         chessboard.setBlackCastlingRights(bQueenside,bKingside);
     }
@@ -124,10 +101,17 @@ public class ChessGame {
         return legalMoves;
     }
 
+    /**
+     * Any moves that allow the King to be captured are omitted
+     *
+     * @param position Position of the piece in question
+     * @param piece Piece whose moves are being checked
+     * @param legalMoves List of legal moves. Begins null and legal moves are added
+     */
     private void removeIllegalMoves(ChessPosition position, ChessPiece piece, HashSet<ChessMove> legalMoves) {
         ArrayList<ChessMove> pieceMoves = (ArrayList<ChessMove>) piece.pieceMoves(chessboard, position);
         for (ChessMove move : pieceMoves) {
-            if (chessboard.moveDoesntExposeKing(piece.getTeamColor(),move)) {
+            if (chessboard.moveDoesntExposeKing(piece.getTeamColor(), move)) {
                 legalMoves.add(move);
             }
         }
