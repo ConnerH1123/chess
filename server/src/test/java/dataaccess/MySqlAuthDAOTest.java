@@ -3,9 +3,6 @@ package dataaccess;
 import model.AuthData;
 import org.junit.jupiter.api.*;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-
 public class MySqlAuthDAOTest {
     private AuthDAO authDAO;
 
@@ -21,14 +18,7 @@ public class MySqlAuthDAOTest {
 
     @AfterAll
     public static void completeTearDown() throws DataAccessException {
-        String statement = "DROP TABLE IF EXISTS test";
-        try (Connection connection = DatabaseManager.getConnection()) {
-            try (PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
-                preparedStatement.executeUpdate();
-            }
-        } catch (Exception e) {
-            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
-        }
+        MySqlUserDAOTest.completeTearDown();
     }
 
     @Test
