@@ -13,7 +13,7 @@ import service.*;
 
 public class Server {
 
-    private Javalin javalin;
+    private final Javalin javalin;
     private Handler handler;
 
 
@@ -23,7 +23,6 @@ public class Server {
             handler = new Handler();
         } catch (DataAccessException e) {
             System.err.println("=== HANDLER INITIALIZATION ERROR ===");
-            e.printStackTrace();
             System.err.println("Error message: " + e.getMessage());
             System.err.println("=====================================");
         }

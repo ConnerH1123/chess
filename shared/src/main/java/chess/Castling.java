@@ -3,6 +3,12 @@ package chess;
 import java.util.ArrayList;
 
 public class Castling {
+    public static final ChessMove WHITE_QUEEN_SIDE_CASTLE = new ChessMove(new ChessPosition(1,5),new ChessPosition(1,3), null);
+    public static final ChessMove BLACK_QUEEN_SIDE_CASTLE = new ChessMove(new ChessPosition(8,5),new ChessPosition(8,3), null);
+    public static final ChessMove WHITE_KING_SIDE_CASTLE = new ChessMove(new ChessPosition(1,5),new ChessPosition(1,7), null);
+    public static final ChessMove BLACK_KING_SIDE_CASTLE = new ChessMove(new ChessPosition(8,5),new ChessPosition(8,7), null);
+
+
     public record CastlingRights(boolean queenSide, boolean kingSide) {
         public CastlingRights setQueenSide(boolean b) {
             return new CastlingRights(b,this.kingSide);
