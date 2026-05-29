@@ -12,20 +12,55 @@ public class ChessBoard {
 
     private final ChessPiece[][] theBoard = new ChessPiece[8][8];
 
-    private final HashMap<ChessPiece.PieceType,Integer> whitePieces = new HashMap<>();
-    private final HashMap<ChessPiece.PieceType,Integer> blackPieces = new HashMap<>();
-
     private final HashSet<ChessPosition> whitePieceLocations = new HashSet<>();
     private final HashSet<ChessPosition> blackPieceLocations = new HashSet<>();
 
     private ChessPosition whiteKingLocation;
     private ChessPosition blackKingLocation;
 
-    public ChessBoard() {
-        for (ChessPiece.PieceType type : ChessPiece.PieceType.values()) {
-            whitePieces.put(type, 0);
-            blackPieces.put(type, 0);
+    /**
+     * Sets the board to the default starting board
+     * (How the game of chess normally starts)
+     */
+    public void resetBoard() {
+        ChessPiece[] rank1 = {ValidChessPiece.WHITE_ROOK, ValidChessPiece.WHITE_KNIGHT, ValidChessPiece.WHITE_BISHOP,
+                ValidChessPiece.WHITE_QUEEN, ValidChessPiece.WHITE_KING, ValidChessPiece.WHITE_BISHOP,
+                ValidChessPiece.WHITE_KNIGHT, ValidChessPiece.WHITE_ROOK};
+        ChessPiece[] rank8 = {ValidChessPiece.BLACK_ROOK, ValidChessPiece.BLACK_KNIGHT, ValidChessPiece.BLACK_BISHOP,
+                ValidChessPiece.BLACK_QUEEN, ValidChessPiece.BLACK_KING, ValidChessPiece.BLACK_BISHOP,
+                ValidChessPiece.BLACK_KNIGHT, ValidChessPiece.BLACK_ROOK};
+
+        clearBoard();
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                ChessPosition newPosition = new ChessPosition(i+1,j+1);
+                switch (i) {
+                    case 0 -> addPiece(newPosition, rank1[j]);
+                    case 1 -> addPiece(newPosition, ValidChessPiece.WHITE_PAWN);
+                    case 6 -> addPiece(newPosition, ValidChessPiece.BLACK_PAWN);
+                    case 7 -> addPiece(newPosition, rank8[j]);
+                    default -> theBoard[i][j] = null;
+                }
+            }
         }
+        blackCastlingRights = new Castling.CastlingRights(true,true);
+        whiteCastlingRights = new Castling.CastlingRights(true,true);
+    }
+
+    public void clearBoard() {
+        clearLocations();
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                theBoard[i][j] = null;
+            }
+        }
+    }
+
+    private void clearLocations() {
+        whitePieceLocations.clear();
+        blackPieceLocations.clear();
+        whiteKingLocation = null;
+        blackKingLocation = null;
     }
 
     /**
@@ -38,26 +73,8 @@ public class ChessBoard {
         int row = position.getRow();
         int column = position.getColumn();
         theBoard[row-1][column-1] = piece;
-        updatePieceCount(piece, true);
         updatePieceLocation(piece,position,true);
         updateKingPosition(piece, position);
-    }
-
-    private void updatePieceCount(ChessPiece piece, boolean isAdded) {
-        if (piece == null) {
-            return;
-        }
-        int increment;
-        if (isAdded) {
-            increment = 1;
-        }
-        else {
-            increment = -1;
-        }
-        switch (piece.getTeamColor()) {
-            case WHITE -> whitePieces.merge(piece.getPieceType(), increment, Integer::sum);
-            case BLACK -> blackPieces.merge(piece.getPieceType(), increment, Integer::sum);
-        }
     }
 
     private void updatePieceLocation(ChessPiece piece, ChessPosition position, boolean isAdded) {
@@ -75,6 +92,15 @@ public class ChessBoard {
             switch (color) {
                 case WHITE -> whitePieceLocations.remove(position);
                 case BLACK -> blackPieceLocations.remove(position);
+            }
+        }
+    }
+
+    private void updateKingPosition(ChessPiece piece, ChessPosition position) {
+        if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING) {
+            switch (piece.getTeamColor()) {
+                case ChessGame.TeamColor.WHITE -> whiteKingLocation = position;
+                case ChessGame.TeamColor.BLACK -> blackKingLocation = position;
             }
         }
     }
@@ -101,15 +127,6 @@ public class ChessBoard {
         return (row <= 8 && row >= 1 && col <= 8 && col >= 1);
     }
 
-
-    public HashMap<ChessPiece.PieceType, Integer> getWhitePieces() {
-        return whitePieces;
-    }
-
-    public HashMap<ChessPiece.PieceType, Integer> getBlackPieces() {
-        return blackPieces;
-    }
-
     private Castling.CastlingRights whiteCastlingRights = new Castling.CastlingRights(false,false);
     private Castling.CastlingRights blackCastlingRights = new Castling.CastlingRights(false,false);
 
@@ -119,35 +136,6 @@ public class ChessBoard {
 
     public Castling.CastlingRights getWhiteCastlingRights() {
         return whiteCastlingRights;
-    }
-
-    /**
-     * Sets the board to the default starting board
-     * (How the game of chess normally starts)
-     */
-    public void resetBoard() {
-        ChessPiece[] rank1 = {ValidChessPiece.WHITE_ROOK, ValidChessPiece.WHITE_KNIGHT, ValidChessPiece.WHITE_BISHOP,
-                                ValidChessPiece.WHITE_QUEEN, ValidChessPiece.WHITE_KING, ValidChessPiece.WHITE_BISHOP,
-                                ValidChessPiece.WHITE_KNIGHT, ValidChessPiece.WHITE_ROOK};
-        ChessPiece[] rank8 = {ValidChessPiece.BLACK_ROOK, ValidChessPiece.BLACK_KNIGHT, ValidChessPiece.BLACK_BISHOP,
-                                ValidChessPiece.BLACK_QUEEN, ValidChessPiece.BLACK_KING, ValidChessPiece.BLACK_BISHOP,
-                                ValidChessPiece.BLACK_KNIGHT, ValidChessPiece.BLACK_ROOK};
-
-        clearBoard();
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                ChessPosition newPosition = new ChessPosition(i+1,j+1);
-                switch (i) {
-                    case 0 -> addPiece(newPosition, rank1[j]);
-                    case 1 -> addPiece(newPosition, ValidChessPiece.WHITE_PAWN);
-                    case 6 -> addPiece(newPosition, ValidChessPiece.BLACK_PAWN);
-                    case 7 -> addPiece(newPosition, rank8[j]);
-                    default -> theBoard[i][j] = null;
-                }
-            }
-        }
-        blackCastlingRights = new Castling.CastlingRights(true,true);
-        whiteCastlingRights = new Castling.CastlingRights(true,true);
     }
 
     public void setBlackCastlingRights(boolean queenSide, boolean kingSide) {
@@ -214,8 +202,6 @@ public class ChessBoard {
     private ChessPiece promotionMove(ChessMove move) {
         ChessPiece piece = getPiece(move.getStartPosition());
         if (move.getPromotionPiece() != null) {
-            updatePieceCount(piece, false);
-            updatePieceCount(piece, true);
             return new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
         }
         else {
@@ -226,7 +212,6 @@ public class ChessBoard {
     private boolean capturePiece(ChessPosition position) {
         ChessPiece capturedPiece = getPiece(position);
         if (capturedPiece != null) {
-            updatePieceCount(capturedPiece, false);
             updatePieceLocation(capturedPiece,position,false);
             return true;
         }
@@ -283,15 +268,6 @@ public class ChessBoard {
         makeMove(partialMove);
         ChessMove completedMove = new ChessMove(partialEndPosition, move.getEndPosition(), null);
         makeMove(completedMove);
-    }
-
-    private void updateKingPosition(ChessPiece piece, ChessPosition position) {
-        if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING) {
-            switch (piece.getTeamColor()) {
-                case ChessGame.TeamColor.WHITE -> whiteKingLocation = position;
-                case ChessGame.TeamColor.BLACK -> blackKingLocation = position;
-            }
-        }
     }
 
     private void updateCastleStatus(ChessPiece piece, ChessPosition position) {
@@ -396,30 +372,6 @@ public class ChessBoard {
             case WHITE -> whiteKingLocation;
             case BLACK -> blackKingLocation;
         };
-    }
-
-    public void clearBoard() {
-        clearPieces();
-        clearLocations();
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                theBoard[i][j] = null;
-            }
-        }
-    }
-
-    private void clearPieces() {
-        for (ChessPiece.PieceType type : ChessPiece.PieceType.values()) {
-            whitePieces.put(type, 0);
-            blackPieces.put(type, 0);
-        }
-    }
-
-    private void clearLocations() {
-        whitePieceLocations.clear();
-        blackPieceLocations.clear();
-        whiteKingLocation = null;
-        blackKingLocation = null;
     }
 
     public HashSet<ChessPosition> getWhitePieceLocations() {

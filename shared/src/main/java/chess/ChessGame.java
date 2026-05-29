@@ -210,7 +210,7 @@ public class ChessGame {
     }
 
     /**
-     * Flips who's turn it is
+     * Flips whose turn it is
      */
     private void changeTeamTurn() {
         switch (teamTurn) {
