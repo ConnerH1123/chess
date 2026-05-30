@@ -1,10 +1,52 @@
 package client;
 
 import chess.*;
+import static ui.EscapeSequences.*;
 
 public class ClientMain {
     public static void main(String[] args) {
-        var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-        System.out.println("♕ 240 Chess Client: " + piece);
+        System.out.println("♕ 240 Chess Client ♕");
+        ChessBoard defaultBoard = new ChessBoard();
+        drawBoard(defaultBoard);
+    }
+
+    public static void drawBoard(ChessBoard board) {
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                ChessPosition currentPosition = new ChessPosition(i,j);
+                String piece = pieceToString(board.getPiece(currentPosition));
+                System.out.print(" " + piece + " ");
+            }
+        }
+    }
+
+    private static String pieceToString(ChessPiece piece) {
+        String returnString = EMPTY;
+        if (piece == null) {
+            return returnString;
+        }
+        switch (piece.getTeamColor()) {
+            case WHITE -> {
+                returnString = switch (piece.getPieceType()) {
+                    case KING -> WHITE_KING;
+                    case QUEEN -> WHITE_QUEEN;
+                    case ROOK -> WHITE_ROOK;
+                    case BISHOP -> WHITE_BISHOP;
+                    case KNIGHT -> WHITE_KNIGHT;
+                    case PAWN -> WHITE_PAWN;
+                };
+            }
+            case BLACK -> {
+                returnString = switch (piece.getPieceType()) {
+                    case KING -> BLACK_KING;
+                    case QUEEN -> BLACK_QUEEN;
+                    case ROOK -> BLACK_ROOK;
+                    case BISHOP -> BLACK_BISHOP;
+                    case KNIGHT -> BLACK_KNIGHT;
+                    case PAWN -> BLACK_PAWN;
+                };
+            }
+        }
+        return returnString;
     }
 }

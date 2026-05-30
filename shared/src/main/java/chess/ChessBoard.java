@@ -18,6 +18,10 @@ public class ChessBoard {
     private ChessPosition whiteKingLocation;
     private ChessPosition blackKingLocation;
 
+    public ChessBoard() {
+        resetBoard();
+    }
+
     /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
