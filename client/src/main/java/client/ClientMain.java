@@ -1,21 +1,26 @@
 package client;
 
 import chess.*;
+
+import java.util.Objects;
+
 import static ui.EscapeSequences.*;
 
 public class ClientMain {
     public static void main(String[] args) {
         System.out.println("♕ 240 Chess Client ♕");
         ChessBoard defaultBoard = new ChessBoard();
-        drawBoard(defaultBoard);
+        final int PADDING = 1;
+        drawBoard(defaultBoard, PADDING);
     }
 
-    public static void drawBoard(ChessBoard board) {
+    public static void drawBoard(ChessBoard board, int padding) {
         for (int i = 1; i < 9; i++) {
+            System.out.print(padString("\n",padding));
             for (int j = 1; j < 9; j++) {
                 ChessPosition currentPosition = new ChessPosition(i,j);
                 String piece = pieceToString(board.getPiece(currentPosition));
-                System.out.print(" " + piece + " ");
+                System.out.print(padString(piece,padding));
             }
         }
     }
@@ -48,5 +53,22 @@ public class ClientMain {
             }
         }
         return returnString;
+    }
+
+    private static String padString(String str, int padding) {
+        StringBuilder newString = new StringBuilder();
+        if (Objects.equals(str, "\n")) {
+            for (int i = 0; i < padding; i++) {
+                newString.append("\n");
+            }
+        }
+        else {
+            newString.append(str);
+            for (int i = 0; i < padding; i++) {
+                newString.insert(0," ");
+                newString.append(" ");
+            }
+        }
+        return newString.toString();
     }
 }
