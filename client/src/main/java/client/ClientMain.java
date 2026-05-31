@@ -10,18 +10,25 @@ public class ClientMain {
     public static void main(String[] args) {
         System.out.println("♕ 240 Chess Client ♕");
         ChessBoard defaultBoard = new ChessBoard();
-        final int PADDING = 1;
-        drawBoard(defaultBoard, PADDING);
+        drawBoard(defaultBoard, ChessGame.TeamColor.WHITE);
     }
 
-    public static void drawBoard(ChessBoard board, int padding) {
-        for (int i = 1; i < 9; i++) {
-            System.out.print(padString("\n",padding));
-            for (int j = 1; j < 9; j++) {
+    public static void drawBoard(ChessBoard board, ChessGame.TeamColor color) {
+        int[] indexValues = getIndexValues(color);
+        int iStart = 0;
+        int iEnd = 0;
+        int iIncrement = 0;
+        int jStart = 0;
+        int jEnd = 0;
+        int jIncrement = 0;
+
+        for (int i = iStart; i != iEnd; i += iIncrement) {
+            for (int j = jStart; j != jEnd; j += jIncrement) {
                 ChessPosition currentPosition = new ChessPosition(i,j);
                 String piece = pieceToString(board.getPiece(currentPosition));
-                System.out.print(padString(piece,padding));
+                System.out.print(piece);
             }
+            System.out.print("\n");
         }
     }
 
@@ -55,20 +62,17 @@ public class ClientMain {
         return returnString;
     }
 
-    private static String padString(String str, int padding) {
-        StringBuilder newString = new StringBuilder();
-        if (Objects.equals(str, "\n")) {
-            for (int i = 0; i < padding; i++) {
-                newString.append("\n");
+    private static int[] getIndexValues(ChessGame.TeamColor color) {
+        int[] indexValues;
+        switch (color) {
+            case WHITE -> {
+                indexValues = new int[]{8, 0, -1, 0, 9, 1};
             }
-        }
-        else {
-            newString.append(str);
-            for (int i = 0; i < padding; i++) {
-                newString.insert(0," ");
-                newString.append(" ");
+            case BLACK -> {
+                indexValues = new int[]{0,9,1,8,0,-1};
             }
+            default -> throw new IllegalStateException("Unexpected value: " + color);
         }
-        return newString.toString();
+        return indexValues;
     }
 }
