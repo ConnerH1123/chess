@@ -15,12 +15,12 @@ public class ClientMain {
 
     public static void drawBoard(ChessBoard board, ChessGame.TeamColor color) {
         int[] indexValues = getIndexValues(color);
-        int iStart = 0;
-        int iEnd = 0;
-        int iIncrement = 0;
-        int jStart = 0;
-        int jEnd = 0;
-        int jIncrement = 0;
+        int iStart = indexValues[0];
+        int iEnd = indexValues[1];
+        int iIncrement = indexValues[2];
+        int jStart = indexValues[3];
+        int jEnd = indexValues[4];
+        int jIncrement = indexValues[5];
 
         for (int i = iStart; i != iEnd; i += iIncrement) {
             for (int j = jStart; j != jEnd; j += jIncrement) {
