@@ -21,15 +21,17 @@ public class ClientMain {
         int jStart = indexValues[3];
         int jEnd = indexValues[4];
         int jIncrement = indexValues[5];
-
+        printColumns(color, jStart, jEnd, jIncrement);
         for (int i = iStart; i != iEnd; i += iIncrement) {
+            System.out.print(SET_BG_COLOR_LIGHT_GREY+ " " + i + " " + RESET_BG_COLOR);
             for (int j = jStart; j != jEnd; j += jIncrement) {
                 ChessPosition currentPosition = new ChessPosition(i,j);
                 String piece = pieceToString(board.getPiece(currentPosition));
                 System.out.print(piece);
             }
-            System.out.print("\n");
+            System.out.println(SET_BG_COLOR_LIGHT_GREY+ " " + i + " " + RESET_BG_COLOR);
         }
+        printColumns(color, jStart, jEnd, jIncrement);
     }
 
     private static String pieceToString(ChessPiece piece) {
@@ -66,13 +68,23 @@ public class ClientMain {
         int[] indexValues;
         switch (color) {
             case WHITE -> {
-                indexValues = new int[]{8, 0, -1, 0, 9, 1};
+                indexValues = new int[]{8, 0, -1, 1, 9, 1};
             }
             case BLACK -> {
-                indexValues = new int[]{0,9,1,8,0,-1};
+                indexValues = new int[]{1,9,1,8,0,-1};
             }
             default -> throw new IllegalStateException("Unexpected value: " + color);
         }
         return indexValues;
+    }
+
+    private static void printColumns(ChessGame.TeamColor color, int start, int end, int increment) {
+        System.out.print(SET_BG_COLOR_LIGHT_GREY);
+        String[] columns = {"A", "B", "C", "D", "E", "F", "G", "H"};
+        System.out.print("\u2003" + "\u2003" + " ");
+        for (int i = start; i != end; i += increment) {
+            System.out.print(columns[i-1] + "\u2003" + " ");
+        }
+        System.out.println("\u2003" + RESET_BG_COLOR);
     }
 }
