@@ -2,18 +2,19 @@ package client;
 
 import chess.*;
 
-import java.util.Objects;
-
 import static ui.EscapeSequences.*;
 
 public class ClientMain {
     public static void main(String[] args) {
         System.out.println("♕ 240 Chess Client ♕");
         ChessBoard defaultBoard = new ChessBoard();
-        drawBoard(defaultBoard, ChessGame.TeamColor.WHITE);
+        drawBoard(defaultBoard, ChessGame.TeamColor.WHITE, SET_BG_COLOR_BLACK, RESET_TEXT_COLOR, SET_BG_COLOR_LIGHT_GREY, SET_BG_COLOR_DARK_GREY,SET_TEXT_COLOR_WHITE, SET_TEXT_COLOR_BLACK);
     }
 
-    public static void drawBoard(ChessBoard board, ChessGame.TeamColor color) {
+    public static void drawBoard(ChessBoard board, ChessGame.TeamColor color,
+                                 String borderColor, String borderTextColor,
+                                 String whiteSquareColor, String blackSquareColor,
+                                 String whitePieceColor, String blackPieceColor) {
         int[] indexValues = getIndexValues(color);
         int iStart = indexValues[0];
         int iEnd = indexValues[1];
@@ -21,20 +22,21 @@ public class ClientMain {
         int jStart = indexValues[3];
         int jEnd = indexValues[4];
         int jIncrement = indexValues[5];
-        printColumns(jStart, jEnd, jIncrement, SET_BG_COLOR_BLACK, RESET_TEXT_COLOR);
+        printColumns(jStart, jEnd, jIncrement, borderColor, borderTextColor);
         for (int i = iStart; i != iEnd; i += iIncrement) {
-            System.out.print(SET_BG_COLOR_BLACK + " " + i + " " + RESET_BG_COLOR);
+            printRank(i, borderColor, borderTextColor);
             for (int j = jStart; j != jEnd; j += jIncrement) {
                 ChessPosition currentPosition = new ChessPosition(i,j);
                 ChessPiece pieceLiteral = board.getPiece(currentPosition);
                 String piece = pieceToString(pieceLiteral);
-                setSquareColor(SET_BG_COLOR_LIGHT_GREY, SET_BG_COLOR_DARK_GREY, i, j);
-                setPieceColor(pieceLiteral, SET_TEXT_COLOR_WHITE, SET_TEXT_COLOR_BLACK);
+                setSquareColor(whiteSquareColor, blackSquareColor, i, j);
+                setPieceColor(pieceLiteral, whitePieceColor, blackPieceColor);
                 System.out.print(piece + RESET_BG_COLOR + RESET_TEXT_COLOR);
             }
-            System.out.println(SET_BG_COLOR_BLACK + " " + i + " " + RESET_BG_COLOR);
+            printRank(i, borderColor, borderTextColor);
+            System.out.println();
         }
-        printColumns(jStart, jEnd, jIncrement, SET_BG_COLOR_BLACK, RESET_TEXT_COLOR);
+        printColumns(jStart, jEnd, jIncrement, borderColor, RESET_TEXT_COLOR);
     }
 
     private static String pieceToString(ChessPiece piece) {
@@ -81,10 +83,14 @@ public class ClientMain {
         return indexValues;
     }
 
+    private static void printRank(int row, String background, String text) {
+        System.out.print(background + text + " " + row + " " + RESET_BG_COLOR + RESET_TEXT_COLOR);
+    }
+
     private static void printColumns(int start, int end, int increment, String background, String text) {
         System.out.print(background + text);
         String[] columns = {"A", "B", "C", "D", "E", "F", "G", "H"};
-        System.out.print("\u2003" + "\u2003" + " ");
+        System.out.print("\u2003" + SET_TEXT_BOLD + "\u2003" + " " + RESET_TEXT_BOLD_FAINT);
         for (int i = start; i != end; i += increment) {
             System.out.print(columns[i-1] + "\u2003" + " ");
         }
