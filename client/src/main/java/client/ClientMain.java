@@ -21,17 +21,20 @@ public class ClientMain {
         int jStart = indexValues[3];
         int jEnd = indexValues[4];
         int jIncrement = indexValues[5];
-        printColumns(color, jStart, jEnd, jIncrement);
+        printColumns(jStart, jEnd, jIncrement, SET_BG_COLOR_BLACK, RESET_TEXT_COLOR);
         for (int i = iStart; i != iEnd; i += iIncrement) {
-            System.out.print(SET_BG_COLOR_LIGHT_GREY+ " " + i + " " + RESET_BG_COLOR);
+            System.out.print(SET_BG_COLOR_BLACK + " " + i + " " + RESET_BG_COLOR);
             for (int j = jStart; j != jEnd; j += jIncrement) {
                 ChessPosition currentPosition = new ChessPosition(i,j);
-                String piece = pieceToString(board.getPiece(currentPosition));
-                System.out.print(piece);
+                ChessPiece pieceLiteral = board.getPiece(currentPosition);
+                String piece = pieceToString(pieceLiteral);
+                setSquareColor(SET_BG_COLOR_LIGHT_GREY, SET_BG_COLOR_DARK_GREY, i, j);
+                setPieceColor(pieceLiteral, SET_TEXT_COLOR_WHITE, SET_TEXT_COLOR_BLACK);
+                System.out.print(piece + RESET_BG_COLOR + RESET_TEXT_COLOR);
             }
-            System.out.println(SET_BG_COLOR_LIGHT_GREY+ " " + i + " " + RESET_BG_COLOR);
+            System.out.println(SET_BG_COLOR_BLACK + " " + i + " " + RESET_BG_COLOR);
         }
-        printColumns(color, jStart, jEnd, jIncrement);
+        printColumns(jStart, jEnd, jIncrement, SET_BG_COLOR_BLACK, RESET_TEXT_COLOR);
     }
 
     private static String pieceToString(ChessPiece piece) {
@@ -78,13 +81,33 @@ public class ClientMain {
         return indexValues;
     }
 
-    private static void printColumns(ChessGame.TeamColor color, int start, int end, int increment) {
-        System.out.print(SET_BG_COLOR_LIGHT_GREY);
+    private static void printColumns(int start, int end, int increment, String background, String text) {
+        System.out.print(background + text);
         String[] columns = {"A", "B", "C", "D", "E", "F", "G", "H"};
         System.out.print("\u2003" + "\u2003" + " ");
         for (int i = start; i != end; i += increment) {
             System.out.print(columns[i-1] + "\u2003" + " ");
         }
-        System.out.println("\u2003" + RESET_BG_COLOR);
+        System.out.println("\u2003" + RESET_BG_COLOR + RESET_TEXT_COLOR);
     }
+
+    private static void setSquareColor(String white, String black, int row, int col) {
+        if ((row+col) % 2 == 0) {
+            System.out.print(black);
+        }
+        else {
+            System.out.print(white);
+        }
+    }
+
+    private static void setPieceColor(ChessPiece piece, String white, String black) {
+        if (piece == null) {
+            return;
+        }
+        switch (piece.getTeamColor()) {
+            case WHITE -> System.out.print(white);
+            case BLACK -> System.out.print(black);
+        }
+    }
+
 }
