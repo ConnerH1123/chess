@@ -25,6 +25,6 @@ public class ClientMain {
         HashSet<ChessMove> moves = new HashSet<>();
         moves.add(move1);
         moves.add(move2);
-        drawBoard(defaultBoard, team, border, text, lightSquare, darkSquare, whitePiece, blackPiece);
+        drawBoard(defaultBoard, team, border, text, lightSquare, darkSquare, whitePiece, blackPiece, moveColor, startColor, moves);
     }
 }
