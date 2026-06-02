@@ -163,4 +163,22 @@ public class ServerFacadeTests {
         }
     }
 
+    @Test
+    public void testJoinGame() {
+        String username = UUID.randomUUID().toString();
+        String password = "password";
+        String email = "email";
+        RegisterRequest registerRequest = new RegisterRequest(username, password, email);
+        try {
+            facade.register(registerRequest);
+            String gameName = UUID.randomUUID().toString();
+            CreateRequest createRequest = new CreateRequest(null, gameName);
+            int gameID = facade.createGame(createRequest);
+            JoinRequest joinRequest = new JoinRequest(null, "WHITE", gameID);
+            facade.joinGame(joinRequest);
+        } catch (ResponseException e) {
+            Assertions.fail("Error message thrown: " + e.getMessage());
+        }
+    }
+
 }

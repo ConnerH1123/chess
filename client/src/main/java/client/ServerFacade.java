@@ -47,10 +47,12 @@ public class ServerFacade {
         handleResponse(response, null);
     }
 
-    public void createGame(CreateRequest createRequest) throws ResponseException {
+    public int createGame(CreateRequest createRequest) throws ResponseException {
         HttpRequest request = buildRequest("POST", "/game", authToken, createRequest);
         HttpResponse<String> response = sendRequest(request);
-        handleResponse(response, null);
+        CreateResult createResult = handleResponse(response, CreateResult.class);
+        assert createResult != null;
+        return createResult.gameID();
     }
 
     public GameData[] listGames() throws ResponseException {
@@ -59,6 +61,12 @@ public class ServerFacade {
         ListResult listResult = handleResponse(response, ListResult.class);
         assert listResult != null;
         return listResult.games();
+    }
+
+    public void joinGame(JoinRequest joinRequest) throws ResponseException {
+        HttpRequest request = buildRequest("PUT", "/game", authToken, joinRequest);
+        HttpResponse<String> response = sendRequest(request);
+        handleResponse(response, null);
     }
 
     private HttpRequest buildRequest(String method, String path, String authorization, Object body) {
