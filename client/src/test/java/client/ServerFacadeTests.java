@@ -66,4 +66,20 @@ public class ServerFacadeTests {
         }
     }
 
+    @Test
+    public void testLoginIncorrectPassword() {
+        String username = UUID.randomUUID().toString();
+        String password = "password";
+        String email = "email";
+        RegisterRequest registerRequest = new RegisterRequest(username, password, email);
+        try {
+            facade.register(registerRequest);
+            LoginRequest loginRequest = new LoginRequest(username, "incorrect password");
+            facade.login(loginRequest);
+            Assertions.fail("Exception not thrown for incorrect password");
+        } catch (ResponseException e) {
+            //
+        }
+    }
+
 }
