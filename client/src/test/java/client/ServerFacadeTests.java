@@ -136,4 +136,31 @@ public class ServerFacadeTests {
         }
     }
 
+    @Test
+    public void testListGames() {
+        String username = UUID.randomUUID().toString();
+        String password = "password";
+        String email = "email";
+        RegisterRequest registerRequest = new RegisterRequest(username, password, email);
+        try {
+            facade.register(registerRequest);
+            String gameName = UUID.randomUUID().toString();
+            CreateRequest createRequest = new CreateRequest(null, gameName);
+            facade.createGame(createRequest);
+            facade.listGames();
+        } catch (ResponseException e) {
+            Assertions.fail("Error message thrown: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testListGamesBeforeLogin() {
+        try {
+            facade.listGames();
+            Assertions.fail("Shouldn't be able to list games before logging in");
+        } catch (ResponseException e) {
+            //
+        }
+    }
+
 }

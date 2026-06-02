@@ -1,6 +1,7 @@
 package client;
 
 import com.google.gson.Gson;
+import model.GameData;
 import request.*;
 
 import java.net.URI;
@@ -50,6 +51,14 @@ public class ServerFacade {
         HttpRequest request = buildRequest("POST", "/game", authToken, createRequest);
         HttpResponse<String> response = sendRequest(request);
         handleResponse(response, null);
+    }
+
+    public GameData[] listGames() throws ResponseException {
+        HttpRequest request = buildRequest("GET", "/game", authToken, null);
+        HttpResponse<String> response = sendRequest(request);
+        ListResult listResult = handleResponse(response, ListResult.class);
+        assert listResult != null;
+        return listResult.games();
     }
 
     private HttpRequest buildRequest(String method, String path, String authorization, Object body) {
