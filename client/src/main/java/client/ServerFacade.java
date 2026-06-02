@@ -32,6 +32,15 @@ public class ServerFacade {
         authToken = registerResult.authToken();
     }
 
+    public void login(LoginRequest loginRequest) throws ResponseException {
+        HttpRequest request = buildRequest("POST", "/session", null, loginRequest);
+        HttpResponse<String> response = sendRequest(request);
+        LoginResult loginResult = handleResponse(response, LoginResult.class);
+        assert loginResult != null;
+        authToken = loginResult.authToken();
+    }
+
+
     private HttpRequest buildRequest(String method, String path, String authorization, Object body) {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
