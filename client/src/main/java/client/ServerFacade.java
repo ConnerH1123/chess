@@ -1,5 +1,6 @@
 package client;
 
+import request.*;
 import java.net.http.*;
 
 
@@ -13,6 +14,10 @@ public class ServerFacade {
 
     public ServerFacade(int port) {
         serverUrl = "http://localhost:" + port;
+    }
+
+    public void register(RegisterRequest request) {
+
     }
 
 

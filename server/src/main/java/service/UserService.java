@@ -4,6 +4,7 @@ import dataaccess.*;
 import model.UserData;
 import model.AuthData;
 import org.mindrot.jbcrypt.BCrypt;
+import request.*;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -33,9 +34,6 @@ public class UserService extends Authorizable {
         return new RegisterResult(username, authToken);
     }
 
-    public record RegisterRequest(String username, String password, String email) {}
-    public record RegisterResult(String username, String authToken) {}
-
     private String generateAuthToken(){
         return UUID.randomUUID().toString();
     }
@@ -53,14 +51,10 @@ public class UserService extends Authorizable {
         return new LoginResult(username, authToken);
     }
 
-    public record LoginRequest(String username, String password) {}
-    public record LoginResult(String username, String authToken) {}
-
     public void logout(LogoutRequest r) throws DataAccessException{
         String authToken = r.authToken();
         authorize(authToken);
         authDAO.deleteAuth(authToken);
     }
 
-    public record LogoutRequest(String authToken) {}
 }
