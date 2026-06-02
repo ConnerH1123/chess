@@ -1,9 +1,7 @@
 package client;
 
 import org.junit.jupiter.api.*;
-import request.LoginRequest;
-import request.LoginResult;
-import request.RegisterRequest;
+import request.*;
 import server.Server;
 
 import java.util.UUID;
@@ -103,6 +101,22 @@ public class ServerFacadeTests {
             Assertions.fail("Shouldn't be able to logout before logging in");
         } catch (ResponseException e) {
             //
+        }
+    }
+
+    @Test
+    public void testCreateGame() {
+        String username = UUID.randomUUID().toString();
+        String password = "password";
+        String email = "email";
+        RegisterRequest registerRequest = new RegisterRequest(username, password, email);
+        try {
+            facade.register(registerRequest);
+            String gameName = UUID.randomUUID().toString();
+            CreateRequest createRequest = new CreateRequest(null, gameName);
+            facade.createGame(createRequest);
+        } catch (ResponseException e) {
+            Assertions.fail("Error message thrown: " + e.getMessage());
         }
     }
 

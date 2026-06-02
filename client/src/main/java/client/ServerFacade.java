@@ -46,6 +46,12 @@ public class ServerFacade {
         handleResponse(response, null);
     }
 
+    public void createGame(CreateRequest createRequest) throws ResponseException {
+        HttpRequest request = buildRequest("POST", "/game", authToken, createRequest);
+        HttpResponse<String> response = sendRequest(request);
+        handleResponse(response, null);
+    }
+
     private HttpRequest buildRequest(String method, String path, String authorization, Object body) {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
