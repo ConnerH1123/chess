@@ -72,7 +72,7 @@ public class Server {
         ctx.status(200);
     }
 
-    //Header: authToken
+    //Header: Authorization: authToken
     //Body: {"gameName": ""}
     //Returns: {"gameID": <gameID>}
     private void createGame(Context ctx) throws DataAccessException {
@@ -88,7 +88,7 @@ public class Server {
         ctx.result(new Gson().toJson(createResult));
     }
 
-    //Header: authToken
+    //Header: Authorization: authToken
     //Returns: {"games": [{"gameID": <gameID>, "whiteUsername": "", "blackUsername": "", "gameName": ""}]}
     private void listGames(Context ctx) throws DataAccessException {
         String header = "Authorization";
@@ -99,7 +99,7 @@ public class Server {
         ctx.result(new Gson().toJson(listResult));
     }
 
-    //Header: authToken
+    //Header: Authorization: authToken
     //Body: {"playerColor": "", "gameID": <gameID>}
     //Returns: {}
     private void joinGame(Context ctx) throws DataAccessException {
