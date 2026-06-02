@@ -82,4 +82,18 @@ public class ServerFacadeTests {
         }
     }
 
+    @Test
+    public void testLogout() {
+        String username = UUID.randomUUID().toString();
+        String password = "password";
+        String email = "email";
+        RegisterRequest registerRequest = new RegisterRequest(username, password, email);
+        try {
+            facade.register(registerRequest);
+            facade.logout();
+        } catch (ResponseException e) {
+            Assertions.fail("Error message thrown: " + e.getMessage());
+        }
+    }
+
 }
