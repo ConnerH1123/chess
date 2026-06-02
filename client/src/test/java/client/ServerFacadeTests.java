@@ -120,4 +120,20 @@ public class ServerFacadeTests {
         }
     }
 
+    @Test
+    public void testCreateGameNullName() {
+        String username = UUID.randomUUID().toString();
+        String password = "password";
+        String email = "email";
+        RegisterRequest registerRequest = new RegisterRequest(username, password, email);
+        try {
+            facade.register(registerRequest);
+            CreateRequest createRequest = new CreateRequest(null, null);
+            facade.createGame(createRequest);
+            Assertions.fail("No error message thrown for null game name");
+        } catch (ResponseException e) {
+            //
+        }
+    }
+
 }
