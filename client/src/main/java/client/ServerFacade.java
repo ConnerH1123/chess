@@ -14,6 +14,7 @@ import java.util.Objects;
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
     private final String serverUrl;
+    private String authToken = null;
 
     public ServerFacade(String url) {
         serverUrl = url;
@@ -24,12 +25,12 @@ public class ServerFacade {
     }
 
     public void register(RegisterRequest registerRequest) throws ResponseException {
-        var request = buildRequest("POST", "/user", null, registerRequest);
-        var response = sendRequest(request);
-        handleResponse(response, null);
+        HttpRequest request = buildRequest("POST", "/user", null, registerRequest);
+        HttpResponse<String> response = sendRequest(request);
+        RegisterResult registerResult = handleResponse(response, RegisterResult.class);
+        assert registerResult != null;
+        authToken = registerResult.authToken();
     }
-
-
 
     private HttpRequest buildRequest(String method, String path, String authorization, Object body) {
         var request = HttpRequest.newBuilder()
