@@ -119,26 +119,22 @@ public class DrawBoard {
             return returnString;
         }
         switch (piece.getTeamColor()) {
-            case WHITE -> {
-                returnString = switch (piece.getPieceType()) {
-                    case KING -> WHITE_KING;
-                    case QUEEN -> WHITE_QUEEN;
-                    case ROOK -> WHITE_ROOK;
-                    case BISHOP -> WHITE_BISHOP;
-                    case KNIGHT -> WHITE_KNIGHT;
-                    case PAWN -> WHITE_PAWN;
-                };
-            }
-            case BLACK -> {
-                returnString = switch (piece.getPieceType()) {
-                    case KING -> BLACK_KING;
-                    case QUEEN -> BLACK_QUEEN;
-                    case ROOK -> BLACK_ROOK;
-                    case BISHOP -> BLACK_BISHOP;
-                    case KNIGHT -> BLACK_KNIGHT;
-                    case PAWN -> BLACK_PAWN;
-                };
-            }
+            case WHITE -> returnString = switch (piece.getPieceType()) {
+                case KING -> WHITE_KING;
+                case QUEEN -> WHITE_QUEEN;
+                case ROOK -> WHITE_ROOK;
+                case BISHOP -> WHITE_BISHOP;
+                case KNIGHT -> WHITE_KNIGHT;
+                case PAWN -> WHITE_PAWN;
+            };
+            case BLACK -> returnString = switch (piece.getPieceType()) {
+                case KING -> BLACK_KING;
+                case QUEEN -> BLACK_QUEEN;
+                case ROOK -> BLACK_ROOK;
+                case BISHOP -> BLACK_BISHOP;
+                case KNIGHT -> BLACK_KNIGHT;
+                case PAWN -> BLACK_PAWN;
+            };
         }
         return returnString;
     }
@@ -146,12 +142,8 @@ public class DrawBoard {
     private static int[] getIndexValues(ChessGame.TeamColor color) {
         int[] indexValues;
         switch (color) {
-            case WHITE -> {
-                indexValues = new int[]{8, 0, -1, 1, 9, 1};
-            }
-            case BLACK -> {
-                indexValues = new int[]{1,9,1,8,0,-1};
-            }
+            case WHITE -> indexValues = new int[]{8, 0, -1, 1, 9, 1};
+            case BLACK -> indexValues = new int[]{1,9,1,8,0,-1};
             default -> throw new IllegalStateException("Unexpected value: " + color);
         }
         return indexValues;
