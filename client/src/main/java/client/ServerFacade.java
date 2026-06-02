@@ -1,7 +1,14 @@
 package client;
 
+import com.google.gson.Gson;
 import request.*;
+
+import java.net.URI;
 import java.net.http.*;
+import java.net.http.HttpRequest.BodyPublisher;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.util.Objects;
 
 
 public class ServerFacade {
@@ -16,9 +23,56 @@ public class ServerFacade {
         serverUrl = "http://localhost:" + port;
     }
 
-    public void register(RegisterRequest request) {
-
+    public void register(RegisterRequest registerRequest) throws ResponseException {
+        var request = buildRequest("POST", "/user", null, registerRequest);
+        var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
+    private HttpRequest buildRequest(String method, String path, String authorization, Object body) {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + path))
+                .method(method, makeRequestBody(body));
+        if (body != null) {
+            request.setHeader("Content-Type", "application/json");
+        }
+        if (authorization != null) {
+            request.setHeader("Authorization", authorization);
+        }
+        return request.build();
+    }
+
+    private BodyPublisher makeRequestBody(Object request) {
+        if (request != null) {
+            return BodyPublishers.ofString(new Gson().toJson(request));
+        } else {
+            return BodyPublishers.noBody();
+        }
+    }
+
+    private HttpResponse<String> sendRequest(HttpRequest request) throws ResponseException {
+        try {
+            return client.send(request, BodyHandlers.ofString());
+        } catch (Exception ex) {
+            throw new ResponseException(ex.getMessage());
+        }
+    }
+
+    private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) throws ResponseException {
+        int status = response.statusCode();
+        if (status != 200) {
+            String body = response.body();
+            if (!Objects.equals(body, "null")) {
+                throw new ResponseException(body);
+            }
+            throw new ResponseException("Error " + status + ": An error occurred");
+        }
+
+        if (responseClass != null) {
+            return new Gson().fromJson(response.body(), responseClass);
+        }
+
+        return null;
+    }
 
 }
