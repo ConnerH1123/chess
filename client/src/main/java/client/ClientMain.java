@@ -2,6 +2,8 @@ package client;
 
 import chess.*;
 
+import java.util.HashSet;
+
 import static ui.EscapeSequences.*;
 import static ui.DrawBoard.drawBoard;
 
@@ -16,8 +18,13 @@ public class ClientMain {
         String darkSquare = SET_BG_COLOR_DARK_GREY;
         String whitePiece = SET_TEXT_COLOR_WHITE;
         String blackPiece = SET_TEXT_COLOR_BLACK;
-        String moveColor = SET_BG_COLOR_BLUE;
-        ChessMove move = new ChessMove(new ChessPosition(2,5), new ChessPosition(4,5), null);
+        String moveColor = SET_BG_COLOR_YELLOW;
+        String startColor = SET_BG_COLOR_RED;
+        ChessMove move1 = new ChessMove(new ChessPosition(1,7), new ChessPosition(3,6), null);
+        ChessMove move2 = new ChessMove(new ChessPosition(1,7), new ChessPosition(3,8), null);
+        HashSet<ChessMove> moves = new HashSet<>();
+        moves.add(move1);
+        moves.add(move2);
         drawBoard(defaultBoard, team, border, text, lightSquare, darkSquare, whitePiece, blackPiece);
     }
 }

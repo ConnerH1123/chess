@@ -2,6 +2,8 @@ package ui;
 
 import chess.*;
 
+import java.util.HashSet;
+
 import static ui.EscapeSequences.*;
 
 public class DrawBoard {
@@ -60,6 +62,48 @@ public class DrawBoard {
                 setPieceColor(pieceLiteral, whitePieceColor, blackPieceColor);
                 if ((i == startRow && j == startCol) || (i == endRow && j == endCol)) {
                     System.out.print(moveColor);
+                }
+                System.out.print(piece + RESET_BG_COLOR + RESET_TEXT_COLOR);
+            }
+            printRank(i, borderColor, borderTextColor);
+            System.out.println();
+        }
+        printColumns(jStart, jEnd, jIncrement, borderColor, RESET_TEXT_COLOR);
+    }
+
+    public static void drawBoard(ChessBoard board, ChessGame.TeamColor color,
+                                 String borderColor, String borderTextColor,
+                                 String whiteSquareColor, String blackSquareColor,
+                                 String whitePieceColor, String blackPieceColor,
+                                 String moveColor, String startColor,
+                                 HashSet<ChessMove> moves) {
+        int[] indexValues = getIndexValues(color);
+        int iStart = indexValues[0];
+        int iEnd = indexValues[1];
+        int iIncrement = indexValues[2];
+        int jStart = indexValues[3];
+        int jEnd = indexValues[4];
+        int jIncrement = indexValues[5];
+        HashSet<ChessPosition> possiblePosition = new HashSet<>();
+        ChessPosition startPos = null;
+        for (ChessMove move : moves) {
+            startPos = new ChessPosition(move.getStartPosition().getRow(), move.getStartPosition().getColumn());
+            possiblePosition.add(move.getEndPosition());
+        }
+        printColumns(jStart, jEnd, jIncrement, borderColor, borderTextColor);
+        for (int i = iStart; i != iEnd; i += iIncrement) {
+            printRank(i, borderColor, borderTextColor);
+            for (int j = jStart; j != jEnd; j += jIncrement) {
+                ChessPosition currentPosition = new ChessPosition(i,j);
+                ChessPiece pieceLiteral = board.getPiece(currentPosition);
+                String piece = pieceToString(pieceLiteral);
+                setSquareColor(whiteSquareColor, blackSquareColor, i, j);
+                setPieceColor(pieceLiteral, whitePieceColor, blackPieceColor);
+                if (possiblePosition.contains(currentPosition)) {
+                    System.out.print(moveColor);
+                }
+                if (currentPosition.equals(startPos)) {
+                    System.out.print(startColor);
                 }
                 System.out.print(piece + RESET_BG_COLOR + RESET_TEXT_COLOR);
             }
