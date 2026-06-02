@@ -29,6 +29,8 @@ public class ServerFacade {
         handleResponse(response, null);
     }
 
+
+
     private HttpRequest buildRequest(String method, String path, String authorization, Object body) {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
@@ -63,7 +65,10 @@ public class ServerFacade {
         if (status != 200) {
             String body = response.body();
             if (!Objects.equals(body, "null")) {
-                throw new ResponseException(body);
+                int messageStart = body.indexOf("\"message\":") + 11;
+                int messageEnd = messageStart + body.substring(messageStart).indexOf("\"");
+                String message = body.substring(messageStart, messageEnd);
+                throw new ResponseException(message);
             }
             throw new ResponseException("Error " + status + ": An error occurred");
         }

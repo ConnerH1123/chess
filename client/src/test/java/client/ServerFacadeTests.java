@@ -1,7 +1,10 @@
 package client;
 
 import org.junit.jupiter.api.*;
+import request.RegisterRequest;
 import server.Server;
+
+import java.util.UUID;
 
 
 public class ServerFacadeTests {
@@ -24,8 +27,26 @@ public class ServerFacadeTests {
 
 
     @Test
-    public void sampleTest() {
-        Assertions.assertTrue(true);
+    public void testRegister() {
+        String randomStr = UUID.randomUUID().toString();
+        RegisterRequest registerRequest = new RegisterRequest(randomStr, "password", "email");
+        try {
+            facade.register(registerRequest);
+        } catch (ResponseException e) {
+            Assertions.fail("Error message thrown: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testRegisterExistingUser() {
+        RegisterRequest registerRequest = new RegisterRequest("username", "password", "email");
+        try {
+            facade.register(registerRequest);
+            facade.register(registerRequest);
+            Assertions.fail("Exception not thrown for repeated username");
+        } catch (ResponseException e) {
+            //
+        }
     }
 
 }
