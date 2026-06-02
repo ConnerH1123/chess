@@ -2,6 +2,7 @@ package service;
 
 import dataaccess.*;
 import model.*;
+import request.*;
 
 public class GameService extends Authorizable {
     private final GameDAO gameDAO;
@@ -19,21 +20,11 @@ public class GameService extends Authorizable {
         return new CreateResult(gameID);
     }
 
-    public record CreateRequest(String authToken, String gameName) {
-        public CreateRequest setAuthToken(String authToken) {
-            return new CreateRequest(authToken, this.gameName);
-        }
-    }
-    public record CreateResult(int gameID) {}
-
     public ListResult list(ListRequest r) throws DataAccessException {
         authorize(r.authToken());
         GameData[] games = gameDAO.listGames();
         return new ListResult(games);
     }
-
-    public record ListRequest(String authToken) {}
-    public record ListResult(GameData[] games) {}
 
     public void join(JoinRequest r) throws DataAccessException {
         AuthData authData = authorize(r.authToken());
@@ -46,12 +37,6 @@ public class GameService extends Authorizable {
         }
         validatePlayerColor(gameData, playerColor);
         gameDAO.updateGame(gameID, playerColor, username);
-    }
-
-    public record JoinRequest(String authToken, String playerColor, Integer gameID) {
-        public JoinRequest setAuthToken(String authToken) {
-            return new JoinRequest(authToken, this.playerColor, this.gameID);
-        }
     }
 
     private void validatePlayerColor(GameData gameData, String playerColor) throws DataAccessException {
