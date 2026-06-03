@@ -7,9 +7,15 @@ import request.*;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import static ui.EscapeSequences.*;
+
 public class PreLoginUI {
     private final ServerFacade server;
     private boolean isLoggedIn = false;
+    private final String inputColor = SET_TEXT_COLOR_BLUE;
+    private final String outputColor = RESET_TEXT_COLOR;
+    private final String errorColor = SET_TEXT_COLOR_RED;
+    private final String defaultColor = RESET_TEXT_COLOR;
 
     public PreLoginUI(ServerFacade server) {
         this.server = server;
@@ -21,14 +27,14 @@ public class PreLoginUI {
         String result = " ";
         while (!result.equals("Exiting chess server...") && !result.equals("Exiting...")) {
             isLoggedIn = false;
-            System.out.print("[LOGGED_OUT] >>> ");
+            System.out.print(inputColor + "[LOGGED_OUT] >>> " + defaultColor);
             String line = scanner.nextLine();
             result = eval(line);
             System.out.println(result);
             if (isLoggedIn) {
                 PostLoginUI ui = new PostLoginUI(server);
                 result = ui.start();
-                System.out.println("Successfully logged out");
+                System.out.println(outputColor + "Successfully logged out" + defaultColor);
             }
         }
     }
@@ -44,12 +50,12 @@ public class PreLoginUI {
                 case "quit" -> "Exiting chess server...";
                 case "help" -> help();
                 default -> {
-                    System.out.print("'" + cmd + "' was not a recognized command. ");
+                    System.out.print(errorColor + "'" + cmd + "' was not a recognized command. " + defaultColor);
                     yield help();
                 }
             };
         } catch (ResponseException e) {
-            return e.getMessage() + "\n";
+            return errorColor + e.getMessage() + "\n";
         }
     }
 
@@ -61,9 +67,9 @@ public class PreLoginUI {
             RegisterRequest request = new RegisterRequest(username, password, email);
             server.register(request);
             isLoggedIn = true;
-            return String.format("User %s successfully registered", username);
+            return String.format(outputColor + "User %s successfully registered" + defaultColor, username);
         }
-        throw new ResponseException("Insufficient arguments. Expected: <USERNAME> <PASSWORD> <EMAIL>");
+        throw new ResponseException(errorColor + "Insufficient arguments. Expected: <USERNAME> <PASSWORD> <EMAIL>" + defaultColor);
     }
 
     private String login(String... params) throws ResponseException {
@@ -73,18 +79,18 @@ public class PreLoginUI {
             LoginRequest request = new LoginRequest(username, password);
             server.login(request);
             isLoggedIn = true;
-            return String.format("User %s successfully logged in", username);
+            return String.format(outputColor + "User %s successfully logged in" + defaultColor, username);
         }
-        throw new ResponseException("Insufficient arguments. Expected: <USERNAME> <PASSWORD>");
+        throw new ResponseException(errorColor + "Insufficient arguments. Expected: <USERNAME> <PASSWORD>" + defaultColor);
     }
 
     private String help() {
-        return """
+        return outputColor + """
                 These are your options:
                   register <USERNAME> <PASSWORD> <EMAIL> - to create an account
                   login <USERNAME> <PASSWORD> - to play chess
                   quit - playing chess
                   help - with possible commands
-                """;
+                """ + defaultColor;
     }
 }

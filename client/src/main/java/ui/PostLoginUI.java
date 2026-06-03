@@ -9,10 +9,19 @@ import request.*;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import static ui.EscapeSequences.*;
+import static ui.EscapeSequences.RESET_TEXT_COLOR;
+
 public class PostLoginUI {
     private final ServerFacade server;
     private ChessGame chessGame = null;
     private String teamColor = "WHITE";
+
+    private final String inputColor = SET_TEXT_COLOR_BLUE;
+    private final String outputColor = RESET_TEXT_COLOR;
+    private final String errorColor = SET_TEXT_COLOR_RED;
+    private final String defaultColor = RESET_TEXT_COLOR;
+
 
     public PostLoginUI(ServerFacade server) {
         this.server = server;
@@ -24,7 +33,7 @@ public class PostLoginUI {
         String result = "";
         while (!result.equals("Exiting...") && !result.equals("Logging out...")) {
             chessGame = null;
-            System.out.print("[LOGGED_IN] >>> ");
+            System.out.print(inputColor + "[LOGGED_IN] >>> " + defaultColor);
             String line = scanner.nextLine();
             result = eval(line);
             System.out.println(result);
@@ -50,12 +59,12 @@ public class PostLoginUI {
                 case "quit" -> "Exiting...";
                 case "help" -> help();
                 default -> {
-                    System.out.print("'" + cmd + "' was not a recognized command. ");
+                    System.out.print(errorColor + "'" + cmd + "' was not a recognized command. " + defaultColor);
                     yield help();
                 }
             };
         } catch (ResponseException e) {
-            return e.getMessage() + "\n";
+            return errorColor + e.getMessage() + "\n" + defaultColor;
         }
     }
 
@@ -64,7 +73,7 @@ public class PostLoginUI {
             String gameName = params[0];
             CreateRequest request = new CreateRequest(null, gameName);
             server.createGame(request);
-            return String.format("Game %s successfully created\n", gameName);
+            return String.format(outputColor + "Game %s successfully created\n" + defaultColor, gameName);
         }
         throw new ResponseException("Insufficient arguments. Expected: <NAME>");
     }
@@ -77,7 +86,7 @@ public class PostLoginUI {
             if (game == null) {
                 break;
             }
-            sb.append(String.format("%d. %s (White: %s, Black: %s)\n", index, game.gameName(),
+            sb.append(String.format(outputColor + "%d. %s (White: %s, Black: %s)\n" + defaultColor, index, game.gameName(),
                                 (game.whiteUsername() != null) ? game.whiteUsername() : "N/A",
                                 (game.blackUsername() != null) ? game.blackUsername() : "N/A"));
             index++;
@@ -104,7 +113,7 @@ public class PostLoginUI {
             server.joinGame(request);
             chessGame = game.game();
             teamColor = team;
-            return String.format("Game %s successfully joined as %s\n", game.gameName(), team);
+            return String.format(outputColor + "Game %s successfully joined as %s\n" + defaultColor, game.gameName(), team);
         }
         throw new ResponseException("Insufficient arguments. Expected: <ID> <WHITE|BLACK>");
     }
@@ -123,7 +132,7 @@ public class PostLoginUI {
             }
             GameData game = games[gameNumber-1];
             chessGame = game.game();
-            return String.format("Game %s successfully joined as observer\n", game.gameName());
+            return String.format(outputColor + "Game %s successfully joined as observer\n" + defaultColor, game.gameName());
         }
         throw new ResponseException("Insufficient arguments. Expected: <ID>");
     }
@@ -134,7 +143,7 @@ public class PostLoginUI {
     }
 
     private String help() {
-        return """
+        return outputColor + """
                 These are your options:
                   create <NAME> - a game
                   list - games
@@ -143,6 +152,6 @@ public class PostLoginUI {
                   logout - when you are done
                   quit - playing chess
                   help - with possible commands
-                """;
+                """ + defaultColor;
     }
 }
