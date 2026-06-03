@@ -2,27 +2,33 @@ package ui;
 
 import client.ResponseException;
 import client.ServerFacade;
-import request.RegisterRequest;
+import request.*;
 
 import java.util.Arrays;
 import java.util.Scanner;
 
 public class PreLoginUI extends UserInterface {
     private final ServerFacade server;
+    private boolean isLoggedIn = false;
 
     public PreLoginUI(ServerFacade server) {
         this.server = server;
     }
 
     public void start() {
-        help();
+        System.out.println(help());
         Scanner scanner = new Scanner(System.in);
         String result = "";
         while (!result.equals("quit")) {
+            isLoggedIn = false;
             System.out.print("[LOGGED_OUT] >>> ");
             String line = scanner.nextLine();
             result = eval(line);
             System.out.println(result);
+            if (isLoggedIn) {
+//                PostLoginUI ui = new PostLoginUI(server);
+//                ui.start();
+            }
         }
     }
 
@@ -33,6 +39,7 @@ public class PreLoginUI extends UserInterface {
         try {
             return switch (cmd) {
                 case "register" -> register(params);
+                case "login" -> login(params);
                 case "quit" -> "quit";
                 case "help" -> help();
                 default -> {
@@ -53,9 +60,22 @@ public class PreLoginUI extends UserInterface {
             String email = params[2];
             RegisterRequest request = new RegisterRequest(username, password, email);
             server.register(request);
+            isLoggedIn = true;
             return String.format("User %s successfully registered", username);
         }
         throw new ResponseException("Insufficient arguments. Expected: <USERNAME> <PASSWORD> <EMAIL>");
+    }
+
+    private String login(String... params) throws ResponseException {
+        if (params.length >= 2) {
+            String username = params[0];
+            String password = params[1];
+            LoginRequest request = new LoginRequest(username, password);
+            server.login(request);
+            isLoggedIn = true;
+            return String.format("User %s successfully logged in", username);
+        }
+        throw new ResponseException("Insufficient arguments. Expected: <USERNAME> <PASSWORD>");
     }
 
     private String help() {
