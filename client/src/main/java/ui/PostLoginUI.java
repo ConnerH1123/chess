@@ -55,7 +55,7 @@ public class PostLoginUI {
                 }
             };
         } catch (ResponseException e) {
-            return e.getMessage();
+            return e.getMessage() + "\n";
         }
     }
 
@@ -64,7 +64,7 @@ public class PostLoginUI {
             String gameName = params[0];
             CreateRequest request = new CreateRequest(null, gameName);
             server.createGame(request);
-            return String.format("Game %s successfully created", gameName);
+            return String.format("Game %s successfully created\n", gameName);
         }
         throw new ResponseException("Insufficient arguments. Expected: <NAME>");
     }
@@ -104,7 +104,7 @@ public class PostLoginUI {
             server.joinGame(request);
             chessGame = game.game();
             teamColor = team;
-            return String.format("Game %s successfully joined as %s", game.gameName(), team);
+            return String.format("Game %s successfully joined as %s\n", game.gameName(), team);
         }
         throw new ResponseException("Insufficient arguments. Expected: <ID> <WHITE|BLACK>");
     }
@@ -123,7 +123,7 @@ public class PostLoginUI {
             }
             GameData game = games[gameNumber-1];
             chessGame = game.game();
-            return String.format("Game %s successfully joined as observer", game.gameName());
+            return String.format("Game %s successfully joined as observer\n", game.gameName());
         }
         throw new ResponseException("Insufficient arguments. Expected: <ID>");
     }

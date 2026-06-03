@@ -62,7 +62,7 @@ public class GameplayUI {
             default -> WHITE;
         };
         drawBoard(chessGame.getBoard(), color, border, text, lightSquares, darkSquares, whitePieces, blackPieces);
-        return String.format("%s to move", chessGame.getTeamTurn().toString());
+        return String.format("%s to move\n", chessGame.getTeamTurn().toString());
     }
 
     private String help() {

@@ -18,7 +18,7 @@ public class PreLoginUI {
     public void start() {
         System.out.println(help());
         Scanner scanner = new Scanner(System.in);
-        String result = "";
+        String result = " ";
         while (!result.equals("Exiting chess server...") && !result.equals("Exiting...")) {
             isLoggedIn = false;
             System.out.print("[LOGGED_OUT] >>> ");
@@ -49,7 +49,7 @@ public class PreLoginUI {
                 }
             };
         } catch (ResponseException e) {
-            return e.getMessage();
+            return e.getMessage() + "\n";
         }
     }
 
