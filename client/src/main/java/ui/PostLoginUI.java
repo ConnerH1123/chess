@@ -42,6 +42,7 @@ public class PostLoginUI {
             return switch (cmd) {
                 case "create" -> create(params);
                 case "list" -> list();
+                case "join" -> join(params);
                 case "quit" -> "quit";
                 case "help" -> help();
                 default -> {
@@ -69,10 +70,37 @@ public class PostLoginUI {
         StringBuilder sb = new StringBuilder();
         int index = 1;
         for (GameData game : games) {
-            sb.append(String.format("%d. %s (White: %s, Black %s)\n", index, game.gameName(), game.whiteUsername(), game.blackUsername()));
+            if (game == null) {
+                break;
+            }
+            sb.append(String.format("%d. %s (White: %s, Black: %s)\n", index, game.gameName(),
+                                (game.whiteUsername() != null) ? game.whiteUsername() : "N/A",
+                                (game.blackUsername() != null) ? game.blackUsername() : "N/A"));
             index++;
         }
         return sb.toString();
+    }
+
+    private String join(String... params) throws ResponseException {
+        if (params.length >= 2) {
+            int gameNumber;
+            try {
+                gameNumber = Integer.parseInt(params[0]);
+            } catch (Exception e) {
+                throw new ResponseException("Error: Invalid ID");
+            }
+            String team = params[1].toUpperCase();
+            GameData[] games = server.listGames();
+            if (gameNumber <= 0 || gameNumber > games.length) {
+                throw new ResponseException("Error: Invalid ID");
+            }
+            GameData game = games[gameNumber-1];
+            int gameID = game.gameID();
+            JoinRequest request = new JoinRequest(null, team, gameID);
+            server.joinGame(request);
+            return String.format("Game %s successfully joined as %s", game.gameName(), team);
+        }
+        throw new ResponseException("Insufficient arguments. Expected: <ID> <WHITE|BLACK>");
     }
 
     private String help() {
