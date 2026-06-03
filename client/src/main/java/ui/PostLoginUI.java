@@ -2,6 +2,7 @@ package ui;
 
 import client.ResponseException;
 import client.ServerFacade;
+import model.GameData;
 import request.*;
 
 import java.util.Arrays;
@@ -40,6 +41,7 @@ public class PostLoginUI {
         try {
             return switch (cmd) {
                 case "create" -> create(params);
+                case "list" -> list();
                 case "quit" -> "quit";
                 case "help" -> help();
                 default -> {
@@ -60,6 +62,17 @@ public class PostLoginUI {
             return String.format("Game %s successfully created", gameName);
         }
         throw new ResponseException("Insufficient arguments. Expected: <NAME>");
+    }
+
+    private String list() throws ResponseException {
+        GameData[] games = server.listGames();
+        StringBuilder sb = new StringBuilder();
+        int index = 1;
+        for (GameData game : games) {
+            sb.append(String.format("%d. %s (White: %s, Black %s)\n", index, game.gameName(), game.whiteUsername(), game.blackUsername()));
+            index++;
+        }
+        return sb.toString();
     }
 
     private String help() {
