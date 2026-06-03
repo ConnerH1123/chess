@@ -21,7 +21,7 @@ public class PostLoginUI {
         System.out.println(help());
         Scanner scanner = new Scanner(System.in);
         String result = "";
-        while (!result.equals("quit")) {
+        while (!result.equals("Exiting...") && !result.equals("Logging out...")) {
             chessGame = null;
             System.out.print("[LOGGED_IN] >>> ");
             String line = scanner.nextLine();
@@ -45,7 +45,8 @@ public class PostLoginUI {
                 case "list" -> list();
                 case "join" -> join(params);
                 case "observe" -> observe(params);
-                case "quit" -> "quit";
+                case "logout" -> logout();
+                case "quit" -> "Exiting...";
                 case "help" -> help();
                 default -> {
                     System.out.print("'" + cmd + "' was not a recognized command. ");
@@ -123,6 +124,11 @@ public class PostLoginUI {
             return String.format("Game %s successfully joined as observer", game.gameName());
         }
         throw new ResponseException("Insufficient arguments. Expected: <ID>");
+    }
+
+    private String logout() throws ResponseException {
+        server.logout();
+        return "Logging out...";
     }
 
     private String help() {
