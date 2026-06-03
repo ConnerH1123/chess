@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessGame;
 import client.ResponseException;
 import client.ServerFacade;
 import model.GameData;
@@ -10,7 +11,7 @@ import java.util.Scanner;
 
 public class PostLoginUI {
     private final ServerFacade server;
-    private boolean isInGame = false;
+    private ChessGame chessGame = null;
 
     public PostLoginUI(ServerFacade server) {
         this.server = server;
@@ -21,12 +22,12 @@ public class PostLoginUI {
         Scanner scanner = new Scanner(System.in);
         String result = "";
         while (!result.equals("quit")) {
-            isInGame = false;
+            chessGame = null;
             System.out.print("[LOGGED_IN] >>> ");
             String line = scanner.nextLine();
             result = eval(line);
             System.out.println(result);
-            if (isInGame) {
+            if (chessGame != null) {
 //                PostLoginUI ui = new PostLoginUI(server);
 //                ui.start();
             }
@@ -98,6 +99,7 @@ public class PostLoginUI {
             int gameID = game.gameID();
             JoinRequest request = new JoinRequest(null, team, gameID);
             server.joinGame(request);
+            chessGame = game.game();
             return String.format("Game %s successfully joined as %s", game.gameName(), team);
         }
         throw new ResponseException("Insufficient arguments. Expected: <ID> <WHITE|BLACK>");
