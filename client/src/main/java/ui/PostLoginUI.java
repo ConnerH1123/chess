@@ -44,6 +44,7 @@ public class PostLoginUI {
                 case "create" -> create(params);
                 case "list" -> list();
                 case "join" -> join(params);
+                case "observe" -> observe(params);
                 case "quit" -> "quit";
                 case "help" -> help();
                 default -> {
@@ -103,6 +104,25 @@ public class PostLoginUI {
             return String.format("Game %s successfully joined as %s", game.gameName(), team);
         }
         throw new ResponseException("Insufficient arguments. Expected: <ID> <WHITE|BLACK>");
+    }
+
+    private String observe(String... params) throws ResponseException {
+        if (params.length >= 1) {
+            int gameNumber;
+            try {
+                gameNumber = Integer.parseInt(params[0]);
+            } catch (Exception e) {
+                throw new ResponseException("Error: Invalid ID");
+            }
+            GameData[] games = server.listGames();
+            if (gameNumber <= 0 || gameNumber > games.length) {
+                throw new ResponseException("Error: Invalid ID");
+            }
+            GameData game = games[gameNumber-1];
+            chessGame = game.game();
+            return String.format("Game %s successfully joined as observer", game.gameName());
+        }
+        throw new ResponseException("Insufficient arguments. Expected: <ID>");
     }
 
     private String help() {
