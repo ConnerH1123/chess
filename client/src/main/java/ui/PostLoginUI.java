@@ -28,8 +28,8 @@ public class PostLoginUI {
             result = eval(line);
             System.out.println(result);
             if (chessGame != null) {
-//                PostLoginUI ui = new PostLoginUI(server);
-//                ui.start();
+                GameplayUI ui = new GameplayUI(server, chessGame);
+                result = ui.start();
             }
         }
         return result;
