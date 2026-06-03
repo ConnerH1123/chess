@@ -7,7 +7,7 @@ import request.*;
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class PreLoginUI extends UserInterface {
+public class PreLoginUI {
     private final ServerFacade server;
     private boolean isLoggedIn = false;
 
@@ -26,8 +26,9 @@ public class PreLoginUI extends UserInterface {
             result = eval(line);
             System.out.println(result);
             if (isLoggedIn) {
-//                PostLoginUI ui = new PostLoginUI(server);
-//                ui.start();
+                PostLoginUI ui = new PostLoginUI(server);
+                result = ui.start();
+                System.out.println("Successfully logged out");
             }
         }
     }
@@ -50,7 +51,6 @@ public class PreLoginUI extends UserInterface {
         } catch (ResponseException e) {
             return e.getMessage();
         }
-
     }
 
     private String register(String... params) throws ResponseException {

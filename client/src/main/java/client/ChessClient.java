@@ -10,7 +10,7 @@ public class ChessClient {
     }
 
     public void run() {
-        System.out.println("♕ Welcome to the chess server ♕");
+        System.out.println("♕ Welcome to 240 Chess Server ♕");
         PreLoginUI ui = new PreLoginUI(server);
         ui.start();
         System.out.println("Exiting chess server. Come again soon!");
