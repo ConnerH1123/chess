@@ -36,7 +36,7 @@ public class PreLoginUI {
     private String eval(String input) {
         String[] tokens = input.toLowerCase().split(" ");
         String cmd = (tokens.length > 0) ? tokens[0] : "help";
-        String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
+        String[] params = (!cmd.equals("help")) ? Arrays.copyOfRange(tokens, 1, tokens.length) : null;
         try {
             return switch (cmd) {
                 case "register" -> register(params);
