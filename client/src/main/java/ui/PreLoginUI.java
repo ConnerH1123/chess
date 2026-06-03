@@ -19,7 +19,7 @@ public class PreLoginUI {
         System.out.println(help());
         Scanner scanner = new Scanner(System.in);
         String result = "";
-        while (!result.equals("quit")) {
+        while (!result.equals("Exiting chess server...")) {
             isLoggedIn = false;
             System.out.print("[LOGGED_OUT] >>> ");
             String line = scanner.nextLine();
@@ -41,7 +41,7 @@ public class PreLoginUI {
             return switch (cmd) {
                 case "register" -> register(params);
                 case "login" -> login(params);
-                case "quit" -> "quit";
+                case "quit" -> "Exiting chess server...";
                 case "help" -> help();
                 default -> {
                     System.out.print("'" + cmd + "' was not a recognized command. ");
