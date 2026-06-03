@@ -98,6 +98,7 @@ public class ServerFacadeTests {
     public void testLogoutBeforeLogin() {
         try {
             facade.logout();
+            facade.logout();
             Assertions.fail("Shouldn't be able to logout before logging in");
         } catch (ResponseException e) {
             //
