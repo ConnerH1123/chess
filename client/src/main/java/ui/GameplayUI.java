@@ -45,20 +45,15 @@ public class GameplayUI {
     private String eval(String input) {
         String[] tokens = input.toLowerCase().split(" ");
         String cmd = (tokens.length > 0) ? tokens[0] : "help";
-//        String[] params = (!cmd.equals("help")) ? Arrays.copyOfRange(tokens, 1, tokens.length) : null;
-//        try {
-            return switch (cmd) {
-                case "redraw" -> redraw();
-                case "quit" -> "Exiting...";
-                case "help" -> help();
-                default -> {
-                    System.out.print("'" + cmd + "' was not a recognized command. ");
-                    yield help();
-                }
-            };
-//        } catch (ResponseException e) {
-//            return e.getMessage();
-//        }
+        return switch (cmd) {
+            case "redraw" -> redraw();
+            case "quit" -> "Exiting...";
+            case "help" -> help();
+            default -> {
+                System.out.print("'" + cmd + "' was not a recognized command. ");
+                yield help();
+            }
+        };
     }
 
     private String redraw() {
