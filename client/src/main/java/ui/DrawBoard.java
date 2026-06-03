@@ -155,7 +155,7 @@ public class DrawBoard {
 
     private static void printColumns(int start, int end, int increment, String background, String text) {
         System.out.print(background + text);
-        String[] columns = {"A", "B", "C", "D", "E", "F", "G", "H"};
+        String[] columns = {"a", "b", "c", "d", "e", "f", "g", "h"};
         System.out.print("\u2003" + SET_TEXT_BOLD + "\u2003" + " " + RESET_TEXT_BOLD_FAINT);
         for (int i = start; i != end; i += increment) {
             System.out.print(columns[i-1] + "\u2003" + " ");

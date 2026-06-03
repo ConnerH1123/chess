@@ -12,6 +12,7 @@ import java.util.Scanner;
 public class PostLoginUI {
     private final ServerFacade server;
     private ChessGame chessGame = null;
+    private String teamColor = "WHITE";
 
     public PostLoginUI(ServerFacade server) {
         this.server = server;
@@ -28,7 +29,7 @@ public class PostLoginUI {
             result = eval(line);
             System.out.println(result);
             if (chessGame != null) {
-                GameplayUI ui = new GameplayUI(server, chessGame);
+                GameplayUI ui = new GameplayUI(server, chessGame, teamColor);
                 result = ui.start();
             }
         }
@@ -102,6 +103,7 @@ public class PostLoginUI {
             JoinRequest request = new JoinRequest(null, team, gameID);
             server.joinGame(request);
             chessGame = game.game();
+            teamColor = team;
             return String.format("Game %s successfully joined as %s", game.gameName(), team);
         }
         throw new ResponseException("Insufficient arguments. Expected: <ID> <WHITE|BLACK>");

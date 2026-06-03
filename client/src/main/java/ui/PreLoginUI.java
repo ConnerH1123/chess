@@ -19,7 +19,7 @@ public class PreLoginUI {
         System.out.println(help());
         Scanner scanner = new Scanner(System.in);
         String result = "";
-        while (!result.equals("Exiting chess server...")) {
+        while (!result.equals("Exiting chess server...") && !result.equals("Exiting...")) {
             isLoggedIn = false;
             System.out.print("[LOGGED_OUT] >>> ");
             String line = scanner.nextLine();
