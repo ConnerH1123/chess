@@ -18,9 +18,7 @@ public class ChessBoard {
     private ChessPosition whiteKingLocation;
     private ChessPosition blackKingLocation;
 
-    public ChessBoard() {
-        resetBoard();
-    }
+    public ChessBoard() {}
 
     /**
      * Sets the board to the default starting board
