@@ -34,6 +34,7 @@ public class PostLoginUI {
         while (!result.equals("Exiting...") && !result.equals("Logging out...")) {
             try {
                 chessGame = null;
+                teamColor = "WHITE";
                 System.out.print(inputColor + "[LOGGED_IN] >>> " + defaultColor);
                 String line = scanner.nextLine();
                 result = eval(line);
@@ -45,6 +46,11 @@ public class PostLoginUI {
             } catch (Exception e) {
                 System.out.println(errorColor + "System error. Error message: " + e.getMessage() + defaultColor);
             }
+        }
+        try {
+            logout();
+        } catch (ResponseException e) {
+            System.out.println(errorColor + e.getMessage() + defaultColor);
         }
         return result;
     }
@@ -59,7 +65,7 @@ public class PostLoginUI {
                 case "list" -> list();
                 case "join" -> join(params);
                 case "observe" -> observe(params);
-                case "logout" -> logout();
+                case "logout" -> "Logging out...";
                 case "quit" -> "Exiting...";
                 case "help" -> help();
                 default -> {
@@ -147,9 +153,8 @@ public class PostLoginUI {
         throw new ResponseException("Insufficient arguments. Expected: <ID>");
     }
 
-    private String logout() throws ResponseException {
+    private void logout() throws ResponseException {
         server.logout();
-        return "Logging out...";
     }
 
     private String help() {
