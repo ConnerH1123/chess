@@ -26,15 +26,19 @@ public class PreLoginUI {
         Scanner scanner = new Scanner(System.in);
         String result = " ";
         while (!result.equals("Exiting chess server...") && !result.equals("Exiting...")) {
-            isLoggedIn = false;
-            System.out.print(inputColor + "[LOGGED_OUT] >>> " + defaultColor);
-            String line = scanner.nextLine();
-            result = eval(line);
-            System.out.println(result);
-            if (isLoggedIn) {
-                PostLoginUI ui = new PostLoginUI(server);
-                result = ui.start();
-                System.out.println(outputColor + "Successfully logged out" + defaultColor);
+            try {
+                isLoggedIn = false;
+                System.out.print(inputColor + "[LOGGED_OUT] >>> " + defaultColor);
+                String line = scanner.nextLine();
+                result = eval(line);
+                System.out.println(result);
+                if (isLoggedIn) {
+                    PostLoginUI ui = new PostLoginUI(server);
+                    result = ui.start();
+                    System.out.println(outputColor + "Successfully logged out" + defaultColor);
+                }
+            } catch (Exception e) {
+                System.out.println(errorColor + "System error. Error message: " + e.getMessage() + defaultColor);
             }
         }
     }

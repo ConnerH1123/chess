@@ -22,6 +22,11 @@ public class GameplayUI {
     private final String whitePieces = SET_TEXT_COLOR_WHITE;
     private final String blackPieces = SET_TEXT_COLOR_BLACK;
 
+    private final String inputColor = SET_TEXT_COLOR_BLUE;
+    private final String outputColor = RESET_TEXT_COLOR;
+    private final String errorColor = SET_TEXT_COLOR_RED;
+    private final String defaultColor = RESET_TEXT_COLOR;
+
     public GameplayUI(ServerFacade server, ChessGame chessGame, String teamColor) {
         this.server = server;
         this.chessGame = chessGame;
@@ -33,8 +38,8 @@ public class GameplayUI {
         System.out.println(help());
         Scanner scanner = new Scanner(System.in);
         String result = "";
-        while (!result.equals("Exiting...")) {
-            System.out.print("[GAMEPLAY] >>> ");
+        while (!result.equals("Exiting...") && !result.equals("Leaving...")) {
+            System.out.print(inputColor + "[GAMEPLAY] >>> " + defaultColor);
             String line = scanner.nextLine();
             result = eval(line);
             System.out.println(result);
@@ -47,6 +52,7 @@ public class GameplayUI {
         String cmd = (tokens.length > 0) ? tokens[0] : "help";
         return switch (cmd) {
             case "redraw" -> redraw();
+            case "leave" -> "Leaving...";
             case "quit" -> "Exiting...";
             case "help" -> help();
             default -> {
@@ -69,6 +75,7 @@ public class GameplayUI {
         return """
                 These are your options:
                   redraw - the board
+                  leave - the game
                   quit - playing chess
                   help - with possible commands
                 """;

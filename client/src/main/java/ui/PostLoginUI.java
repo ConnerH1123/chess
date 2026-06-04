@@ -32,14 +32,18 @@ public class PostLoginUI {
         Scanner scanner = new Scanner(System.in);
         String result = "";
         while (!result.equals("Exiting...") && !result.equals("Logging out...")) {
-            chessGame = null;
-            System.out.print(inputColor + "[LOGGED_IN] >>> " + defaultColor);
-            String line = scanner.nextLine();
-            result = eval(line);
-            System.out.println(result);
-            if (chessGame != null) {
-                GameplayUI ui = new GameplayUI(server, chessGame, teamColor);
-                result = ui.start();
+            try {
+                chessGame = null;
+                System.out.print(inputColor + "[LOGGED_IN] >>> " + defaultColor);
+                String line = scanner.nextLine();
+                result = eval(line);
+                System.out.println(result);
+                if (chessGame != null) {
+                    GameplayUI ui = new GameplayUI(server, chessGame, teamColor);
+                    result = ui.start();
+                }
+            } catch (Exception e) {
+                System.out.println(errorColor + "System error. Error message: " + e.getMessage() + defaultColor);
             }
         }
         return result;
@@ -108,6 +112,9 @@ public class PostLoginUI {
                 throw new ResponseException("Error: Invalid ID");
             }
             GameData game = games[gameNumber-1];
+            if (game == null) {
+                throw new ResponseException("Error: Invalid ID");
+            }
             int gameID = game.gameID();
             JoinRequest request = new JoinRequest(null, team, gameID);
             server.joinGame(request);
@@ -131,6 +138,9 @@ public class PostLoginUI {
                 throw new ResponseException("Error: Invalid ID");
             }
             GameData game = games[gameNumber-1];
+            if (game == null) {
+                throw new ResponseException("Error: Invalid ID");
+            }
             chessGame = game.game();
             return String.format(outputColor + "Game %s successfully joined as observer\n" + defaultColor, game.gameName());
         }
