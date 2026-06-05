@@ -14,7 +14,7 @@ import static ui.EscapeSequences.RESET_TEXT_COLOR;
 
 public class PostLoginUI {
     private final ServerFacade server;
-    private ChessGame chessGame = null;
+    private GameData chessGame = null;
     private String teamColor = "WHITE";
 
     private final String inputColor = SET_TEXT_COLOR_BLUE;
@@ -127,7 +127,7 @@ public class PostLoginUI {
             int gameID = game.gameID();
             JoinRequest request = new JoinRequest(null, team, gameID);
             server.joinGame(request);
-            chessGame = game.game();
+            chessGame = game;
             teamColor = team;
             return String.format(outputColor + "Game %s successfully joined as %s\n" + defaultColor, game.gameName(), team);
         }
@@ -150,7 +150,7 @@ public class PostLoginUI {
             if (game == null) {
                 throw new ResponseException("Error: Invalid ID");
             }
-            chessGame = game.game();
+            chessGame = game;
             return String.format(outputColor + "Game %s successfully joined as observer\n" + defaultColor, game.gameName());
         }
         throw new ResponseException("Insufficient arguments. Expected: <ID>");

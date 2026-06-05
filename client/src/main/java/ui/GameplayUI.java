@@ -2,6 +2,7 @@ package ui;
 
 import chess.ChessGame;
 import client.ServerFacade;
+import model.GameData;
 
 import java.util.Scanner;
 
@@ -12,6 +13,7 @@ import static ui.EscapeSequences.*;
 
 public class GameplayUI {
     private final ServerFacade server;
+    private final GameData gamedata;
     private final ChessGame chessGame;
     private final String teamColor;
 
@@ -27,9 +29,10 @@ public class GameplayUI {
     private final String errorColor = SET_TEXT_COLOR_RED;
     private final String defaultColor = RESET_TEXT_COLOR;
 
-    public GameplayUI(ServerFacade server, ChessGame chessGame, String teamColor) {
+    public GameplayUI(ServerFacade server, GameData gameData, String teamColor) {
         this.server = server;
-        this.chessGame = chessGame;
+        this.gamedata = gameData;
+        this.chessGame = gameData.game();
         this.teamColor = teamColor;
     }
 
@@ -52,7 +55,7 @@ public class GameplayUI {
         String cmd = (tokens.length > 0) ? tokens[0] : "help";
         return switch (cmd) {
             case "redraw" -> redraw();
-            case "leave" -> "Leaving...";
+            case "leave" -> leave();
             case "quit" -> "Exiting...";
             case "help" -> help();
             default -> {
@@ -69,6 +72,10 @@ public class GameplayUI {
         };
         drawBoard(chessGame.getBoard(), color, border, text, lightSquares, darkSquares, whitePieces, blackPieces);
         return String.format("%s to move\n", chessGame.getTeamTurn().toString());
+    }
+
+    private String leave() {
+        return "Leaving...";
     }
 
     private String help() {
