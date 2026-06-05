@@ -4,6 +4,8 @@ import dataaccess.*;
 import model.*;
 import request.*;
 
+import java.util.Objects;
+
 public class GameService extends Authorizable {
     private final GameDAO gameDAO;
 
@@ -39,6 +41,21 @@ public class GameService extends Authorizable {
         gameDAO.updateGame(gameID, playerColor, username);
     }
 
+    public void leave(LeaveRequest r) throws DataAccessException {
+        AuthData authData = authorize(r.authToken());
+        String username = authData.username();
+        int gameID = r.gameID();
+        String playerColor = r.playerColor();
+        GameData gameData = gameDAO.getGame(gameID);
+        if (gameData == null) {
+            throw new BadRequestException("Error: gameID does not exist");
+        }
+        validatePlayerColor(gameData, playerColor, username);
+        if (playerColor != null) {
+            gameDAO.updateGame(gameID, playerColor, null);
+        }
+    }
+
     private void validatePlayerColor(GameData gameData, String playerColor) throws DataAccessException {
         switch (playerColor) {
             case "WHITE" -> {
@@ -50,6 +67,24 @@ public class GameService extends Authorizable {
                 if (gameData.blackUsername() != null) {
                     throw new AlreadyTakenException("Error: user already taken");
                 }
+            }
+            default -> throw new BadRequestException("Error: invalid player color");
+        }
+    }
+
+    private void validatePlayerColor(GameData gameData, String playerColor, String username) throws DataAccessException {
+        switch (playerColor) {
+            case "WHITE" -> {
+                if (!Objects.equals(gameData.whiteUsername(), username)) {
+                    throw new AlreadyTakenException("Error: in use by other user");
+                }
+            }
+            case "BLACK" -> {
+                if (!Objects.equals(gameData.blackUsername(), username)) {
+                    throw new AlreadyTakenException("Error: in use by other user");
+                }
+            }
+            case null -> {
             }
             default -> throw new BadRequestException("Error: invalid player color");
         }
