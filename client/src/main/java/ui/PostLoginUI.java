@@ -92,6 +92,9 @@ public class PostLoginUI {
         GameData[] games = server.listGames();
         StringBuilder sb = new StringBuilder();
         int index = 1;
+        if (games.length == 0) {
+            sb.append(outputColor + "No games available\n" + defaultColor);
+        }
         for (GameData game : games) {
             if (game == null) {
                 break;
