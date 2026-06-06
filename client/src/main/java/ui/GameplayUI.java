@@ -3,6 +3,7 @@ package ui;
 import chess.ChessGame;
 import client.ServerFacade;
 import model.GameData;
+import request.*;
 
 import java.util.Scanner;
 
@@ -66,15 +67,23 @@ public class GameplayUI {
     }
 
     private String redraw() {
-        ChessGame.TeamColor color = switch (teamColor) {
-            case "BLACK" -> BLACK;
-            default -> WHITE;
-        };
+        ChessGame.TeamColor color;
+        if (teamColor == null) {
+            color = WHITE;
+        }
+        else if (teamColor.equals("BLACK")) {
+            color = BLACK;
+        }
+        else {
+            color = WHITE;
+        }
         drawBoard(chessGame.getBoard(), color, border, text, lightSquares, darkSquares, whitePieces, blackPieces);
         return String.format("%s to move\n", chessGame.getTeamTurn().toString());
     }
 
     private String leave() {
+        LeaveRequest leaveRequest = new LeaveRequest(null, gamedata.gameID(), teamColor);
+        server.
         return "Leaving...";
     }
 

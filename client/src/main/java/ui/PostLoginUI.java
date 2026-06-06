@@ -15,7 +15,7 @@ import static ui.EscapeSequences.RESET_TEXT_COLOR;
 public class PostLoginUI {
     private final ServerFacade server;
     private GameData chessGame = null;
-    private String teamColor = "WHITE";
+    private String teamColor = null;
 
     private final String inputColor = SET_TEXT_COLOR_BLUE;
     private final String outputColor = RESET_TEXT_COLOR;
@@ -34,7 +34,7 @@ public class PostLoginUI {
         while (!result.equals("Exiting...") && !result.equals("Logging out...")) {
             try {
                 chessGame = null;
-                teamColor = "WHITE";
+                teamColor = null;
                 System.out.print(inputColor + "[LOGGED_IN] >>> " + defaultColor);
                 String line = scanner.nextLine();
                 result = eval(line);
