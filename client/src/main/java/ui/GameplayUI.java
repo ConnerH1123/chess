@@ -83,17 +83,16 @@ public class GameplayUI {
 
     private String leave() {
         LeaveRequest leaveRequest = new LeaveRequest(null, gamedata.gameID(), teamColor);
-        server.
         return "Leaving...";
     }
 
     private String help() {
-        return """
+        return outputColor + """
                 These are your options:
                   redraw - the board
                   leave - the game
                   quit - playing chess
                   help - with possible commands
-                """;
+                """ + defaultColor;
     }
 }

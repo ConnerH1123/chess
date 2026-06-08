@@ -200,12 +200,13 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         HashSet<ChessMove> legalMoves = (HashSet<ChessMove>) validMoves(move.getStartPosition());
         ChessPiece piece = chessboard.getPiece(move.getStartPosition());
-        if (legalMoves.contains(move) && piece.getTeamColor() == teamTurn) {
+        if (legalMoves.contains(move) && piece.getTeamColor() == teamTurn && gameStatus == GameStatus.ONGOING) {
             chessboard.makeMove(move);
             changeTeamTurn();
+            updateGameStatus();
         }
         else {
-            throw new InvalidMoveException();
+            throw new InvalidMoveException("Error: invalid move");
         }
     }
 
@@ -218,6 +219,33 @@ public class ChessGame {
             case BLACK -> teamTurn = TeamColor.WHITE;
         }
     }
+
+    private GameStatus gameStatus = GameStatus.ONGOING;
+
+    public GameStatus getGameStatus() {
+        return gameStatus;
+    }
+
+    private void updateGameStatus() {
+        if (isInCheckmate(teamTurn)) {
+            gameStatus = GameStatus.CHECKMATE;
+        }
+        else if (isInStalemate(teamTurn)) {
+            gameStatus = GameStatus.STALEMATE;
+        }
+    }
+
+    public void resign() {
+        gameStatus = GameStatus.RESIGNED;
+    }
+
+    public enum GameStatus {
+        ONGOING,
+        CHECKMATE,
+        STALEMATE,
+        RESIGNED
+    }
+
 
     /**
      * Determines if the given team is in check
