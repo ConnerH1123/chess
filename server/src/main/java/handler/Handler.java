@@ -29,6 +29,10 @@ public class Handler {
         }
     }
 
+    public GameService getGameService() {
+        return gameService;
+    }
+
 
     public RegisterResult register(RegisterRequest r) throws DataAccessException {
         return userService.register(r);

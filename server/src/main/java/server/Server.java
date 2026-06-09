@@ -3,6 +3,7 @@ package server;
 import java.sql.*;
 import com.google.gson.Gson;
 import dataaccess.*;
+import server.websocket.WebSocketHandler;
 import service.UserService.*;
 import service.GameService.*;
 import handler.Handler;
@@ -16,17 +17,21 @@ public class Server {
 
     private final Javalin javalin;
     private Handler handler;
+    private WebSocketHandler webSocketHandler;
 
 
     public Server() {
         handler = null;
         try {
             handler = new Handler();
+            webSocketHandler = new WebSocketHandler(handler.getGameService());
         } catch (DataAccessException e) {
             System.err.println("=== HANDLER INITIALIZATION ERROR ===");
             System.err.println("Error message: " + e.getMessage());
             System.err.println("=====================================");
         }
+
+
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
                 .post("/user",this::register)
@@ -35,7 +40,12 @@ public class Server {
                 .get("/game", this::listGames)
                 .post("/game", this::createGame)
                 .put("/game", this::joinGame)
-                .delete("/db", this::clear);
+                .delete("/db", this::clear)
+                .ws("/ws", ws -> {
+                    ws.onConnect(webSocketHandler);
+                    ws.onMessage(webSocketHandler);
+                    ws.onClose(webSocketHandler);
+                });
 
         javalin.exception(DataAccessException.class, this::handleDataAccessException);
     }
