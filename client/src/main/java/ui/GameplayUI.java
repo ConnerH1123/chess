@@ -13,7 +13,6 @@ import static ui.DrawBoard.drawBoard;
 import static ui.EscapeSequences.*;
 
 public class GameplayUI {
-    private final ServerFacade server;
     private final GameData gamedata;
     private final ChessGame chessGame;
     private final String teamColor;
@@ -31,7 +30,6 @@ public class GameplayUI {
     private final String defaultColor = RESET_TEXT_COLOR;
 
     public GameplayUI(String serverURL, GameData gameData, String teamColor) {
-        this.server = server;
         this.gamedata = gameData;
         this.chessGame = gameData.game();
         this.teamColor = teamColor;
