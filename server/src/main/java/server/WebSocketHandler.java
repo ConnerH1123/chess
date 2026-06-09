@@ -29,13 +29,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     @Override
-    public void handleMessage(@NotNull WsMessageContext ctx) {
+    public void handleMessage(@NotNull WsMessageContext ctx) throws DataAccessException {
         try {
             UserGameCommand command = new Gson().fromJson(ctx.message(), UserGameCommand.class);
             switch (command.getCommandType()) {
                 case CONNECT -> connect(command.getGameID(), ctx.session);
                 case LEAVE -> leave(command.getGameID(), ctx.session);
-                case MAKE_MOVE ->
+                case MAKE_MOVE -> move(command.getGameID(), command.getAuthToken(), command.getMove(), ctx.session);
+                case RESIGN -> resign(command.getGameID(), command.getAuthToken());
             }
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -56,7 +57,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void move(int gameID, String authToken, ChessMove move, Session session) throws DataAccessException {
-        UpdateRequest updateRequest = new UpdateRequest(authToken, gameID, move);
+        UpdateRequest updateRequest = new UpdateRequest(authToken, gameID, move, false);
+        gameService.update(updateRequest);
+    }
+
+    private void resign(int gameID, String authToken) throws DataAccessException {
+        UpdateRequest updateRequest = new UpdateRequest(authToken, gameID, null, true);
         gameService.update(updateRequest);
     }
 }

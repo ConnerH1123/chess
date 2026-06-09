@@ -64,10 +64,16 @@ public class GameService extends Authorizable {
         if (gameData == null) {
             throw new BadRequestException("Error: gameID does not exist");
         }
+        boolean resignStatus = r.resignStatus();
         ChessMove move = r.move();
         ChessGame game = gameData.game();
+        if (resignStatus) {
+            game.resign();
+        }
         try {
-            game.makeMove(move);
+            if (move != null) {
+                game.makeMove(move);
+            }
         } catch (InvalidMoveException e) {
             throw new BadRequestException(e.getMessage());
         }
