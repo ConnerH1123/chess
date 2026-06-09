@@ -13,17 +13,17 @@ import java.util.Objects;
 public class UserGameCommand {
 
     private final CommandType commandType;
-
     private final String authToken;
-
     private final Integer gameID;
+    private final ChessMove move;
+    private final String username;
 
-    private ChessMove move = null;
-
-    public UserGameCommand(CommandType commandType, String authToken, Integer gameID) {
+    public UserGameCommand(CommandType commandType, String authToken, Integer gameID, String username) {
         this.commandType = commandType;
         this.authToken = authToken;
         this.gameID = gameID;
+        this.move = null;
+        this.username = username;
     }
 
     public UserGameCommand(CommandType commandType, String authToken, Integer gameID, ChessMove move) {
@@ -31,6 +31,7 @@ public class UserGameCommand {
         this.authToken = authToken;
         this.gameID = gameID;
         this.move = move;
+        this.username = null;
     }
 
 
@@ -55,6 +56,10 @@ public class UserGameCommand {
 
     public ChessMove getMove() {
         return move;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     @Override
