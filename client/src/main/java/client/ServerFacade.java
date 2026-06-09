@@ -25,6 +25,10 @@ public class ServerFacade {
         serverUrl = "http://localhost:" + port;
     }
 
+    public String getServerUrl() {
+        return serverUrl;
+    }
+
     public void register(RegisterRequest registerRequest) throws ResponseException {
         HttpRequest request = buildRequest("POST", "/user", null, registerRequest);
         HttpResponse<String> response = sendRequest(request);

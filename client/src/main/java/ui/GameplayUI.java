@@ -30,7 +30,7 @@ public class GameplayUI {
     private final String errorColor = SET_TEXT_COLOR_RED;
     private final String defaultColor = RESET_TEXT_COLOR;
 
-    public GameplayUI(ServerFacade server, GameData gameData, String teamColor) {
+    public GameplayUI(String serverURL, GameData gameData, String teamColor) {
         this.server = server;
         this.gamedata = gameData;
         this.chessGame = gameData.game();
