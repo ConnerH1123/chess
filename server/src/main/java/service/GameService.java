@@ -99,12 +99,12 @@ public class GameService extends Authorizable {
     private void validatePlayerColor(GameData gameData, String playerColor, String username) throws DataAccessException {
         switch (playerColor) {
             case "WHITE" -> {
-                if (!Objects.equals(gameData.whiteUsername(), username)) {
+                if (!Objects.equals(gameData.whiteUsername(), null) && !Objects.equals(gameData.whiteUsername(), username)) {
                     throw new AlreadyTakenException("Error: user already taken");
                 }
             }
             case "BLACK" -> {
-                if (!Objects.equals(gameData.blackUsername(), username)) {
+                if (!Objects.equals(gameData.blackUsername(), null) &&!Objects.equals(gameData.blackUsername(), username)) {
                     throw new AlreadyTakenException("Error: user already taken");
                 }
             }
