@@ -1,9 +1,13 @@
 package ui;
 
 import chess.ChessGame;
+import client.ResponseException;
 import client.ServerFacade;
 import model.GameData;
 import request.*;
+import websocket.ServerMessageHandler;
+import websocket.WebSocketFacade;
+import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
 
@@ -12,10 +16,12 @@ import static chess.ChessGame.TeamColor.WHITE;
 import static ui.DrawBoard.drawBoard;
 import static ui.EscapeSequences.*;
 
-public class GameplayUI {
+public class GameplayUI implements ServerMessageHandler {
+    private WebSocketFacade ws = null;
     private final GameData gamedata;
     private final ChessGame chessGame;
     private final String teamColor;
+    private final String username;
 
     private final String border = SET_BG_COLOR_BLACK;
     private final String text = RESET_TEXT_COLOR;
@@ -30,9 +36,19 @@ public class GameplayUI {
     private final String defaultColor = RESET_TEXT_COLOR;
 
     public GameplayUI(String serverURL, GameData gameData, String teamColor) {
+        try {
+            this.ws = new WebSocketFacade(serverURL, this);
+        } catch (ResponseException e) {
+            System.out.println(errorColor + "Error. Unable to connect with chess game: " + e + defaultColor);
+        }
         this.gamedata = gameData;
         this.chessGame = gameData.game();
         this.teamColor = teamColor;
+        username = switch (teamColor) {
+            case "WHITE" -> gameData.whiteUsername();
+            case "BLACK" -> gameData.blackUsername();
+            default -> null;
+        };
     }
 
     public String start() {
@@ -40,7 +56,7 @@ public class GameplayUI {
         System.out.println(help());
         Scanner scanner = new Scanner(System.in);
         String result = "";
-        while (!result.equals("Exiting...") && !result.equals("Leaving...")) {
+        while (!result.equals("Exiting...") && !result.equals("Leaving...") && (ws != null)) {
             System.out.print(inputColor + "[GAMEPLAY] >>> " + defaultColor);
             String line = scanner.nextLine();
             result = eval(line);
@@ -52,16 +68,20 @@ public class GameplayUI {
     private String eval(String input) {
         String[] tokens = input.toLowerCase().split(" ");
         String cmd = (tokens.length > 0) ? tokens[0] : "help";
-        return switch (cmd) {
-            case "redraw" -> redraw();
-            case "leave" -> leave();
-            case "quit" -> "Exiting...";
-            case "help" -> help();
-            default -> {
-                System.out.print("'" + cmd + "' was not a recognized command. ");
-                yield help();
-            }
-        };
+        try {
+            return switch (cmd) {
+                case "redraw" -> redraw();
+                case "leave" -> leave();
+                case "quit" -> "Exiting...";
+                case "help" -> help();
+                default -> {
+                    System.out.print("'" + cmd + "' was not a recognized command. ");
+                    yield help();
+                }
+            };
+        } catch (ResponseException e) {
+            return errorColor + e.getMessage() + "\n" + defaultColor;
+        }
     }
 
     private String redraw() {
@@ -79,8 +99,8 @@ public class GameplayUI {
         return String.format("%s to move\n", chessGame.getTeamTurn().toString());
     }
 
-    private String leave() {
-        LeaveRequest leaveRequest = new LeaveRequest(null, gamedata.gameID(), teamColor);
+    private String leave() throws ResponseException {
+        ws.leave(null, gamedata.gameID(), username);
         return "Leaving...";
     }
 
@@ -92,5 +112,9 @@ public class GameplayUI {
                   quit - playing chess
                   help - with possible commands
                 """ + defaultColor;
+    }
+
+    @Override
+    public void notify(ServerMessage serverMessage) {
     }
 }
