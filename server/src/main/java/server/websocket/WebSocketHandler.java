@@ -36,14 +36,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             switch (command.getCommandType()) {
                 case CONNECT -> connect(command.getGameID(), command.getUsername(), ctx.session);
                 case LEAVE -> leave(command.getGameID(), command.getUsername(), ctx.session);
-                case MAKE_MOVE -> move(command.getGameID(), command.getAuthToken(), command.getMove(), ctx.session);
+                case MAKE_MOVE -> move(command.getGameID(), command.getAuthToken(), command.getMove());
                 case RESIGN -> resign(command.getGameID(), command.getAuthToken(), command.getUsername(), ctx.session);
             }
         } catch (DataAccessException e) {
             try {
                 String msg = e.getMessage();
                 ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, msg);
-                connectionManager.broadcast(command.getGameID(), ctx.session, serverMessage);
+                connectionManager.notifyClient(command.getGameID(), ctx.session, serverMessage);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -71,9 +71,27 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         connectionManager.broadcast(gameID, session, serverMessage);
     }
 
-    private void move(int gameID, String authToken, ChessMove move, Session session) throws DataAccessException {
+    private void move(int gameID, String authToken, ChessMove move) throws DataAccessException, IOException {
         UpdateRequest updateRequest = new UpdateRequest(authToken, gameID, move, false);
         gameService.update(updateRequest);
+        String msg = moveToString(move);
+        ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, msg);
+        connectionManager.broadcast(gameID, null, serverMessage);
+    }
+
+    private String moveToString(ChessMove move) {
+        String[] rank = {"1", "2", "3", "4", "5", "6", "7", "8"};
+        String[] file = {"a", "b", "c", "d", "e", "f", "g", "h"};
+
+        String startRank = rank[move.getStartPosition().getRow()-1];
+        String startFile = file[move.getStartPosition().getColumn()-1];
+        String start = startFile + startRank;
+
+        String endRank = rank[move.getEndPosition().getRow()-1];
+        String endFile = file[move.getEndPosition().getColumn()-1];
+        String end = endFile + endRank;
+
+        return start + " " + end;
     }
 
     private void resign(int gameID, String authToken, String username, Session session) throws DataAccessException, IOException {
