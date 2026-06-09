@@ -1,5 +1,6 @@
 package service;
 
+import chess.*;
 import dataaccess.*;
 import model.*;
 import request.*;
@@ -37,7 +38,7 @@ public class GameService extends Authorizable {
         if (gameData == null) {
             throw new BadRequestException("Error: gameID does not exist");
         }
-        validatePlayerColor(gameData, playerColor);
+        validatePlayerColor(gameData, playerColor, username);
         gameDAO.updateGame(gameID, playerColor, username);
     }
 
@@ -54,6 +55,23 @@ public class GameService extends Authorizable {
         if (playerColor != null) {
             gameDAO.updateGame(gameID, playerColor, null);
         }
+    }
+
+    public void update(UpdateRequest r) throws DataAccessException {
+        authorize(r.authToken());
+        int gameID = r.gameID();
+        GameData gameData = gameDAO.getGame(gameID);
+        if (gameData == null) {
+            throw new BadRequestException("Error: gameID does not exist");
+        }
+        ChessMove move = r.move();
+        ChessGame game = gameData.game();
+        try {
+            game.makeMove(move);
+        } catch (InvalidMoveException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+        gameDAO.updateGame(gameID, game);
     }
 
     private void validatePlayerColor(GameData gameData, String playerColor) throws DataAccessException {
@@ -76,12 +94,12 @@ public class GameService extends Authorizable {
         switch (playerColor) {
             case "WHITE" -> {
                 if (!Objects.equals(gameData.whiteUsername(), username)) {
-                    throw new AlreadyTakenException("Error: in use by other user");
+                    throw new AlreadyTakenException("Error: user already taken");
                 }
             }
             case "BLACK" -> {
                 if (!Objects.equals(gameData.blackUsername(), username)) {
-                    throw new AlreadyTakenException("Error: in use by other user");
+                    throw new AlreadyTakenException("Error: user already taken");
                 }
             }
             case null -> {
