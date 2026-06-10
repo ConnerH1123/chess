@@ -33,6 +33,7 @@ public class GameplayUI implements ServerMessageHandler {
     private final String inputColor = SET_TEXT_COLOR_BLUE;
     private final String outputColor = RESET_TEXT_COLOR;
     private final String errorColor = SET_TEXT_COLOR_RED;
+    private final String messageColor = SET_TEXT_COLOR_YELLOW;
     private final String defaultColor = RESET_TEXT_COLOR;
 
     public GameplayUI(String serverURL, GameData gameData, String teamColor) {
@@ -52,17 +53,14 @@ public class GameplayUI implements ServerMessageHandler {
         }
     }
 
+    String prompt = "[GAMEPLAY] >>> ";
     public String start() {
         System.out.println(redraw());
         System.out.println(help());
-        return repl();
-    }
-
-    private String repl() {
         Scanner scanner = new Scanner(System.in);
         String result = "";
         while (!result.equals("Exiting...") && !result.equals("Leaving...") && (ws != null)) {
-            System.out.print(inputColor + "[GAMEPLAY] >>> " + defaultColor);
+            System.out.print(inputColor + prompt + defaultColor);
             String line = scanner.nextLine();
             result = eval(line);
             System.out.println(result);
@@ -121,6 +119,9 @@ public class GameplayUI implements ServerMessageHandler {
 
     @Override
     public void notify(ServerMessage serverMessage) {
-        System.out.println(inputColor + serverMessage.getMessage() + defaultColor);
+        System.out.print("\033[2K\r");
+        System.out.flush();
+        System.out.println(messageColor + serverMessage.getMessage() + defaultColor);
+        System.out.print(inputColor + prompt + defaultColor);
     }
 }
