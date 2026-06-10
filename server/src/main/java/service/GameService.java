@@ -58,7 +58,6 @@ public class GameService extends Authorizable {
     }
 
     public void update(UpdateRequest r) throws DataAccessException {
-        System.out.println("DEBUG: Entering update method in GameService");
         authorize(r.authToken());
         int gameID = r.gameID();
         GameData gameData = gameDAO.getGame(gameID);
@@ -71,7 +70,6 @@ public class GameService extends Authorizable {
         if (resignStatus) {
             game.resign();
         }
-        System.out.println("DEBUG: Making move...");
         try {
             if (move != null) {
                 game.makeMove(move);
@@ -79,9 +77,7 @@ public class GameService extends Authorizable {
         } catch (InvalidMoveException e) {
             throw new BadRequestException(e.getMessage());
         }
-        System.out.println("DEBUG: Move made successfully. Updating database...");
         gameDAO.updateGame(gameID, game);
-        System.out.println("DEBUG: Database updated successfully");
     }
 
     private void validatePlayerColor(GameData gameData, String playerColor) throws DataAccessException {

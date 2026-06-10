@@ -25,14 +25,10 @@ public class SqlDatabase {
     }
 
     int updateDatabase(String statement, Object... params) throws DataAccessException {
-        System.out.println("DEBUG: updateDatabase method in SqlDatabase accessed");
         try (Connection connection = DatabaseManager.getConnection()) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                System.out.println("DEBUG: Loading parameters...");
                 loadParametersIntoStatement(preparedStatement, params);
-                System.out.println("DEBUG: Parameters loaded. Statement is: " + statement + ". Executing statement...");
                 preparedStatement.executeUpdate();
-                System.out.println("DEBUG: Statement executed");
                 ResultSet rs = preparedStatement.getGeneratedKeys();
                 if (rs.next()) {
                     return rs.getInt(1);
@@ -47,7 +43,6 @@ public class SqlDatabase {
     private void loadParametersIntoStatement(PreparedStatement preparedStatement, Object... params) throws SQLException {
         for (int i = 0; i < params.length; i++) {
             Object param = params[i];
-            System.out.println("DEBUG: Current param: " + param);
             switch (param) {
                 case String p -> preparedStatement.setString(i + 1, p);
                 case Integer p -> preparedStatement.setInt(i + 1, p);

@@ -104,15 +104,12 @@ public class MySqlGameDAO extends SqlDatabase implements GameDAO {
 
     @Override
     public void updateGame(int gameID, ChessGame updatedGame) throws DataAccessException {
-        System.out.println("DEBUG: updateGame method in MySqlGameDAO accessed");
         if (gameID < 0 || gameID > size) {
             throw new DataAccessException("Error: gameID outside of bounds");
         }
         String statement = "UPDATE " + tableName + " SET json=? WHERE gameID=?";
         String json = new Gson().toJson(updatedGame);
-        System.out.println("DEBUG: updating database...");
         updateDatabase(statement, json, gameID);
-        System.out.println("DEBUG: Database updated successfully");
     }
 
     @Override
