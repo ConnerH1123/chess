@@ -36,11 +36,6 @@ public class GameplayUI implements ServerMessageHandler {
     private final String defaultColor = RESET_TEXT_COLOR;
 
     public GameplayUI(String serverURL, GameData gameData, String teamColor) {
-        try {
-            this.ws = new WebSocketFacade(serverURL, this);
-        } catch (ResponseException e) {
-            System.out.println(errorColor + "Error. Unable to connect with chess game: " + e + defaultColor);
-        }
         this.gamedata = gameData;
         this.chessGame = gameData.game();
         this.teamColor = teamColor;
@@ -49,11 +44,21 @@ public class GameplayUI implements ServerMessageHandler {
             case "BLACK" -> gameData.blackUsername();
             default -> null;
         };
+        try {
+            this.ws = new WebSocketFacade(serverURL, this);
+            ws.connect(gameData.gameID(), username);
+        } catch (ResponseException e) {
+            System.out.println(errorColor + "Unable to connect with websocket: " + e + defaultColor);
+        }
     }
 
     public String start() {
         System.out.println(redraw());
         System.out.println(help());
+        return repl();
+    }
+
+    private String repl() {
         Scanner scanner = new Scanner(System.in);
         String result = "";
         while (!result.equals("Exiting...") && !result.equals("Leaving...") && (ws != null)) {
@@ -100,7 +105,7 @@ public class GameplayUI implements ServerMessageHandler {
     }
 
     private String leave() throws ResponseException {
-        ws.leave(null, gamedata.gameID(), username);
+        ws.leave(gamedata.gameID(), username);
         return "Leaving...";
     }
 
@@ -116,5 +121,6 @@ public class GameplayUI implements ServerMessageHandler {
 
     @Override
     public void notify(ServerMessage serverMessage) {
+        System.out.println(inputColor + serverMessage.getMessage() + defaultColor);
     }
 }

@@ -25,7 +25,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     @Override
     public void handleConnect(@NotNull WsConnectContext ctx) {
-        System.out.println("DEBUG: Websocket connected");
+        System.out.println("Websocket connected");
         ctx.enableAutomaticPings();
     }
 
@@ -54,7 +54,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     @Override
     public void handleClose(@NotNull WsCloseContext ctx) {
-        System.out.println("DEBUG: Websocket closed");
+        System.out.println("Websocket closed");
     }
 
     private void connect(int gameID, String username, Session session) throws IOException {
