@@ -111,7 +111,7 @@ public class MySqlGameDAO extends SqlDatabase implements GameDAO {
         String statement = "UPDATE " + tableName + " SET json=? WHERE gameID=?";
         String json = new Gson().toJson(updatedGame);
         System.out.println("DEBUG: updating database...");
-        updateDatabase(statement, gameID, json);
+        updateDatabase(statement, json, gameID);
         System.out.println("DEBUG: Database updated successfully");
     }
 
