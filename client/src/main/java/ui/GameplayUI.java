@@ -54,7 +54,7 @@ public class GameplayUI implements ServerMessageHandler {
     }
 
     String prompt = "[GAMEPLAY] >>> ";
-    public String start() {
+    public String start(String authToken) {
         System.out.println(redraw());
         System.out.println(help());
         Scanner scanner = new Scanner(System.in);

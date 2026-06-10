@@ -29,20 +29,22 @@ public class ServerFacade {
         return serverUrl;
     }
 
-    public void register(RegisterRequest registerRequest) throws ResponseException {
+    public String register(RegisterRequest registerRequest) throws ResponseException {
         HttpRequest request = buildRequest("POST", "/user", null, registerRequest);
         HttpResponse<String> response = sendRequest(request);
         RegisterResult registerResult = handleResponse(response, RegisterResult.class);
         assert registerResult != null;
         authToken = registerResult.authToken();
+        return authToken;
     }
 
-    public void login(LoginRequest loginRequest) throws ResponseException {
+    public String login(LoginRequest loginRequest) throws ResponseException {
         HttpRequest request = buildRequest("POST", "/session", null, loginRequest);
         HttpResponse<String> response = sendRequest(request);
         LoginResult loginResult = handleResponse(response, LoginResult.class);
         assert loginResult != null;
         authToken = loginResult.authToken();
+        return authToken;
     }
 
     public void logout() throws ResponseException {

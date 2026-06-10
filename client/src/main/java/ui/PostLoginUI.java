@@ -27,7 +27,7 @@ public class PostLoginUI {
         this.server = server;
     }
 
-    public String start() {
+    public String start(String authToken) {
         System.out.println(help());
         Scanner scanner = new Scanner(System.in);
         String result = "";
@@ -41,7 +41,7 @@ public class PostLoginUI {
                 System.out.println(result);
                 if (chessGame != null) {
                     GameplayUI ui = new GameplayUI(server.getServerUrl(), chessGame, teamColor);
-                    result = ui.start();
+                    result = ui.start(authToken);
                 }
             } catch (Exception e) {
                 System.out.println(errorColor + "System error. Error message: " + e.getMessage() + defaultColor);

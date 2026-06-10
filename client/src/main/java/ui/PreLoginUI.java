@@ -12,6 +12,8 @@ import static ui.EscapeSequences.*;
 public class PreLoginUI {
     private final ServerFacade server;
     private boolean isLoggedIn = false;
+    private String authToken = null;
+
     private final String inputColor = SET_TEXT_COLOR_BLUE;
     private final String outputColor = RESET_TEXT_COLOR;
     private final String errorColor = SET_TEXT_COLOR_RED;
@@ -27,6 +29,7 @@ public class PreLoginUI {
         String result = " ";
         while (!result.equals("Exiting chess server...") && !result.equals("Exiting...")) {
             try {
+                authToken = null;
                 isLoggedIn = false;
                 System.out.print(inputColor + "[LOGGED_OUT] >>> " + defaultColor);
                 String line = scanner.nextLine();
@@ -34,7 +37,7 @@ public class PreLoginUI {
                 System.out.println(result);
                 if (isLoggedIn) {
                     PostLoginUI ui = new PostLoginUI(server);
-                    result = ui.start();
+                    result = ui.start(authToken);
                     System.out.println(outputColor + "Successfully logged out" + defaultColor);
                 }
             } catch (Exception e) {
@@ -69,7 +72,7 @@ public class PreLoginUI {
             String password = params[1];
             String email = params[2];
             RegisterRequest request = new RegisterRequest(username, password, email);
-            server.register(request);
+            authToken = server.register(request);
             isLoggedIn = true;
             return String.format(outputColor + "User %s successfully registered" + defaultColor, username);
         }
@@ -81,7 +84,7 @@ public class PreLoginUI {
             String username = params[0];
             String password = params[1];
             LoginRequest request = new LoginRequest(username, password);
-            server.login(request);
+            authToken = server.login(request);
             isLoggedIn = true;
             return String.format(outputColor + "User %s successfully logged in" + defaultColor, username);
         }
