@@ -9,6 +9,7 @@ import websocket.ServerMessageHandler;
 import websocket.WebSocketFacade;
 import websocket.messages.ServerMessage;
 
+import java.util.Arrays;
 import java.util.Scanner;
 
 import static chess.ChessGame.TeamColor.BLACK;
@@ -22,6 +23,7 @@ public class GameplayUI implements ServerMessageHandler {
     private final ChessGame chessGame;
     private final String teamColor;
     private final String username;
+    private String authToken = null;
 
     private final String border = SET_BG_COLOR_BLACK;
     private final String text = RESET_TEXT_COLOR;
@@ -55,6 +57,7 @@ public class GameplayUI implements ServerMessageHandler {
 
     String prompt = "[GAMEPLAY] >>> ";
     public String start(String authToken) {
+        this.authToken = authToken;
         System.out.println(redraw());
         System.out.println(help());
         Scanner scanner = new Scanner(System.in);
@@ -71,9 +74,11 @@ public class GameplayUI implements ServerMessageHandler {
     private String eval(String input) {
         String[] tokens = input.toLowerCase().split(" ");
         String cmd = (tokens.length > 0) ? tokens[0] : "help";
+        String[] params = (!cmd.equals("help")) ? Arrays.copyOfRange(tokens, 1, tokens.length) : null;
         try {
             return switch (cmd) {
                 case "redraw" -> redraw();
+                case "move" -> move(params);
                 case "leave" -> leave();
                 case "quit" -> "Exiting...";
                 case "help" -> help();
@@ -107,7 +112,7 @@ public class GameplayUI implements ServerMessageHandler {
         return "Leaving...";
     }
 
-    private String move(String authToken, String... params) throws ResponseException {
+    private String move(String... params) throws ResponseException {
         if (params.length >= 2) {
             ChessMove tempMove = stringToChessMove(params[0], params[1]);
             ChessMove move = includePromotion(tempMove);
@@ -208,7 +213,14 @@ public class GameplayUI implements ServerMessageHandler {
     public void notify(ServerMessage serverMessage) {
         System.out.print("\033[2K\r");
         System.out.flush();
-        System.out.println(messageColor + serverMessage.getMessage() + defaultColor);
+        switch (serverMessage.getServerMessageType()) {
+            case NOTIFICATION -> System.out.println(messageColor + serverMessage.getMessage() + defaultColor);
+            case ERROR -> System.out.println(errorColor + serverMessage.getMessage() + defaultColor);
+            case LOAD_GAME -> {
+                System.out.println(messageColor + serverMessage.getMessage() + defaultColor);
+                redraw();
+            }
+        }
         System.out.print(inputColor + prompt + defaultColor);
     }
 }
