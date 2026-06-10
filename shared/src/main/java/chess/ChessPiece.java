@@ -206,7 +206,7 @@ public class ChessPiece {
     /**
      * e.g. returns true if PAWN is BLACK and on the 1st rank
      */
-    private boolean isPromotionRank(ChessPosition position) {
+    public boolean isPromotionRank(ChessPosition position) {
         return switch (theColor) {
             case WHITE -> position.getRow() == 8;
             case BLACK -> position.getRow() == 1;

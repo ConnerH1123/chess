@@ -1,6 +1,6 @@
 package ui;
 
-import chess.ChessGame;
+import chess.*;
 import client.ResponseException;
 import client.ServerFacade;
 import model.GameData;
@@ -107,10 +107,97 @@ public class GameplayUI implements ServerMessageHandler {
         return "Leaving...";
     }
 
+    private String move(String authToken, String... params) throws ResponseException {
+        if (params.length >= 2) {
+            ChessMove tempMove = stringToChessMove(params[0], params[1]);
+            ChessMove move = includePromotion(tempMove);
+            ws.makeMove(authToken, gamedata.gameID(), move);
+        }
+        return params[0] + " moved to " + params[1];
+    }
+
+    private ChessMove stringToChessMove(String start, String end) throws ResponseException {
+        validateStringLength(start);
+        validateStringLength(end);
+        int startColumn = fileToInt(start.substring(0,1));
+        int startRow = rankToInt(start.substring(1));
+        int endColumn = fileToInt(end.substring(0,1));
+        int endRow = rankToInt(end.substring(1));
+        ChessPosition startPos = new ChessPosition(startRow, startColumn);
+        ChessPosition endPos = new ChessPosition(endRow, endColumn);
+        return new ChessMove(startPos, endPos, null);
+    }
+
+    private void validateStringLength(String str) throws ResponseException {
+        int size = 2;
+        if (str.length() != size) {
+            throw new ResponseException("Error: Expected character count of " + str + " was " + size);
+        }
+    }
+
+    private int fileToInt(String str) throws ResponseException {
+        String columns = "abcdefgh";
+        if (!columns.contains(str)) {
+            throw new ResponseException("Error: " + str + " is not a recognized column");
+        }
+        return columns.indexOf(str);
+    }
+
+    private int rankToInt(String str) throws ResponseException {
+        int row;
+        try {
+            row = Integer.parseInt(str);
+        } catch (Exception e) {
+            throw new ResponseException("Error: " + str + " is not a recognized row");
+        }
+        if (row < 1 || row > 8) {
+            throw new ResponseException("Error: " + str + " is not a recognized row");
+        }
+        return row;
+    }
+
+    private ChessMove includePromotion(ChessMove move) {
+        ChessBoard board = chessGame.getBoard();
+        ChessPiece piece = board.getPiece(move.getStartPosition());
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN && piece.isPromotionRank(move.getStartPosition())) {
+            ChessPiece.PieceType promotionPiece = promptPromotion();
+            return new ChessMove(move.getStartPosition(), move.getEndPosition(), promotionPiece);
+        }
+        return move;
+    }
+
+    private ChessPiece.PieceType promptPromotion() {
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.print(inputColor + "Select promotion piece: [Q]ueen, [R]ook, [B]ishop, K[N]ight >>> " + defaultColor);
+            String line = scanner.nextLine();
+            String[] tokens = line.toLowerCase().split(" ");
+            String piece = (tokens.length > 0) ? tokens[0] : "";
+            switch (piece) {
+                case "q" -> {
+                    return ChessPiece.PieceType.QUEEN;
+                }
+                case "r" -> {
+                    return ChessPiece.PieceType.ROOK;
+                }
+                case "b" -> {
+                    return ChessPiece.PieceType.BISHOP;
+                }
+                case "n" -> {
+                    return ChessPiece.PieceType.KNIGHT;
+                }
+            }
+            System.out.println(errorColor + "Error: unrecognized piece" + defaultColor);
+        }
+    }
+
     private String help() {
         return outputColor + """
                 These are your options:
                   redraw - the board
+                  highlight <SQUARE> - a piece's legal moves
+                  move <START_SQUARE> <END_SQUARE> - a piece
+                  resign - the game
                   leave - the game
                   quit - playing chess
                   help - with possible commands
