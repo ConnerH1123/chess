@@ -18,9 +18,10 @@ import static ui.DrawBoard.drawBoard;
 import static ui.EscapeSequences.*;
 
 public class GameplayUI implements ServerMessageHandler {
+    private final ServerFacade server;
     private WebSocketFacade ws = null;
-    private final GameData gamedata;
-    private final ChessGame chessGame;
+    private GameData gamedata;
+    private ChessGame chessGame;
     private final String teamColor;
     private final String username;
     private String authToken = null;
@@ -38,7 +39,8 @@ public class GameplayUI implements ServerMessageHandler {
     private final String messageColor = SET_TEXT_COLOR_YELLOW;
     private final String defaultColor = RESET_TEXT_COLOR;
 
-    public GameplayUI(String serverURL, GameData gameData, String teamColor) {
+    public GameplayUI(ServerFacade server, GameData gameData, String teamColor) {
+        this.server = server;
         this.gamedata = gameData;
         this.chessGame = gameData.game();
         this.teamColor = teamColor;
@@ -48,7 +50,7 @@ public class GameplayUI implements ServerMessageHandler {
             default -> null;
         };
         try {
-            this.ws = new WebSocketFacade(serverURL, this);
+            this.ws = new WebSocketFacade(server.getServerUrl(), this);
             ws.connect(gameData.gameID(), username);
         } catch (ResponseException e) {
             System.out.println(errorColor + "Unable to connect with websocket: " + e + defaultColor);
@@ -93,6 +95,7 @@ public class GameplayUI implements ServerMessageHandler {
     }
 
     private String redraw() {
+        chessGame = gamedata.game();
         ChessGame.TeamColor color;
         if (teamColor == null) {
             color = WHITE;
@@ -218,6 +221,11 @@ public class GameplayUI implements ServerMessageHandler {
             case ERROR -> System.out.println(errorColor + serverMessage.getMessage() + defaultColor);
             case LOAD_GAME -> {
                 System.out.println(messageColor + serverMessage.getMessage() + defaultColor);
+                try {
+                    gamedata = server.listGames()[gamedata.gameID()-1];
+                } catch (ResponseException e) {
+                    System.out.println(errorColor + e + defaultColor);
+                }
                 redraw();
             }
         }

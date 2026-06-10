@@ -40,7 +40,7 @@ public class PostLoginUI {
                 result = eval(line);
                 System.out.println(result);
                 if (chessGame != null) {
-                    GameplayUI ui = new GameplayUI(server.getServerUrl(), chessGame, teamColor);
+                    GameplayUI ui = new GameplayUI(server, chessGame, teamColor);
                     result = ui.start(authToken);
                 }
             } catch (Exception e) {
