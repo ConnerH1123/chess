@@ -148,7 +148,7 @@ public class GameplayUI implements ServerMessageHandler {
         if (!columns.contains(str)) {
             throw new ResponseException("Error: " + str + " is not a recognized column");
         }
-        return columns.indexOf(str);
+        return columns.indexOf(str) + 1;
     }
 
     private int rankToInt(String str) throws ResponseException {
@@ -167,7 +167,7 @@ public class GameplayUI implements ServerMessageHandler {
     private ChessMove includePromotion(ChessMove move) {
         ChessBoard board = chessGame.getBoard();
         ChessPiece piece = board.getPiece(move.getStartPosition());
-        if (piece.getPieceType() == ChessPiece.PieceType.PAWN && piece.isPromotionRank(move.getStartPosition())) {
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN && piece.isPromotionRank(move.getEndPosition())) {
             ChessPiece.PieceType promotionPiece = promptPromotion();
             return new ChessMove(move.getStartPosition(), move.getEndPosition(), promotionPiece);
         }
@@ -217,6 +217,7 @@ public class GameplayUI implements ServerMessageHandler {
         System.out.print("\033[2K\r");
         System.out.flush();
         switch (serverMessage.getServerMessageType()) {
+            // DEBUG: When someone joins the game for the first time, their username pops up as null
             case NOTIFICATION -> System.out.println(messageColor + serverMessage.getMessage() + defaultColor);
             case ERROR -> System.out.println(errorColor + serverMessage.getMessage() + defaultColor);
             case LOAD_GAME -> {
@@ -227,6 +228,7 @@ public class GameplayUI implements ServerMessageHandler {
                     System.out.println(errorColor + e + defaultColor);
                 }
                 redraw();
+                System.out.println();
             }
         }
         System.out.print(inputColor + prompt + defaultColor);
