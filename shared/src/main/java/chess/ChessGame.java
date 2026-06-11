@@ -222,8 +222,14 @@ public class ChessGame {
 
     private GameStatus gameStatus = GameStatus.ONGOING;
 
-    public GameStatus getGameStatus() {
-        return gameStatus;
+    public String gameStatusToString() {
+        return switch (gameStatus) {
+            case ONGOING -> String.format("%s to move", teamTurn.toString());
+            case CHECK -> String.format("Check! %s to move", teamTurn.toString());
+            case RESIGNED -> String.format("Game over. %s resigned", teamTurn.toString());
+            case CHECKMATE -> String.format("Game over. %s checkmated", teamTurn.toString());
+            case STALEMATE -> "Game over. Stalemate";
+        };
     }
 
     private void updateGameStatus() {
@@ -233,6 +239,9 @@ public class ChessGame {
         else if (isInStalemate(teamTurn)) {
             gameStatus = GameStatus.STALEMATE;
         }
+        else if (isInCheck(teamTurn)) {
+            gameStatus = GameStatus.CHECK;
+        }
     }
 
     public void resign() {
@@ -241,6 +250,7 @@ public class ChessGame {
 
     public enum GameStatus {
         ONGOING,
+        CHECK,
         CHECKMATE,
         STALEMATE,
         RESIGNED

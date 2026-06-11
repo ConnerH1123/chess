@@ -9,7 +9,6 @@ import websocket.ServerMessageHandler;
 import websocket.WebSocketFacade;
 import websocket.messages.ServerMessage;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Scanner;
@@ -84,8 +83,12 @@ public class GameplayUI implements ServerMessageHandler {
                 case "redraw" -> redraw();
                 case "highlight" -> highlight(params);
                 case "move" -> move(params);
+                case "resign" -> resign();
                 case "leave" -> leave();
-                case "quit" -> "Exiting...";
+                case "quit" -> {
+                    ws.leave(gamedata.gameID(), username);
+                    yield "Exiting...";
+                }
                 case "help" -> help();
                 default -> {
                     System.out.print("'" + cmd + "' was not a recognized command. ");
@@ -101,7 +104,7 @@ public class GameplayUI implements ServerMessageHandler {
         chessGame = gamedata.game();
         ChessGame.TeamColor color = getColor();
         drawBoard(chessGame.getBoard(), color, border, text, lightSquares, darkSquares, whitePieces, blackPieces);
-        return String.format("%s to move\n", chessGame.getTeamTurn().toString());
+        return chessGame.gameStatusToString() + "\n";
     }
 
     private String redraw(ChessMove move) {
@@ -109,7 +112,7 @@ public class GameplayUI implements ServerMessageHandler {
         ChessGame.TeamColor color = getColor();
         String moveColor = SET_BG_COLOR_BLUE;
         drawBoard(chessGame.getBoard(), color, border, text, lightSquares, darkSquares, whitePieces, blackPieces, moveColor, move);
-        return String.format("%s to move\n", chessGame.getTeamTurn().toString());
+        return chessGame.gameStatusToString() + "\n";
     }
 
     private ChessGame.TeamColor getColor() {
@@ -138,7 +141,7 @@ public class GameplayUI implements ServerMessageHandler {
         String moveColor = SET_BG_COLOR_YELLOW;
         String captureColor = SET_TEXT_COLOR_RED;
         drawBoard(board, color, border, text, lightSquares, darkSquares, whitePieces, blackPieces, moveColor, startColor, captureColor, moves);
-        return String.format("%s to move\n", chessGame.getTeamTurn().toString());
+        return chessGame.gameStatusToString() + "\n";
     }
 
     private ChessPosition stringToPosition(String str) throws ResponseException {
@@ -158,6 +161,9 @@ public class GameplayUI implements ServerMessageHandler {
         if (params.length >= 2) {
             ChessMove tempMove = stringToChessMove(params[0], params[1]);
             ChessMove move = includePromotion(tempMove);
+//            if (chessGame.getBoard().getPiece(move.getStartPosition()).getTeamColor() != getColor()) {
+//                throw new ResponseException("Error: move can't be made for opponent");
+//            }
             ws.makeMove(authToken, gamedata.gameID(), move);
             return params[0] + " moved to " + params[1];
         }
@@ -233,6 +239,11 @@ public class GameplayUI implements ServerMessageHandler {
             }
             System.out.println(errorColor + "Error: unrecognized piece" + defaultColor);
         }
+    }
+
+    private String resign() throws ResponseException {
+        ws.resign(authToken, gamedata.gameID(), username);
+        return "Resigned";
     }
 
     private String help() {
