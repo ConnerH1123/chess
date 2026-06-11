@@ -161,9 +161,9 @@ public class GameplayUI implements ServerMessageHandler {
         if (params.length >= 2) {
             ChessMove tempMove = stringToChessMove(params[0], params[1]);
             ChessMove move = includePromotion(tempMove);
-//            if (chessGame.getBoard().getPiece(move.getStartPosition()).getTeamColor() != getColor()) {
-//                throw new ResponseException("Error: move can't be made for opponent");
-//            }
+            if (chessGame.getBoard().getPiece(move.getStartPosition()).getTeamColor() != getColor()) {
+                throw new ResponseException("Error: move can't be made for opponent");
+            }
             ws.makeMove(authToken, gamedata.gameID(), move);
             return "Moving piece...";
         }

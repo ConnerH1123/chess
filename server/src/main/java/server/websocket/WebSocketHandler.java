@@ -85,6 +85,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void leave(int gameID, String authToken, String username, Session session) throws IOException, DataAccessException {
+        if (username == null) {
+            username = gameService.getUsername(authToken);
+        }
         GameData gameData = getGameData(gameID, authToken);
         String playerColor = getUserColor(gameData, username);
         LeaveRequest r = new LeaveRequest(authToken, gameID, playerColor);
