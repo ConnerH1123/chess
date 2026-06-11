@@ -14,6 +14,7 @@ import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     private final ConnectionManager connectionManager = new ConnectionManager();
@@ -38,7 +39,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             switch (command.getCommandType()) {
                 case CONNECT -> connect(command.getGameID(), command.getAuthToken(), command.getUsername(), ctx.session);
                 case LEAVE -> leave(command.getGameID(), command.getUsername(), ctx.session);
-                case MAKE_MOVE -> move(command.getGameID(), command.getAuthToken(), command.getMove(), ctx.session);
+                case MAKE_MOVE -> move(command.getGameID(), command.getAuthToken(), command.getUsername(), command.getMove(), ctx.session);
                 case RESIGN -> resign(command.getGameID(), command.getAuthToken(), command.getUsername(), ctx.session);
             }
         } catch (DataAccessException e) {
@@ -70,12 +71,17 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private ChessGame getChessGame(int gameID, String authToken) throws DataAccessException {
+        GameData gameData = getGameData(gameID, authToken);
+        return gameData.game();
+    }
+
+    private GameData getGameData(int gameID, String authToken) throws DataAccessException {
         ListRequest r = new ListRequest(authToken);
         GameData[] games = gameService.list(r).games();
         if (gameID < 1 || gameID > games.length) {
             throw new DataAccessException("Error: invalid game ID");
         }
-        return games[gameID-1].game();
+        return games[gameID-1];
     }
 
     private void leave(int gameID, String username, Session session) throws IOException {
@@ -85,7 +91,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         connectionManager.broadcast(gameID, session, serverMessage);
     }
 
-    private void move(int gameID, String authToken, ChessMove move, Session session) throws DataAccessException, IOException {
+    private void move(int gameID, String authToken, String username, ChessMove move, Session session) throws DataAccessException, IOException {
+        validateUsername(gameID, authToken, username);
         UpdateRequest updateRequest = new UpdateRequest(authToken, gameID, move, false);
         gameService.update(updateRequest);
         ChessGame game = getChessGame(gameID, authToken);
@@ -106,6 +113,23 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             case CHECK -> {
                 ServerMessage message = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Check!");
                 connectionManager.broadcast(gameID, null, message);
+            }
+        }
+    }
+
+    private void validateUsername(int gameID, String authToken, String username) throws DataAccessException {
+        GameData gameData = getGameData(gameID, authToken);
+        ChessGame.TeamColor currentTurn = gameData.game().getTeamTurn();
+        switch (currentTurn) {
+            case WHITE -> {
+                if (!Objects.equals(gameData.whiteUsername(), username)) {
+                    throw new DataAccessException("Error: it is another player's turn");
+                }
+            }
+            case BLACK -> {
+                if (!Objects.equals(gameData.blackUsername(), username)) {
+                    throw new DataAccessException("Error: it is another player's turn");
+                }
             }
         }
     }
