@@ -99,9 +99,10 @@ public class PostLoginUI {
             if (game == null) {
                 break;
             }
-            sb.append(String.format(outputColor + "%d. %s (White: %s, Black: %s)\n" + defaultColor, index, game.gameName(),
+            sb.append(String.format(outputColor + "%d. %s (White: %s, Black: %s) Status: %s\n" + defaultColor, index, game.gameName(),
                                 (game.whiteUsername() != null) ? game.whiteUsername() : "N/A",
-                                (game.blackUsername() != null) ? game.blackUsername() : "N/A"));
+                                (game.blackUsername() != null) ? game.blackUsername() : "N/A",
+                                 game.game().whatIsGameStatus()));
             index++;
         }
         return sb.toString();

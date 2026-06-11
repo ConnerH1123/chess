@@ -200,7 +200,7 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         HashSet<ChessMove> legalMoves = (HashSet<ChessMove>) validMoves(move.getStartPosition());
         ChessPiece piece = chessboard.getPiece(move.getStartPosition());
-        if (legalMoves.contains(move) && piece.getTeamColor() == teamTurn && gameStatus == GameStatus.ONGOING) {
+        if (legalMoves.contains(move) && piece.getTeamColor() == teamTurn && (gameStatus == GameStatus.ONGOING || gameStatus == GameStatus.CHECK)) {
             chessboard.makeMove(move);
             changeTeamTurn();
             updateGameStatus();
@@ -221,6 +221,15 @@ public class ChessGame {
     }
 
     private GameStatus gameStatus = GameStatus.ONGOING;
+
+    public String whatIsGameStatus() {
+        if (gameStatus == GameStatus.CHECK || gameStatus == GameStatus.ONGOING) {
+            return "ONGOING";
+        }
+        else {
+            return "GAME OVER";
+        }
+    }
 
     public String gameStatusToString() {
         return switch (gameStatus) {

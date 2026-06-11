@@ -165,7 +165,7 @@ public class GameplayUI implements ServerMessageHandler {
 //                throw new ResponseException("Error: move can't be made for opponent");
 //            }
             ws.makeMove(authToken, gamedata.gameID(), move);
-            return params[0] + " moved to " + params[1];
+            return "Moving piece...";
         }
         else {
             throw new ResponseException("Error: Insufficient arguments. Expected <START_SQUARE> <END_SQUARE>");
