@@ -45,7 +45,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             try {
                 String msg = e.getMessage();
                 ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, msg);
-                connectionManager.notifyClient(command.getGameID(), ctx.session, serverMessage);
+                connectionManager.notifyClient(ctx.session, serverMessage);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -65,10 +65,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         if (gameID < 1 || gameID > games.length) {
             throw new DataAccessException("Error: invalid game ID");
         }
-        ChessGame game = games[gameID-1].game();
         connectionManager.add(gameID, session);
+        ChessGame game = games[gameID-1].game();
         ServerMessage clientMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, null, game);
-        connectionManager.notifyClient(gameID, session, clientMessage);
+        connectionManager.notifyClient(session, clientMessage);
         String msg = username + " has joined the game";
         ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg);
         connectionManager.broadcast(gameID, session, serverMessage);

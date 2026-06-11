@@ -42,15 +42,10 @@ public class ConnectionManager {
         }
     }
 
-    public void notifyClient(int gameID, Session client, ServerMessage serverMessage) throws IOException {
+    public void notifyClient(Session clientSession, ServerMessage serverMessage) throws IOException {
         String msg = serverMessage.toString();
-        ArrayList<Session> connection = connections.get(gameID);
-        if (connection != null) {
-            for (Session c : connection) {
-                if (c.isOpen() && c.equals(client)) {
-                    c.getRemote().sendString(msg);
-                }
-            }
+        if (clientSession != null && clientSession.isOpen()) {
+            clientSession.getRemote().sendString(msg);
         }
     }
 }
