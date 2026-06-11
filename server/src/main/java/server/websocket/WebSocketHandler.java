@@ -40,7 +40,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 case CONNECT -> connect(command.getGameID(), command.getAuthToken(), command.getUsername(), ctx.session);
                 case LEAVE -> leave(command.getGameID(), command.getUsername(), ctx.session);
                 case MAKE_MOVE -> move(command.getGameID(), command.getAuthToken(), command.getUsername(), command.getMove(), ctx.session);
-                case RESIGN -> resign(command.getGameID(), command.getAuthToken(), command.getUsername(), ctx.session);
+                case RESIGN -> resign(command.getGameID(), command.getAuthToken(), command.getUsername());
             }
         } catch (DataAccessException e) {
             try {
@@ -93,9 +93,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void move(int gameID, String authToken, String username, ChessMove move, Session session) throws DataAccessException, IOException {
         validateUsername(gameID, authToken, username);
+        ChessGame game = getChessGame(gameID, authToken);
+        validateGameState(game);
         UpdateRequest updateRequest = new UpdateRequest(authToken, gameID, move, false);
         gameService.update(updateRequest);
-        ChessGame game = getChessGame(gameID, authToken);
         ServerMessage loadGameMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
         connectionManager.broadcast(gameID, null, loadGameMessage);
         String moveMade = moveToString(move);
@@ -134,6 +135,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
+    private void validateGameState(ChessGame game) throws DataAccessException {
+        if (game.getGameStatus() == ChessGame.GameStatus.CHECKMATE
+                || game.getGameStatus() == ChessGame.GameStatus.STALEMATE
+                || game.getGameStatus() == ChessGame.GameStatus.RESIGNED) {
+            throw new DataAccessException("Error: game has ended");
+        }
+    }
+
     private String moveToString(ChessMove move) {
         String[] rank = {"1", "2", "3", "4", "5", "6", "7", "8"};
         String[] file = {"a", "b", "c", "d", "e", "f", "g", "h"};
@@ -149,11 +158,13 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         return start + " " + end;
     }
 
-    private void resign(int gameID, String authToken, String username, Session session) throws DataAccessException, IOException {
+    private void resign(int gameID, String authToken, String username) throws DataAccessException, IOException {
+        ChessGame game = getChessGame(gameID, authToken);
+        validateGameState(game);
         UpdateRequest updateRequest = new UpdateRequest(authToken, gameID, null, true);
         gameService.update(updateRequest);
         String msg = username + " has resigned";
         ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg);
-        connectionManager.broadcast(gameID, session, serverMessage);
+        connectionManager.broadcast(gameID, null, serverMessage);
     }
 }
