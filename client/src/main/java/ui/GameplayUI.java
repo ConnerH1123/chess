@@ -9,7 +9,9 @@ import websocket.ServerMessageHandler;
 import websocket.WebSocketFacade;
 import websocket.messages.ServerMessage;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Scanner;
 
 import static chess.ChessGame.TeamColor.BLACK;
@@ -80,6 +82,7 @@ public class GameplayUI implements ServerMessageHandler {
         try {
             return switch (cmd) {
                 case "redraw" -> redraw();
+                case "highlight" -> highlight(params);
                 case "move" -> move(params);
                 case "leave" -> leave();
                 case "quit" -> "Exiting...";
@@ -96,36 +99,55 @@ public class GameplayUI implements ServerMessageHandler {
 
     private String redraw() {
         chessGame = gamedata.game();
-        ChessGame.TeamColor color;
-        if (teamColor == null) {
-            color = WHITE;
-        }
-        else if (teamColor.equals("BLACK")) {
-            color = BLACK;
-        }
-        else {
-            color = WHITE;
-        }
+        ChessGame.TeamColor color = getColor();
         drawBoard(chessGame.getBoard(), color, border, text, lightSquares, darkSquares, whitePieces, blackPieces);
         return String.format("%s to move\n", chessGame.getTeamTurn().toString());
     }
 
     private String redraw(ChessMove move) {
         chessGame = gamedata.game();
-        ChessGame.TeamColor color;
+        ChessGame.TeamColor color = getColor();
         String moveColor = SET_BG_COLOR_BLUE;
-        if (teamColor == null) {
-            color = WHITE;
-        }
-        else if (teamColor.equals("BLACK")) {
-            color = BLACK;
-        }
-        else {
-            color = WHITE;
-        }
         drawBoard(chessGame.getBoard(), color, border, text, lightSquares, darkSquares, whitePieces, blackPieces, moveColor, move);
         return String.format("%s to move\n", chessGame.getTeamTurn().toString());
     }
+
+    private ChessGame.TeamColor getColor() {
+        if (teamColor == null) {
+            return WHITE;
+        }
+        else if (teamColor.equals("BLACK")) {
+            return BLACK;
+        }
+        else {
+            return WHITE;
+        }
+
+    }
+
+    private String highlight(String... params) throws ResponseException {
+        if (params.length < 1) {
+            throw new ResponseException("Error: Insufficient arguments. Expected <SQUARE>");
+        }
+        chessGame = gamedata.game();
+        ChessGame.TeamColor color = getColor();
+        ChessPosition position = stringToPosition(params[0]);
+        ChessBoard board = chessGame.getBoard();
+        HashSet<ChessMove> moves = (HashSet<ChessMove>) chessGame.validMoves(position);
+        String startColor = SET_BG_COLOR_RED;
+        String moveColor = SET_BG_COLOR_YELLOW;
+        String captureColor = SET_TEXT_COLOR_RED;
+        drawBoard(board, color, border, text, lightSquares, darkSquares, whitePieces, blackPieces, moveColor, startColor, captureColor, moves);
+        return String.format("%s to move\n", chessGame.getTeamTurn().toString());
+    }
+
+    private ChessPosition stringToPosition(String str) throws ResponseException {
+        validateStringLength(str);
+        int col = fileToInt(str.substring(0,1));
+        int row = rankToInt(str.substring(1));
+        return new ChessPosition(row, col);
+    }
+
 
     private String leave() throws ResponseException {
         ws.leave(gamedata.gameID(), username);
@@ -137,19 +159,16 @@ public class GameplayUI implements ServerMessageHandler {
             ChessMove tempMove = stringToChessMove(params[0], params[1]);
             ChessMove move = includePromotion(tempMove);
             ws.makeMove(authToken, gamedata.gameID(), move);
+            return params[0] + " moved to " + params[1];
         }
-        return params[0] + " moved to " + params[1];
+        else {
+            throw new ResponseException("Error: Insufficient arguments. Expected <START_SQUARE> <END_SQUARE>");
+        }
     }
 
     private ChessMove stringToChessMove(String start, String end) throws ResponseException {
-        validateStringLength(start);
-        validateStringLength(end);
-        int startColumn = fileToInt(start.substring(0,1));
-        int startRow = rankToInt(start.substring(1));
-        int endColumn = fileToInt(end.substring(0,1));
-        int endRow = rankToInt(end.substring(1));
-        ChessPosition startPos = new ChessPosition(startRow, startColumn);
-        ChessPosition endPos = new ChessPosition(endRow, endColumn);
+        ChessPosition startPos = stringToPosition(start);
+        ChessPosition endPos = stringToPosition(end);
         return new ChessMove(startPos, endPos, null);
     }
 

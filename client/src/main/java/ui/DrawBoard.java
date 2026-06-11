@@ -75,7 +75,7 @@ public class DrawBoard {
                                  String borderColor, String borderTextColor,
                                  String whiteSquareColor, String blackSquareColor,
                                  String whitePieceColor, String blackPieceColor,
-                                 String moveColor, String startColor,
+                                 String moveColor, String startColor, String captureColor,
                                  HashSet<ChessMove> moves) {
         int[] indexValues = getIndexValues(color);
         int iStart = indexValues[0];
@@ -100,7 +100,7 @@ public class DrawBoard {
                 setSquareColor(whiteSquareColor, blackSquareColor, i, j);
                 setPieceColor(pieceLiteral, whitePieceColor, blackPieceColor);
                 if (possiblePosition.contains(currentPosition)) {
-                    System.out.print(moveColor);
+                    System.out.print(moveColor + captureColor);
                 }
                 if (currentPosition.equals(startPos)) {
                     System.out.print(startColor);
