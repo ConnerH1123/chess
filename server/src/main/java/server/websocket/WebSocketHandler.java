@@ -112,10 +112,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             username = gameService.getUsername(authToken);
         }
         validateUsername(gameID, authToken, username);
-        ChessGame game = getChessGame(gameID, authToken);
-        validateGameState(game);
+        validateGameState(getChessGame(gameID, authToken));
         UpdateRequest updateRequest = new UpdateRequest(authToken, gameID, move, false);
         gameService.update(updateRequest);
+        ChessGame game = getChessGame(gameID, authToken);
         ServerMessage loadGameMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
         connectionManager.broadcast(gameID, null, loadGameMessage);
         String moveMade = moveToString(move);
@@ -181,8 +181,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         if (username == null) {
             username = gameService.getUsername(authToken);
         }
-        ChessGame game = getChessGame(gameID, authToken);
+        GameData gameData = getGameData(gameID, authToken);
+        ChessGame game = gameData.game();
         validateGameState(game);
+        if (!Objects.equals(gameData.whiteUsername(), username) && !Objects.equals(gameData.blackUsername(), username)) {
+            throw new DataAccessException("Error: cannot resign as an observer");
+        }
         UpdateRequest updateRequest = new UpdateRequest(authToken, gameID, null, true);
         gameService.update(updateRequest);
         String msg = username + " has resigned";

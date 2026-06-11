@@ -81,18 +81,20 @@ public class GameService extends Authorizable {
     }
 
     private void validateUsername(GameData gameData, String playerColor, String username) throws DataAccessException {
-        switch (playerColor) {
-            case "WHITE" -> {
-                if (!Objects.equals(gameData.whiteUsername(), username)) {
-                    throw new AlreadyTakenException("Error: user already taken");
+        if (playerColor != null) {
+            switch (playerColor) {
+                case "WHITE" -> {
+                    if (!Objects.equals(gameData.whiteUsername(), username)) {
+                        throw new AlreadyTakenException("Error: user already taken");
+                    }
                 }
-            }
-            case "BLACK" -> {
-                if (!Objects.equals(gameData.blackUsername(), username)) {
-                    throw new AlreadyTakenException("Error: user already taken");
+                case "BLACK" -> {
+                    if (!Objects.equals(gameData.blackUsername(), username)) {
+                        throw new AlreadyTakenException("Error: user already taken");
+                    }
                 }
+                default -> throw new BadRequestException("Error: invalid player color");
             }
-            default -> throw new BadRequestException("Error: invalid player color");
         }
     }
 
@@ -115,7 +117,7 @@ public class GameService extends Authorizable {
     }
 
     public String getUsername(String authToken) throws DataAccessException {
-        AuthData authData = authDAO.getAuth(authToken);
+        AuthData authData = authorize(authToken);
         return authData.username();
     }
 }
