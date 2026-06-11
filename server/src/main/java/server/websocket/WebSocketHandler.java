@@ -108,6 +108,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void move(int gameID, String authToken, String username, ChessMove move, Session session) throws DataAccessException, IOException {
+        if (username == null) {
+            username = gameService.getUsername(authToken);
+        }
         validateUsername(gameID, authToken, username);
         ChessGame game = getChessGame(gameID, authToken);
         validateGameState(game);
@@ -175,6 +178,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void resign(int gameID, String authToken, String username) throws DataAccessException, IOException {
+        if (username == null) {
+            username = gameService.getUsername(authToken);
+        }
         ChessGame game = getChessGame(gameID, authToken);
         validateGameState(game);
         UpdateRequest updateRequest = new UpdateRequest(authToken, gameID, null, true);

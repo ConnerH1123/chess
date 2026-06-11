@@ -113,4 +113,9 @@ public class GameService extends Authorizable {
             default -> throw new BadRequestException("Error: invalid player color");
         }
     }
+
+    public String getUsername(String authToken) throws DataAccessException {
+        AuthData authData = authDAO.getAuth(authToken);
+        return authData.username();
+    }
 }
