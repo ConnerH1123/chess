@@ -38,7 +38,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             switch (command.getCommandType()) {
                 case CONNECT -> connect(command.getGameID(), command.getAuthToken(), command.getUsername(), ctx.session);
                 case LEAVE -> leave(command.getGameID(), command.getUsername(), ctx.session);
-                case MAKE_MOVE -> move(command.getGameID(), command.getAuthToken(), command.getMove());
+                case MAKE_MOVE -> move(command.getGameID(), command.getAuthToken(), command.getMove(), ctx.session);
                 case RESIGN -> resign(command.getGameID(), command.getAuthToken(), command.getUsername(), ctx.session);
             }
         } catch (DataAccessException e) {
@@ -60,18 +60,22 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void connect(int gameID, String authToken, String username, Session session) throws IOException, DataAccessException {
+        ChessGame game = getChessGame(gameID, authToken);
+        connectionManager.add(gameID, session);
+        ServerMessage clientMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+        connectionManager.notifyClient(session, clientMessage);
+        String msg = username + " has joined the game";
+        ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg);
+        connectionManager.broadcast(gameID, session, serverMessage);
+    }
+
+    private ChessGame getChessGame(int gameID, String authToken) throws DataAccessException {
         ListRequest r = new ListRequest(authToken);
         GameData[] games = gameService.list(r).games();
         if (gameID < 1 || gameID > games.length) {
             throw new DataAccessException("Error: invalid game ID");
         }
-        connectionManager.add(gameID, session);
-        ChessGame game = games[gameID-1].game();
-        ServerMessage clientMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, null, game);
-        connectionManager.notifyClient(session, clientMessage);
-        String msg = username + " has joined the game";
-        ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg);
-        connectionManager.broadcast(gameID, session, serverMessage);
+        return games[gameID-1].game();
     }
 
     private void leave(int gameID, String username, Session session) throws IOException {
@@ -81,12 +85,29 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         connectionManager.broadcast(gameID, session, serverMessage);
     }
 
-    private void move(int gameID, String authToken, ChessMove move) throws DataAccessException, IOException {
+    private void move(int gameID, String authToken, ChessMove move, Session session) throws DataAccessException, IOException {
         UpdateRequest updateRequest = new UpdateRequest(authToken, gameID, move, false);
         gameService.update(updateRequest);
-        String msg = moveToString(move);
-        ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, msg, move);
-        connectionManager.broadcast(gameID, null, serverMessage);
+        ChessGame game = getChessGame(gameID, authToken);
+        ServerMessage loadGameMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+        connectionManager.broadcast(gameID, null, loadGameMessage);
+        String moveMade = moveToString(move);
+        ServerMessage moveMadeMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, moveMade);
+        connectionManager.broadcast(gameID, session, moveMadeMessage);
+        switch (game.getGameStatus()) {
+            case CHECKMATE -> {
+                ServerMessage message = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Checkmate!");
+                connectionManager.broadcast(gameID, null, message);
+            }
+            case STALEMATE -> {
+                ServerMessage message = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Stalemate!");
+                connectionManager.broadcast(gameID, null, message);
+            }
+            case CHECK -> {
+                ServerMessage message = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Check!");
+                connectionManager.broadcast(gameID, null, message);
+            }
+        }
     }
 
     private String moveToString(ChessMove move) {

@@ -38,9 +38,9 @@ public class ServerMessage {
         this.game = null;
     }
 
-    public ServerMessage(ServerMessageType type, String message, ChessGame game) {
+    public ServerMessage(ServerMessageType type, ChessGame game) {
         this.serverMessageType = type;
-        this.message = message;
+        this.message = null;
         this.game = game;
         this.move = null;
     }

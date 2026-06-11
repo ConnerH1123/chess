@@ -231,6 +231,10 @@ public class ChessGame {
         }
     }
 
+    public GameStatus getGameStatus() {
+        return gameStatus;
+    }
+
     public String gameStatusToString() {
         return switch (gameStatus) {
             case ONGOING -> String.format("%s to move", teamTurn.toString());
