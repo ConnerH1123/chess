@@ -51,7 +51,7 @@ public class GameService extends Authorizable {
         if (gameData == null) {
             throw new BadRequestException("Error: gameID does not exist");
         }
-        validatePlayerColor(gameData, playerColor, username);
+        validateUsername(gameData, playerColor, username);
         if (playerColor != null) {
             gameDAO.updateGame(gameID, playerColor, null);
         }
@@ -80,15 +80,15 @@ public class GameService extends Authorizable {
         gameDAO.updateGame(gameID, game);
     }
 
-    private void validatePlayerColor(GameData gameData, String playerColor) throws DataAccessException {
+    private void validateUsername(GameData gameData, String playerColor, String username) throws DataAccessException {
         switch (playerColor) {
             case "WHITE" -> {
-                if (gameData.whiteUsername() != null) {
+                if (!Objects.equals(gameData.whiteUsername(), username)) {
                     throw new AlreadyTakenException("Error: user already taken");
                 }
             }
             case "BLACK" -> {
-                if (gameData.blackUsername() != null) {
+                if (!Objects.equals(gameData.blackUsername(), username)) {
                     throw new AlreadyTakenException("Error: user already taken");
                 }
             }
@@ -104,7 +104,7 @@ public class GameService extends Authorizable {
                 }
             }
             case "BLACK" -> {
-                if (!Objects.equals(gameData.blackUsername(), null) &&!Objects.equals(gameData.blackUsername(), username)) {
+                if (!Objects.equals(gameData.blackUsername(), null) && !Objects.equals(gameData.blackUsername(), username)) {
                     throw new AlreadyTakenException("Error: user already taken");
                 }
             }

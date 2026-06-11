@@ -38,7 +38,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         try {
             switch (command.getCommandType()) {
                 case CONNECT -> connect(command.getGameID(), command.getAuthToken(), command.getUsername(), ctx.session);
-                case LEAVE -> leave(command.getGameID(), command.getUsername(), ctx.session);
+                case LEAVE -> leave(command.getGameID(), command.getAuthToken(), command.getUsername(), ctx.session);
                 case MAKE_MOVE -> move(command.getGameID(), command.getAuthToken(), command.getUsername(), command.getMove(), ctx.session);
                 case RESIGN -> resign(command.getGameID(), command.getAuthToken(), command.getUsername());
             }
@@ -84,11 +84,27 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         return games[gameID-1];
     }
 
-    private void leave(int gameID, String username, Session session) throws IOException {
+    private void leave(int gameID, String authToken, String username, Session session) throws IOException, DataAccessException {
+        GameData gameData = getGameData(gameID, authToken);
+        String playerColor = getUserColor(gameData, username);
+        LeaveRequest r = new LeaveRequest(authToken, gameID, playerColor);
+        gameService.leave(r);
         connectionManager.remove(gameID, session);
         String msg = username + " has left the game";
         ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg);
         connectionManager.broadcast(gameID, session, serverMessage);
+    }
+
+    private String getUserColor(GameData gameData, String username) {
+        if (Objects.equals(gameData.whiteUsername(), username)) {
+            return "WHITE";
+        }
+        else if (Objects.equals(gameData.blackUsername(), username)) {
+            return "BLACK";
+        }
+        else {
+            return null;
+        }
     }
 
     private void move(int gameID, String authToken, String username, ChessMove move, Session session) throws DataAccessException, IOException {
