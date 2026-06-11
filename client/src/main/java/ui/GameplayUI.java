@@ -110,6 +110,23 @@ public class GameplayUI implements ServerMessageHandler {
         return String.format("%s to move\n", chessGame.getTeamTurn().toString());
     }
 
+    private String redraw(ChessMove move) {
+        chessGame = gamedata.game();
+        ChessGame.TeamColor color;
+        String moveColor = SET_BG_COLOR_BLUE;
+        if (teamColor == null) {
+            color = WHITE;
+        }
+        else if (teamColor.equals("BLACK")) {
+            color = BLACK;
+        }
+        else {
+            color = WHITE;
+        }
+        drawBoard(chessGame.getBoard(), color, border, text, lightSquares, darkSquares, whitePieces, blackPieces, moveColor, move);
+        return String.format("%s to move\n", chessGame.getTeamTurn().toString());
+    }
+
     private String leave() throws ResponseException {
         ws.leave(gamedata.gameID(), username);
         return "Leaving...";
@@ -227,8 +244,13 @@ public class GameplayUI implements ServerMessageHandler {
                 } catch (ResponseException e) {
                     System.out.println(errorColor + e + defaultColor);
                 }
-                redraw();
-                System.out.println();
+                ChessMove move = serverMessage.getMove();
+                if (move != null) {
+                    System.out.println(redraw(move));
+                }
+                else {
+                    System.out.println(redraw());
+                }
             }
         }
         System.out.print(inputColor + prompt + defaultColor);

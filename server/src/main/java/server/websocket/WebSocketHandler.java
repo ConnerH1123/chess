@@ -75,7 +75,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         UpdateRequest updateRequest = new UpdateRequest(authToken, gameID, move, false);
         gameService.update(updateRequest);
         String msg = moveToString(move);
-        ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, msg);
+        ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, msg, move);
         connectionManager.broadcast(gameID, null, serverMessage);
     }
 
