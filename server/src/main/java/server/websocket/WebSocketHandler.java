@@ -1,12 +1,14 @@
 package server.websocket;
 
+import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
 import dataaccess.*;
 import io.javalin.websocket.*;
+import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
-import request.UpdateRequest;
+import request.*;
 import service.GameService;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
@@ -34,7 +36,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         UserGameCommand command = new Gson().fromJson(ctx.message(), UserGameCommand.class);
         try {
             switch (command.getCommandType()) {
-                case CONNECT -> connect(command.getGameID(), command.getUsername(), ctx.session);
+                case CONNECT -> connect(command.getGameID(), command.getAuthToken(), command.getUsername(), ctx.session);
                 case LEAVE -> leave(command.getGameID(), command.getUsername(), ctx.session);
                 case MAKE_MOVE -> move(command.getGameID(), command.getAuthToken(), command.getMove());
                 case RESIGN -> resign(command.getGameID(), command.getAuthToken(), command.getUsername(), ctx.session);
@@ -57,8 +59,16 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         System.out.println("Websocket closed");
     }
 
-    private void connect(int gameID, String username, Session session) throws IOException {
+    private void connect(int gameID, String authToken, String username, Session session) throws IOException, DataAccessException {
+        ListRequest r = new ListRequest(authToken);
+        GameData[] games = gameService.list(r).games();
+        if (gameID < 1 || gameID > games.length) {
+            throw new DataAccessException("Error: invalid game ID");
+        }
+        ChessGame game = games[gameID-1].game();
         connectionManager.add(gameID, session);
+        ServerMessage clientMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, null, game);
+        connectionManager.notifyClient(gameID, session, clientMessage);
         String msg = username + " has joined the game";
         ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg);
         connectionManager.broadcast(gameID, session, serverMessage);
