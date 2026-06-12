@@ -40,8 +40,8 @@ public class PostLoginUI {
                 result = eval(line);
                 System.out.println(result);
                 if (chessGame != null) {
-                    GameplayUI ui = new GameplayUI(server, chessGame, teamColor);
-                    result = ui.start(authToken);
+                    GameplayUI ui = new GameplayUI(server, authToken, chessGame, teamColor);
+                    result = ui.start();
                 }
             } catch (Exception e) {
                 System.out.println(errorColor + "System error. Error message: " + e.getMessage() + defaultColor);

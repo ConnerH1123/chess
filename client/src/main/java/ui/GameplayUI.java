@@ -40,8 +40,9 @@ public class GameplayUI implements ServerMessageHandler {
     private final String messageColor = SET_TEXT_COLOR_YELLOW;
     private final String defaultColor = RESET_TEXT_COLOR;
 
-    public GameplayUI(ServerFacade server, GameData gameData, String teamColor) {
+    public GameplayUI(ServerFacade server, String authToken, GameData gameData, String teamColor) {
         this.server = server;
+        this.authToken = authToken;
         this.gamedata = gameData;
         this.chessGame = gameData.game();
         this.teamColor = teamColor;
@@ -52,15 +53,14 @@ public class GameplayUI implements ServerMessageHandler {
         };
         try {
             this.ws = new WebSocketFacade(server.getServerUrl(), this);
-            ws.connect(gameData.gameID(), username);
+            ws.connect(authToken, gameData.gameID(), username);
         } catch (ResponseException e) {
             System.out.println(errorColor + "Unable to connect with websocket: " + e + defaultColor);
         }
     }
 
     String prompt = "[GAMEPLAY] >>> ";
-    public String start(String authToken) {
-        this.authToken = authToken;
+    public String start() {
         System.out.println(redraw());
         System.out.println(help());
         Scanner scanner = new Scanner(System.in);
