@@ -63,7 +63,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     private void connect(int gameID, String authToken, String username, Session session) throws IOException, DataAccessException {
         ChessGame game = getChessGame(gameID, authToken);
         connectionManager.add(gameID, session);
-        ServerMessage clientMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+        ServerMessage clientMessage = new ServerMessage(game);
         connectionManager.notifyClient(session, clientMessage);
         String msg = username + " has joined the game";
         ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg);
@@ -119,7 +119,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         UpdateRequest updateRequest = new UpdateRequest(authToken, gameID, move, false);
         gameService.update(updateRequest);
         ChessGame game = getChessGame(gameID, authToken);
-        ServerMessage loadGameMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+        ServerMessage loadGameMessage = new ServerMessage(game, move);
         connectionManager.broadcast(gameID, null, loadGameMessage);
         String moveMade = moveToString(move);
         ServerMessage moveMadeMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, moveMade);

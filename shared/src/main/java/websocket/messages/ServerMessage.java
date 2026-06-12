@@ -14,9 +14,9 @@ import java.util.Objects;
  */
 public class ServerMessage {
     private final ServerMessageType serverMessageType;
-    private final String message;
-    private final ChessMove move;
-    private final ChessGame game;
+    private String message = null;
+    private ChessMove move = null;
+    private ChessGame game = null;
     private String errorMessage = null;
 
     public enum ServerMessageType {
@@ -27,29 +27,23 @@ public class ServerMessage {
 
     public ServerMessage(ServerMessageType type, String message) {
         if (type == ServerMessageType.ERROR) {
-            errorMessage = message;
-            this.message = null;
+            this.errorMessage = message;
         }
         else {
             this.message = message;
         }
         this.serverMessageType = type;
-        this.move = null;
-        this.game = null;
     }
 
-    public ServerMessage(ServerMessageType type, ChessGame game) {
-        this.serverMessageType = type;
-        this.message = null;
+    public ServerMessage(ChessGame game) {
+        this.serverMessageType = ServerMessageType.LOAD_GAME;
         this.game = game;
-        this.move = null;
     }
 
-    public ServerMessage(ServerMessageType type, String message, ChessMove move) {
-        this.serverMessageType = type;
-        this.message = message;
+    public ServerMessage(ChessGame game, ChessMove move) {
+        this.serverMessageType = ServerMessageType.LOAD_GAME;
+        this.game = game;
         this.move = move;
-        this.game = null;
     }
 
 
