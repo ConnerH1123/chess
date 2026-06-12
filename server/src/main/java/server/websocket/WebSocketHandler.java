@@ -129,15 +129,20 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         validateGameState(getChessGame(gameID, authToken));
         UpdateRequest updateRequest = new UpdateRequest(authToken, gameID, move, false);
         gameService.update(updateRequest);
-        ChessGame game = getChessGame(gameID, authToken);
+        GameData gameData = getGameData(gameID, authToken);
+        ChessGame game = gameData.game();
         ServerMessage loadGameMessage = new ServerMessage(game, move);
         connectionManager.broadcast(gameID, null, loadGameMessage);
         String moveMade = moveToString(move, username);
         ServerMessage moveMadeMessage = new ServerMessage(username, ServerMessage.ServerMessageType.NOTIFICATION, moveMade);
         connectionManager.broadcast(gameID, session, moveMadeMessage);
+        String userToPlay = getUsername(gameData, game.getTeamTurn());
+        if (userToPlay == null) {
+            userToPlay = game.getTeamTurn().toString();
+        }
         switch (game.getGameStatus()) {
             case CHECKMATE -> {
-                ServerMessage message = new ServerMessage(username, ServerMessage.ServerMessageType.NOTIFICATION, "Checkmate!");
+                ServerMessage message = new ServerMessage(username, ServerMessage.ServerMessageType.NOTIFICATION, userToPlay + " has been checkmated!");
                 connectionManager.broadcast(gameID, null, message);
             }
             case STALEMATE -> {
@@ -145,10 +150,17 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 connectionManager.broadcast(gameID, null, message);
             }
             case CHECK -> {
-                ServerMessage message = new ServerMessage(username, ServerMessage.ServerMessageType.NOTIFICATION, "Check!");
+                ServerMessage message = new ServerMessage(username, ServerMessage.ServerMessageType.NOTIFICATION, userToPlay + " is in check!");
                 connectionManager.broadcast(gameID, null, message);
             }
         }
+    }
+
+    private String getUsername(GameData gameData, ChessGame.TeamColor color) {
+        return switch (color) {
+            case WHITE -> gameData.whiteUsername();
+            case BLACK -> gameData.blackUsername();
+        };
     }
 
     private void validateUsername(int gameID, String authToken, String username) throws DataAccessException {

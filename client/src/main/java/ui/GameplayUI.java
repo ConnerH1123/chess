@@ -239,7 +239,17 @@ public class GameplayUI implements ServerMessageHandler {
     }
 
     private String help() {
-        return outputColor + """
+        if (teamColor == null) {
+            return outputColor + """
+                These are your options:
+                  redraw - the board
+                  highlight <SQUARE> - a piece's legal moves
+                  leave - the game
+                  quit - playing chess
+                  help - with possible commands
+                """ + defaultColor;
+        }
+        return  outputColor + """
                 These are your options:
                   redraw - the board
                   highlight <SQUARE> - a piece's legal moves
