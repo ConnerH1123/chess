@@ -26,12 +26,12 @@ public class UserGameCommand {
         this.username = username;
     }
 
-    public UserGameCommand(CommandType commandType, String authToken, Integer gameID, ChessMove move) {
+    public UserGameCommand(CommandType commandType, String authToken, Integer gameID, String username, ChessMove move) {
         this.commandType = commandType;
         this.authToken = authToken;
         this.gameID = gameID;
         this.move = move;
-        this.username = null;
+        this.username = username;
     }
 
 

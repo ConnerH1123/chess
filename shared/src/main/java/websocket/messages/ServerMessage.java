@@ -61,6 +61,10 @@ public class ServerMessage {
         return this.message;
     }
 
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
     public ChessMove getMove() {
         return move;
     }

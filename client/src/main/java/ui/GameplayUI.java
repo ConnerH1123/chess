@@ -86,7 +86,7 @@ public class GameplayUI implements ServerMessageHandler {
                 case "resign" -> resign();
                 case "leave" -> leave();
                 case "quit" -> {
-                    ws.leave(gamedata.gameID(), username);
+                    ws.leave(authToken, gamedata.gameID(), username);
                     yield "Exiting...";
                 }
                 case "help" -> help();
@@ -153,7 +153,7 @@ public class GameplayUI implements ServerMessageHandler {
 
 
     private String leave() throws ResponseException {
-        ws.leave(gamedata.gameID(), username);
+        ws.leave(authToken, gamedata.gameID(), username);
         return "Leaving...";
     }
 
@@ -161,10 +161,7 @@ public class GameplayUI implements ServerMessageHandler {
         if (params.length >= 2) {
             ChessMove tempMove = stringToChessMove(params[0], params[1]);
             ChessMove move = includePromotion(tempMove);
-            if (chessGame.getBoard().getPiece(move.getStartPosition()).getTeamColor() != getColor()) {
-                throw new ResponseException("Error: move can't be made for opponent");
-            }
-            ws.makeMove(authToken, gamedata.gameID(), move);
+            ws.makeMove(authToken, gamedata.gameID(), username, move);
             return "Moving piece...";
         }
         else {
@@ -243,7 +240,7 @@ public class GameplayUI implements ServerMessageHandler {
 
     private String resign() throws ResponseException {
         ws.resign(authToken, gamedata.gameID(), username);
-        return "Resigned";
+        return "Resigning...";
     }
 
     private String help() {
@@ -264,11 +261,9 @@ public class GameplayUI implements ServerMessageHandler {
         System.out.print("\033[2K\r");
         System.out.flush();
         switch (serverMessage.getServerMessageType()) {
-            // DEBUG: When someone joins the game for the first time, their username pops up as null
             case NOTIFICATION -> System.out.println(messageColor + serverMessage.getMessage() + defaultColor);
-            case ERROR -> System.out.println(errorColor + serverMessage.getMessage() + defaultColor);
+            case ERROR -> System.out.println(errorColor + serverMessage.getErrorMessage() + defaultColor);
             case LOAD_GAME -> {
-                System.out.println(messageColor + serverMessage.getMessage() + defaultColor);
                 try {
                     gamedata = server.listGames()[gamedata.gameID()-1];
                 } catch (ResponseException e) {
