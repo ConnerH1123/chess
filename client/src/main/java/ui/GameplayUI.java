@@ -60,7 +60,7 @@ public class GameplayUI implements ServerMessageHandler {
         System.out.println(help());
         Scanner scanner = new Scanner(System.in);
         String result = "";
-        while (!result.equals("Exiting...") && !result.equals("Leaving...") && (ws != null)) {
+        while (!result.equals("Exiting...") && !result.equals("Leaving...\n") && (ws != null)) {
             System.out.print(inputColor + prompt + defaultColor);
             String line = scanner.nextLine();
             result = eval(line);
@@ -149,7 +149,7 @@ public class GameplayUI implements ServerMessageHandler {
 
     private String leave() throws ResponseException {
         ws.leave(authToken, gamedata.gameID(), username);
-        return "Leaving...";
+        return "Leaving...\n";
     }
 
     private String move(String... params) throws ResponseException {
@@ -234,8 +234,23 @@ public class GameplayUI implements ServerMessageHandler {
     }
 
     private String resign() throws ResponseException {
-        ws.resign(authToken, gamedata.gameID(), username);
-        return "Resigning...";
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.print(inputColor + "Are you sure you want to resign?: [Y]es or [N]o >>> " + defaultColor);
+            String line = scanner.nextLine();
+            String[] tokens = line.toLowerCase().split(" ");
+            String piece = (tokens.length > 0) ? tokens[0] : "";
+            switch (piece) {
+                case "y" -> {
+                    ws.resign(authToken, gamedata.gameID(), username);
+                    return "Resigning...";
+                }
+                case "n" -> {
+                    return "Resuming game...";
+                }
+            }
+            System.out.println(errorColor + "Error: unrecognized choice" + defaultColor);
+        }
     }
 
     private String help() {
