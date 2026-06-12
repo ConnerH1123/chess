@@ -245,6 +245,13 @@ public class ChessGame {
         };
     }
 
+    public String gameStatusToStringSimple() {
+        return switch (gameStatus) {
+            case ONGOING, CHECK -> String.format("%s to move", teamTurn.toString());
+            case RESIGNED, CHECKMATE, STALEMATE -> "Game over";
+        };
+    }
+
     private void updateGameStatus() {
         if (isInCheckmate(teamTurn)) {
             gameStatus = GameStatus.CHECKMATE;
@@ -254,6 +261,9 @@ public class ChessGame {
         }
         else if (isInCheck(teamTurn)) {
             gameStatus = GameStatus.CHECK;
+        }
+        else {
+            gameStatus = GameStatus.ONGOING;
         }
     }
 

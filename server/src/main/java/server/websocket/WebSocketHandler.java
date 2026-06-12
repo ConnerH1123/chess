@@ -124,7 +124,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         ChessGame game = getChessGame(gameID, authToken);
         ServerMessage loadGameMessage = new ServerMessage(game, move);
         connectionManager.broadcast(gameID, null, loadGameMessage);
-        String moveMade = moveToString(move);
+        String moveMade = moveToString(move, username);
         ServerMessage moveMadeMessage = new ServerMessage(username, ServerMessage.ServerMessageType.NOTIFICATION, moveMade);
         connectionManager.broadcast(gameID, session, moveMadeMessage);
         switch (game.getGameStatus()) {
@@ -168,7 +168,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    private String moveToString(ChessMove move) {
+    private String moveToString(ChessMove move, String username) {
         String[] rank = {"1", "2", "3", "4", "5", "6", "7", "8"};
         String[] file = {"a", "b", "c", "d", "e", "f", "g", "h"};
 
@@ -180,7 +180,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         String endFile = file[move.getEndPosition().getColumn()-1];
         String end = endFile + endRank;
 
-        return start + " " + end;
+        return String.format("%s moved %s to %s", username, start, end);
     }
 
     private void resign(int gameID, String authToken, String username) throws DataAccessException, IOException {

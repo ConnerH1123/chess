@@ -61,7 +61,6 @@ public class GameplayUI implements ServerMessageHandler {
 
     String prompt = "[GAMEPLAY] >>> ";
     public String start() {
-        System.out.println(redraw());
         System.out.println(help());
         Scanner scanner = new Scanner(System.in);
         String result = "";
@@ -86,7 +85,7 @@ public class GameplayUI implements ServerMessageHandler {
                 case "resign" -> resign();
                 case "leave" -> leave();
                 case "quit" -> {
-                    ws.leave(authToken, gamedata.gameID(), username);
+                    leave();
                     yield "Exiting...";
                 }
                 case "help" -> help();
@@ -96,7 +95,7 @@ public class GameplayUI implements ServerMessageHandler {
                 }
             };
         } catch (ResponseException e) {
-            return errorColor + e.getMessage() + "\n" + defaultColor;
+            return errorColor + e.getMessage() + defaultColor;
         }
     }
 
@@ -104,7 +103,7 @@ public class GameplayUI implements ServerMessageHandler {
         chessGame = gamedata.game();
         ChessGame.TeamColor color = getColor();
         drawBoard(chessGame.getBoard(), color, border, text, lightSquares, darkSquares, whitePieces, blackPieces);
-        return chessGame.gameStatusToString() + "\n";
+        return chessGame.gameStatusToString();
     }
 
     private String redraw(ChessMove move) {
@@ -112,7 +111,7 @@ public class GameplayUI implements ServerMessageHandler {
         ChessGame.TeamColor color = getColor();
         String moveColor = SET_BG_COLOR_BLUE;
         drawBoard(chessGame.getBoard(), color, border, text, lightSquares, darkSquares, whitePieces, blackPieces, moveColor, move);
-        return "";
+        return chessGame.gameStatusToStringSimple();
     }
 
     private ChessGame.TeamColor getColor() {
@@ -141,7 +140,7 @@ public class GameplayUI implements ServerMessageHandler {
         String moveColor = SET_BG_COLOR_YELLOW;
         String captureColor = SET_TEXT_COLOR_RED;
         drawBoard(board, color, border, text, lightSquares, darkSquares, whitePieces, blackPieces, moveColor, startColor, captureColor, moves);
-        return chessGame.gameStatusToString() + "\n";
+        return chessGame.gameStatusToString();
     }
 
     private ChessPosition stringToPosition(String str) throws ResponseException {
