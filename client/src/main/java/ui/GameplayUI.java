@@ -81,7 +81,7 @@ public class GameplayUI implements ServerMessageHandler {
                 case "resign" -> resign();
                 case "leave" -> leave();
                 case "quit" -> {
-                    leave();
+                    String temp = leave();
                     yield "Exiting...";
                 }
                 case "help" -> help();
