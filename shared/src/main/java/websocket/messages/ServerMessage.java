@@ -18,6 +18,7 @@ public class ServerMessage {
     private ChessMove move = null;
     private ChessGame game = null;
     private String errorMessage = null;
+    private String username = null;
 
     public enum ServerMessageType {
         LOAD_GAME,
@@ -25,7 +26,8 @@ public class ServerMessage {
         NOTIFICATION
     }
 
-    public ServerMessage(ServerMessageType type, String message) {
+    public ServerMessage(String username, ServerMessageType type, String message) {
+        this.username = username;
         if (type == ServerMessageType.ERROR) {
             this.errorMessage = message;
         }
@@ -59,9 +61,13 @@ public class ServerMessage {
         return errorMessage;
     }
 
+    public ChessGame getGame() {return game;}
+
     public ChessMove getMove() {
         return move;
     }
+
+    public String getUsername() {return username;}
 
     public String toString() {
         return new Gson().toJson(this);

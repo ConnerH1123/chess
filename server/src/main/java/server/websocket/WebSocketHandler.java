@@ -45,7 +45,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         } catch (DataAccessException e) {
             try {
                 String msg = e.getMessage();
-                ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, msg);
+                ServerMessage serverMessage = new ServerMessage(null, ServerMessage.ServerMessageType.ERROR, msg);
                 connectionManager.notifyClient(ctx.session, serverMessage);
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -66,7 +66,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         ServerMessage clientMessage = new ServerMessage(game);
         connectionManager.notifyClient(session, clientMessage);
         String msg = username + " has joined the game";
-        ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg);
+        ServerMessage serverMessage = new ServerMessage(username, ServerMessage.ServerMessageType.NOTIFICATION, msg);
         connectionManager.broadcast(gameID, session, serverMessage);
     }
 
@@ -94,7 +94,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         gameService.leave(r);
         connectionManager.remove(gameID, session);
         String msg = username + " has left the game";
-        ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg);
+        ServerMessage serverMessage = new ServerMessage(username, ServerMessage.ServerMessageType.NOTIFICATION, msg);
         connectionManager.broadcast(gameID, session, serverMessage);
     }
 
@@ -122,19 +122,19 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         ServerMessage loadGameMessage = new ServerMessage(game, move);
         connectionManager.broadcast(gameID, null, loadGameMessage);
         String moveMade = moveToString(move);
-        ServerMessage moveMadeMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, moveMade);
+        ServerMessage moveMadeMessage = new ServerMessage(username, ServerMessage.ServerMessageType.NOTIFICATION, moveMade);
         connectionManager.broadcast(gameID, session, moveMadeMessage);
         switch (game.getGameStatus()) {
             case CHECKMATE -> {
-                ServerMessage message = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Checkmate!");
+                ServerMessage message = new ServerMessage(username, ServerMessage.ServerMessageType.NOTIFICATION, "Checkmate!");
                 connectionManager.broadcast(gameID, null, message);
             }
             case STALEMATE -> {
-                ServerMessage message = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Stalemate!");
+                ServerMessage message = new ServerMessage(username, ServerMessage.ServerMessageType.NOTIFICATION, "Stalemate!");
                 connectionManager.broadcast(gameID, null, message);
             }
             case CHECK -> {
-                ServerMessage message = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Check!");
+                ServerMessage message = new ServerMessage(username, ServerMessage.ServerMessageType.NOTIFICATION, "Check!");
                 connectionManager.broadcast(gameID, null, message);
             }
         }
@@ -193,7 +193,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         UpdateRequest updateRequest = new UpdateRequest(authToken, gameID, null, true);
         gameService.update(updateRequest);
         String msg = username + " has resigned";
-        ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg);
+        ServerMessage serverMessage = new ServerMessage(username, ServerMessage.ServerMessageType.NOTIFICATION, msg);
         connectionManager.broadcast(gameID, null, serverMessage);
     }
 }
