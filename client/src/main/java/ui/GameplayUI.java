@@ -112,7 +112,7 @@ public class GameplayUI implements ServerMessageHandler {
         ChessGame.TeamColor color = getColor();
         String moveColor = SET_BG_COLOR_BLUE;
         drawBoard(chessGame.getBoard(), color, border, text, lightSquares, darkSquares, whitePieces, blackPieces, moveColor, move);
-        return chessGame.gameStatusToString() + "\n";
+        return "";
     }
 
     private ChessGame.TeamColor getColor() {

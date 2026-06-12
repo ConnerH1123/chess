@@ -61,6 +61,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void connect(int gameID, String authToken, String username, Session session) throws IOException, DataAccessException {
+        if (username == null) {
+            username = gameService.getUsername(authToken);
+        }
         ChessGame game = getChessGame(gameID, authToken);
         connectionManager.add(gameID, session);
         ServerMessage clientMessage = new ServerMessage(game);
