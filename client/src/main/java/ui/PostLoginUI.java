@@ -27,7 +27,7 @@ public class PostLoginUI {
         this.server = server;
     }
 
-    public String start(String authToken) {
+    public String start(String authToken, String username) {
         System.out.println(help());
         Scanner scanner = new Scanner(System.in);
         String result = "";
@@ -40,7 +40,7 @@ public class PostLoginUI {
                 result = eval(line);
                 System.out.println(result);
                 if (chessGame != null) {
-                    GameplayUI ui = new GameplayUI(server, authToken, chessGame, teamColor);
+                    GameplayUI ui = new GameplayUI(server, authToken, username, chessGame, teamColor);
                     result = ui.start();
                 }
             } catch (Exception e) {

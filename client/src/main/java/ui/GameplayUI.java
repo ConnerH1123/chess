@@ -40,17 +40,13 @@ public class GameplayUI implements ServerMessageHandler {
     private final String messageColor = SET_TEXT_COLOR_YELLOW;
     private final String defaultColor = RESET_TEXT_COLOR;
 
-    public GameplayUI(ServerFacade server, String authToken, GameData gameData, String teamColor) {
+    public GameplayUI(ServerFacade server, String authToken, String username, GameData gameData, String teamColor) {
         this.server = server;
         this.authToken = authToken;
         this.gamedata = gameData;
         this.chessGame = gameData.game();
         this.teamColor = teamColor;
-        username = switch (teamColor) {
-            case "WHITE" -> gameData.whiteUsername();
-            case "BLACK" -> gameData.blackUsername();
-            default -> null;
-        };
+        this.username = username;
         try {
             this.ws = new WebSocketFacade(server.getServerUrl(), this);
             ws.connect(authToken, gameData.gameID(), username);

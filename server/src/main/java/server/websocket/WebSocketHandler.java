@@ -64,11 +64,19 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         if (username == null) {
             username = gameService.getUsername(authToken);
         }
-        ChessGame game = getChessGame(gameID, authToken);
+        GameData gameData = getGameData(gameID, authToken);
+        ChessGame game = gameData.game();
         connectionManager.add(gameID, session);
         ServerMessage clientMessage = new ServerMessage(game);
         connectionManager.notifyClient(session, clientMessage);
-        String msg = username + " has joined the game";
+        String playerColor = getUserColor(gameData, username);
+        String msg;
+        if (playerColor == null) {
+            msg = username + " has joined the game as observer";
+        }
+        else {
+            msg = username + " has joined the game as " + playerColor;
+        }
         ServerMessage serverMessage = new ServerMessage(username, ServerMessage.ServerMessageType.NOTIFICATION, msg);
         connectionManager.broadcast(gameID, session, serverMessage);
     }

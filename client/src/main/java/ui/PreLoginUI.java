@@ -13,6 +13,7 @@ public class PreLoginUI {
     private final ServerFacade server;
     private boolean isLoggedIn = false;
     private String authToken = null;
+    private String username = null;
 
     private final String inputColor = SET_TEXT_COLOR_BLUE;
     private final String outputColor = RESET_TEXT_COLOR;
@@ -37,7 +38,7 @@ public class PreLoginUI {
                 System.out.println(result);
                 if (isLoggedIn) {
                     PostLoginUI ui = new PostLoginUI(server);
-                    result = ui.start(authToken);
+                    result = ui.start(authToken, username);
                     System.out.println(outputColor + "Successfully logged out" + defaultColor);
                 }
             } catch (Exception e) {
@@ -69,6 +70,7 @@ public class PreLoginUI {
     private String register(String... params) throws ResponseException {
         if (params.length >= 3) {
             String username = params[0];
+            this.username = username;
             String password = params[1];
             String email = params[2];
             RegisterRequest request = new RegisterRequest(username, password, email);
@@ -82,6 +84,7 @@ public class PreLoginUI {
     private String login(String... params) throws ResponseException {
         if (params.length >= 2) {
             String username = params[0];
+            this.username = username;
             String password = params[1];
             LoginRequest request = new LoginRequest(username, password);
             authToken = server.login(request);
