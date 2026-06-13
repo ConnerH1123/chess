@@ -80,10 +80,7 @@ public class GameplayUI implements ServerMessageHandler {
                 case "move" -> move(params);
                 case "resign" -> resign();
                 case "leave" -> leave();
-                case "quit" -> {
-                    String temp = leave();
-                    yield "Exiting...";
-                }
+                case "quit" -> leave();
                 case "help" -> help();
                 default -> {
                     System.out.print("'" + cmd + "' was not a recognized command. ");
